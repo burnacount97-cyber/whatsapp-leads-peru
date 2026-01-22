@@ -23,7 +23,21 @@ import {
   TrendingUp,
   AlertCircle,
   Shield,
+  Plus,
+  Pencil,
+  Copy,
+  ExternalLink,
 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 import type { Tables } from '@/integrations/supabase/types';
 
 type Profile = Tables<'profiles'>;
@@ -44,6 +58,11 @@ export default function SuperAdmin() {
   const [searchQuery, setSearchQuery] = useState('');
   const [updatingClient, setUpdatingClient] = useState<string | null>(null);
   const [verifyingPayment, setVerifyingPayment] = useState<string | null>(null);
+
+  // New States for Management
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [editingClient, setEditingClient] = useState<Profile | null>(null);
+  const [editForm, setEditForm] = useState({ business_name: '', phone: '', email: '' });
 
   // Stats
   const [stats, setStats] = useState({
@@ -149,7 +168,7 @@ export default function SuperAdmin() {
 
       if (error) throw error;
 
-      setClients(clients.map(c => 
+      setClients(clients.map(c =>
         c.id === clientId ? { ...c, status: newStatus } : c
       ));
 
@@ -172,10 +191,10 @@ export default function SuperAdmin() {
     setVerifyingPayment(paymentId);
     try {
       const payment = payments.find(p => p.id === paymentId);
-      
+
       const { error } = await supabase
         .from('payments')
-        .update({ 
+        .update({
           status,
           verified_at: new Date().toISOString(),
           verified_by: user?.id,
@@ -192,7 +211,7 @@ export default function SuperAdmin() {
           .eq('id', payment.user_id);
       }
 
-      setPayments(payments.map(p => 
+      setPayments(payments.map(p =>
         p.id === paymentId ? { ...p, status } : p
       ));
 
@@ -213,7 +232,60 @@ export default function SuperAdmin() {
     }
   };
 
-  const filteredClients = clients.filter(client => 
+  const handleEditClick = (client: Profile) => {
+    setEditingClient(client);
+    setEditForm({
+      business_name: client.business_name || '',
+      phone: client.whatsapp_number || '',
+      email: client.email || ''
+    });
+  };
+
+  const handleUpdateProfile = async () => {
+    if (!editingClient) return;
+
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          business_name: editForm.business_name,
+          whatsapp_number: editForm.phone
+        })
+        .eq('id', editingClient.id);
+
+      if (error) throw error;
+
+      setClients(clients.map(c =>
+        c.id === editingClient.id
+          ? { ...c, business_name: editForm.business_name, whatsapp_number: editForm.phone }
+          : c
+      ));
+
+      toast({ title: 'Cliente actualizado correctamente' });
+      setEditingClient(null);
+    } catch (error: any) {
+      toast({
+        title: 'Error al actualizar',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const copyInviteLink = () => {
+    const link = `${window.location.origin}/register`;
+    navigator.clipboard.writeText(link);
+    toast({
+      title: "Link copiado",
+      description: "Envía este link al cliente para que se registre",
+    });
+    setIsCreateOpen(false);
+  };
+
+  const filteredClients = clients.filter(client =>
     client.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     client.business_name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -333,14 +405,19 @@ export default function SuperAdmin() {
                     <CardTitle>Gestión de Clientes</CardTitle>
                     <CardDescription>{clients.length} clientes registrados</CardDescription>
                   </div>
-                  <div className="relative w-full md:w-64">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Buscar por email o empresa..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10"
-                    />
+                  <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+                    <div className="relative w-full md:w-64">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                      <Input
+                        placeholder="Buscar por email o empresa..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                    <Button onClick={() => setIsCreateOpen(true)} className="gap-2">
+                      <Plus className="w-4 h-4" /> Nuevo Cliente
+                    </Button>
                   </div>
                 </div>
               </CardHeader>
@@ -372,12 +449,19 @@ export default function SuperAdmin() {
                             <span className="font-semibold">{client.leads_count}</span>
                           </td>
                           <td className="py-3 px-4 text-sm text-muted-foreground">
-                            {client.trial_ends_at 
+                            {client.trial_ends_at
                               ? new Date(client.trial_ends_at).toLocaleDateString('es-PE')
                               : '-'}
                           </td>
                           <td className="py-3 px-4">
                             <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleEditClick(client)}
+                              >
+                                <Pencil className="w-4 h-4 text-muted-foreground" />
+                              </Button>
                               {client.status !== 'active' && (
                                 <Button
                                   size="sm"
@@ -576,8 +660,8 @@ export default function SuperAdmin() {
                     <div className="p-4 bg-muted/50 rounded-xl">
                       <p className="text-sm text-muted-foreground">Pagos este mes</p>
                       <p className="text-xl font-bold">
-                        {payments.filter(p => 
-                          p.status === 'verified' && 
+                        {payments.filter(p =>
+                          p.status === 'verified' &&
                           new Date(p.created_at).getMonth() === new Date().getMonth()
                         ).length}
                       </p>
@@ -586,8 +670,8 @@ export default function SuperAdmin() {
                       <p className="text-sm text-muted-foreground">Ingresos mes</p>
                       <p className="text-xl font-bold">
                         S/{payments
-                          .filter(p => 
-                            p.status === 'verified' && 
+                          .filter(p =>
+                            p.status === 'verified' &&
                             new Date(p.created_at).getMonth() === new Date().getMonth()
                           )
                           .reduce((sum, p) => sum + Number(p.amount), 0)}
@@ -599,6 +683,92 @@ export default function SuperAdmin() {
             </div>
           </TabsContent>
         </Tabs>
+
+        {/* Create Client Dialog */}
+        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Registrar Nuevo Cliente</DialogTitle>
+              <DialogDescription>
+                Opciones para dar de alta un nuevo usuario en la plataforma.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="p-4 bg-muted rounded-xl space-y-3">
+                <h4 className="font-medium text-sm">Opción 1: Enviar Invitación (Recomendado)</h4>
+                <p className="text-xs text-muted-foreground">
+                  Copia el link de registro y envíalo al cliente. Ellos configurarán su propia contraseña.
+                </p>
+                <div className="flex gap-2">
+                  <Input value={`${window.location.origin}/register`} readOnly />
+                  <Button variant="secondary" onClick={copyInviteLink}>
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">O</span>
+                </div>
+              </div>
+
+              <div className="p-4 border rounded-xl space-y-3">
+                <h4 className="font-medium text-sm">Opción 2: Registro Manual</h4>
+                <p className="text-xs text-muted-foreground">
+                  Cerrarás tu sesión actual para registrar al cliente. Necesitarás volver a entrar como Admin.
+                </p>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    signOut();
+                    navigate('/register');
+                  }}
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Cerrar Sesión y Registrar
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Client Dialog */}
+        <Dialog open={!!editingClient} onOpenChange={(open) => !open && setEditingClient(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Editar Cliente</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label>Email (No editable)</Label>
+                <Input value={editForm.email} disabled />
+              </div>
+              <div className="space-y-2">
+                <Label>Nombre de Empresa / Usuario</Label>
+                <Input
+                  value={editForm.business_name}
+                  onChange={(e) => setEditForm({ ...editForm, business_name: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Teléfono</Label>
+                <Input
+                  value={editForm.phone}
+                  onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditingClient(null)}>Cancelar</Button>
+              <Button onClick={handleUpdateProfile}>Guardar Cambios</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

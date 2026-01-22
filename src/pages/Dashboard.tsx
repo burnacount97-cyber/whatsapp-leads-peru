@@ -41,6 +41,7 @@ const templates = [
   { value: 'clinica', label: 'Clínica', question: '¿Qué especialidad necesitas?' },
   { value: 'taller', label: 'Taller', question: '¿Qué vehículo y qué problema tienes?' },
   { value: 'delivery', label: 'Delivery', question: '¿Cuál es tu dirección de entrega?' },
+  { value: 'personalizado', label: 'Personalizado', question: '¿Qué te interesa?' },
 ];
 
 export default function Dashboard() {
@@ -60,10 +61,15 @@ export default function Dashboard() {
   const [formConfig, setFormConfig] = useState({
     template: 'general',
     primary_color: '#00C185',
+    business_name: 'LeadWidget',
     welcome_message: '¡Hola! ¿En qué podemos ayudarte?',
     whatsapp_destination: '',
     niche_question: '¿En qué distrito te encuentras?',
     trigger_delay: 15,
+    // Campos exclusivos para modo personalizado
+    custom_placeholder: 'Tu respuesta',
+    custom_button_text: 'Continuar',
+    custom_confirmation_message: '¡Listo! Te pasamos al WhatsApp del equipo',
   });
 
   useEffect(() => {
@@ -76,7 +82,7 @@ export default function Dashboard() {
 
   const loadData = async () => {
     if (!user) return;
-    
+
     try {
       // Load profile
       const { data: profileData } = await supabase
@@ -84,7 +90,7 @@ export default function Dashboard() {
         .select('*')
         .eq('id', user.id)
         .maybeSingle();
-      
+
       setProfile(profileData);
 
       // Load widget config
@@ -93,16 +99,20 @@ export default function Dashboard() {
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
-      
+
       if (configData) {
         setWidgetConfig(configData);
         setFormConfig({
           template: configData.template || 'general',
           primary_color: configData.primary_color || '#00C185',
+          business_name: profile?.business_name || 'LeadWidget',
           welcome_message: configData.welcome_message || '¡Hola! ¿En qué podemos ayudarte?',
           whatsapp_destination: configData.whatsapp_destination || '',
           niche_question: configData.niche_question || '¿En qué distrito te encuentras?',
           trigger_delay: configData.trigger_delay || 15,
+          custom_placeholder: 'Tu respuesta',
+          custom_button_text: 'Continuar',
+          custom_confirmation_message: '¡Listo! Te pasamos al WhatsApp del equipo',
         });
       }
 
@@ -113,7 +123,7 @@ export default function Dashboard() {
         .eq('client_id', user.id)
         .order('created_at', { ascending: false })
         .limit(100);
-      
+
       setLeads(leadsData || []);
 
       // Load payments
@@ -122,7 +132,7 @@ export default function Dashboard() {
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
-      
+
       setPayments(paymentsData || []);
 
     } catch (error) {
@@ -134,10 +144,10 @@ export default function Dashboard() {
 
   const saveWidgetConfig = async () => {
     if (!user || !widgetConfig) return;
-    
+
     setSaving(true);
     try {
-      const { error } = await supabase
+      const { error: configError } = await supabase
         .from('widget_configs')
         .update({
           template: formConfig.template,
@@ -149,7 +159,17 @@ export default function Dashboard() {
         })
         .eq('id', widgetConfig.id);
 
-      if (error) throw error;
+      if (configError) throw configError;
+
+      // Update business name in profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          business_name: formConfig.business_name
+        })
+        .eq('id', user.id);
+
+      if (profileError) throw profileError;
 
       toast({
         title: '¡Guardado!',
@@ -301,6 +321,27 @@ export default function Dashboard() {
                         ))}
                       </SelectContent>
                     </Select>
+                    {formConfig.template === 'personalizado' && (
+                      <div className="mt-3 p-3 bg-primary/10 border border-primary/20 rounded-lg">
+                        <p className="text-sm text-primary font-medium flex items-center gap-2">
+                          <Target className="w-4 h-4" />
+                          Modo Personalizado Activado
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Ahora puedes editar libremente todos los campos para adaptar el widget a tu negocio específico.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Nombre de tu negocio</Label>
+                    <Input
+                      value={formConfig.business_name}
+                      onChange={(e) => setFormConfig({ ...formConfig, business_name: e.target.value })}
+                      placeholder="Ej: Mi Empresa, Clínica San Juan, Taller Express"
+                    />
+                    <p className="text-xs text-muted-foreground">Este nombre aparecerá en el encabezado del widget</p>
                   </div>
 
                   <div className="space-y-2">
@@ -335,6 +376,41 @@ export default function Dashboard() {
                       onChange={(e) => setFormConfig({ ...formConfig, niche_question: e.target.value })}
                     />
                   </div>
+
+                  {/* Campos exclusivos para modo personalizado */}
+                  {formConfig.template === 'personalizado' && (
+                    <>
+                      <div className="space-y-2">
+                        <Label>Placeholder del campo de respuesta</Label>
+                        <Input
+                          value={formConfig.custom_placeholder}
+                          onChange={(e) => setFormConfig({ ...formConfig, custom_placeholder: e.target.value })}
+                          placeholder="Ej: Escribe tu respuesta aquí"
+                        />
+                        <p className="text-xs text-muted-foreground">Texto que aparece dentro del campo antes de que el usuario escriba</p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Texto del botón principal</Label>
+                        <Input
+                          value={formConfig.custom_button_text}
+                          onChange={(e) => setFormConfig({ ...formConfig, custom_button_text: e.target.value })}
+                          placeholder="Ej: Enviar, Continuar, Siguiente"
+                        />
+                        <p className="text-xs text-muted-foreground">Texto que aparece en el botón de avanzar</p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Mensaje de confirmación final</Label>
+                        <Input
+                          value={formConfig.custom_confirmation_message}
+                          onChange={(e) => setFormConfig({ ...formConfig, custom_confirmation_message: e.target.value })}
+                          placeholder="Ej: ¡Gracias! Nos contactaremos pronto"
+                        />
+                        <p className="text-xs text-muted-foreground">Mensaje que se muestra antes de redirigir a WhatsApp</p>
+                      </div>
+                    </>
+                  )}
 
                   <div className="space-y-2">
                     <Label>WhatsApp destino (+51...)</Label>
@@ -383,6 +459,10 @@ export default function Dashboard() {
                           welcomeMessage={formConfig.welcome_message}
                           nicheQuestion={formConfig.niche_question}
                           template={formConfig.template}
+                          businessName={formConfig.business_name}
+                          customPlaceholder={formConfig.custom_placeholder}
+                          customButtonText={formConfig.custom_button_text}
+                          customConfirmationMessage={formConfig.custom_confirmation_message}
                         />
                       </div>
                     </div>
@@ -444,7 +524,7 @@ export default function Dashboard() {
                           <tr key={lead.id} className="border-b hover:bg-muted/50">
                             <td className="py-3 px-4">{lead.name}</td>
                             <td className="py-3 px-4">
-                              <a 
+                              <a
                                 href={`https://wa.me/${lead.phone.replace(/\D/g, '')}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
