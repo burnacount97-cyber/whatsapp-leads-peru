@@ -114,7 +114,7 @@ export default function SuperAdmin() {
       const activeCount = clientsWithLeads.filter(c => c.status === 'active').length;
       const trialCount = clientsWithLeads.filter(c => c.status === 'trial').length;
       const suspendedCount = clientsWithLeads.filter(c => c.status === 'suspended').length;
-      const totalLeads = Object.values(leadsCounts).reduce((a, b) => a + b, 0);
+      const totalLeadsCount = Object.values(leadsCounts).reduce((a: number, b: number) => a + b, 0);
       const pendingPayments = (paymentsData || []).filter(p => p.status === 'pending').length;
 
       setStats({
@@ -122,7 +122,7 @@ export default function SuperAdmin() {
         activeClients: activeCount,
         trialClients: trialCount,
         suspendedClients: suspendedCount,
-        totalLeads,
+        totalLeads: totalLeadsCount as number,
         pendingPayments,
         mrr: activeCount * 30,
       });
