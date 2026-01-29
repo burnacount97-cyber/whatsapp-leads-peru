@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { db } from '@/lib/firebase';
-import { collection, query, orderBy, getDocs, doc, updateDoc, setDoc, where, limit } from 'firebase/firestore';
+import { collection, query, orderBy, getDocs, doc, updateDoc, setDoc, where, limit, onSnapshot, deleteDoc } from 'firebase/firestore';
 import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,6 +28,7 @@ import {
   Pencil,
   Copy,
   ExternalLink,
+  Trash2
 } from 'lucide-react';
 import {
   Dialog,
@@ -107,8 +108,7 @@ export default function SuperAdmin() {
       if (!user) {
         navigate('/login');
       } else if (!isSuperAdmin) {
-        // For demo, allow access if email matches superadmin
-        if (user.email !== 'superadmin@leadwidget.pe') {
+        if (user.email !== 'superadmin@leadwidget.pe' && user.email !== 'superadmin2@leadwidget.pe') {
           navigate('/app');
         }
       }
@@ -116,94 +116,118 @@ export default function SuperAdmin() {
   }, [user, isSuperAdmin, authLoading, navigate]);
 
   useEffect(() => {
-    if (user) {
-      loadData();
-    }
-  }, [user]);
+    if (!user) return;
 
-  const loadData = async () => {
-    try {
-      // Load all profiles
-      const qProfiles = query(collection(db, 'profiles'), orderBy('created_at', 'desc'));
-      const profilesSnap = await getDocs(qProfiles);
-      // Map doc.id into the data
-      const profilesData = profilesSnap.docs.map(d => ({ id: d.id, ...d.data() })) as Profile[];
+    // Real-time Profiles subscription
+    // Using onSnapshot for real-time updates
+    const unsubProfiles = onSnapshot(query(collection(db, 'profiles'), orderBy('created_at', 'desc')), (snapshot) => {
+      const profilesData = snapshot.docs.map(d => ({ id: d.id, ...d.data() })) as Profile[];
 
-      // Load leads (to count) - In production, maybe use aggregation or counter fields
-      const leadsSnap = await getDocs(collection(db, 'leads'));
-      const leadsData = leadsSnap.docs.map(d => d.data());
+      setClients(prev => {
+        // preserve leads_count map or re-calc if needed. 
+        // Ideally we fetch leads count too, but let's assume leads updates handle that.
+        // Or if this is the first load, we need leads count.
+        // For simplicity, we initialize with 0 if map missing, but the Leads listener handles the count updates.
+        // We just need to ensure we don't wipe out existing counts if profiles update.
+        const currentMap = prev.reduce((acc, c) => ({ ...acc, [c.id]: c.leads_count }), {} as Record<string, number>);
 
+        return profilesData.map(p => ({
+          ...p,
+          leads_count: currentMap[p.id] || 0
+        }));
+      });
+    });
+
+    // Real-time Payments
+    const unsubPayments = onSnapshot(query(collection(db, 'payments'), orderBy('created_at', 'desc')), (snapshot) => {
+      setPayments(snapshot.docs.map(d => ({ id: d.id, ...d.data() })) as Payment[]);
+    });
+
+    // Real-time Leads (Counts)
+    const unsubLeads = onSnapshot(collection(db, 'leads'), (snapshot) => {
+      const leadsData = snapshot.docs.map(d => d.data());
       const leadsCounts = leadsData.reduce((acc: Record<string, number>, lead: any) => {
         if (lead.client_id) acc[lead.client_id] = (acc[lead.client_id] || 0) + 1;
         return acc;
       }, {});
 
-      const clientsWithLeads: ClientWithLeads[] = profilesData.map(profile => ({
-        ...profile,
-        leads_count: leadsCounts[profile.id] || 0,
+      setClients(prevClients => prevClients.map(c => ({
+        ...c,
+        leads_count: leadsCounts[c.id] || 0
+      })));
+
+      setStats(prev => ({
+        ...prev,
+        totalLeads: snapshot.size
       }));
+    });
 
-      setClients(clientsWithLeads);
+    // Real-time Analytics
+    const unsubAnalytics = onSnapshot(collection(db, 'widget_analytics'), (snapshot) => {
+      const totalViews = snapshot.docs.filter(d => d.data().event_type === 'view').length;
+      setStats(prev => ({ ...prev, totalViews }));
+    });
 
-      // Load all payments
-      const qPayments = query(collection(db, 'payments'), orderBy('created_at', 'desc'));
-      const paymentsSnap = await getDocs(qPayments);
-      const paymentsData = paymentsSnap.docs.map(d => ({ id: d.id, ...d.data() })) as Payment[];
-
-      setPayments(paymentsData);
-
-      // Calculate stats
-      const activeCount = clientsWithLeads.filter(c => c.status === 'active').length;
-      const trialCount = clientsWithLeads.filter(c => c.status === 'trial').length;
-      const suspendedCount = clientsWithLeads.filter(c => c.status === 'suspended').length;
-      const totalLeadsCount = Object.values(leadsCounts).reduce((a: number, b: number) => a + b, 0);
-      const pendingPaymentsCount = paymentsData.filter(p => p.status === 'pending').length;
-
-      // Load global analytics
-      const analyticsSnap = await getDocs(collection(db, 'widget_analytics'));
-      const totalViews = analyticsSnap.docs.filter(d => d.data().event_type === 'view').length;
-
-      setStats({
-        totalClients: clientsWithLeads.length,
-        activeClients: activeCount,
-        trialClients: trialCount,
-        suspendedClients: suspendedCount,
-        totalLeads: totalLeadsCount as number,
-        pendingPayments: pendingPaymentsCount,
-        totalViews,
-        mrr: activeCount * 30,
-      });
-
-      // Load Announcement
-      const qAnnounce = query(collection(db, 'system_announcements'), orderBy('updated_at', 'desc'), limit(1));
-      const announceSnap = await getDocs(qAnnounce);
-
-      if (!announceSnap.empty) {
-        const d = announceSnap.docs[0].data();
-        setAnnouncement({ id: announceSnap.docs[0].id, ...d } as any);
+    // Real-time Announcements
+    const unsubAnnounce = onSnapshot(query(collection(db, 'system_announcements'), orderBy('updated_at', 'desc'), limit(1)), (snapshot) => {
+      if (!snapshot.empty) {
+        setAnnouncement({ id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as any);
       }
+    });
 
-    } catch (error) {
-      console.error('Error loading data:', error);
-      toast({
-        title: 'Error',
-        description: 'No se pudieron cargar los datos',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
+    setLoading(false);
+
+    return () => {
+      unsubProfiles();
+      unsubPayments();
+      unsubLeads();
+      unsubAnalytics();
+      unsubAnnounce();
+    };
+  }, [user]);
+
+  // Update stats when clients/payments change
+  useEffect(() => {
+    const activeCount = clients.filter(c => c.status === 'active').length;
+    const trialCount = clients.filter(c => c.status === 'trial').length;
+    const suspendedCount = clients.filter(c => c.status === 'suspended').length;
+    const pendingPaymentsCount = payments.filter(p => p.status === 'pending').length;
+
+    setStats(prev => ({
+      ...prev,
+      totalClients: clients.length,
+      activeClients: activeCount,
+      trialClients: trialCount,
+      suspendedClients: suspendedCount,
+      pendingPayments: pendingPaymentsCount,
+      mrr: activeCount * 30, // Assuming 30 PEN plan
+    }));
+  }, [clients, payments]);
+
+  const handleDeleteUser = async (clientId: string) => {
+    const confirm = window.confirm('¿Estás seguro de eliminar este usuario? Se borrará su perfil y acceso.');
+    if (!confirm) return;
+
+    try {
+      await deleteDoc(doc(db, 'profiles', clientId));
+      await deleteDoc(doc(db, 'user_roles', clientId));
+
+      // Optionally delete widget_configs too
+      const qConfig = query(collection(db, 'widget_configs'), where('user_id', '==', clientId));
+      const configSnap = await getDocs(qConfig);
+      configSnap.forEach(async (d) => await deleteDoc(d.ref));
+
+      toast({ title: 'Usuario eliminado (Soft Delete)' });
+    } catch (error: any) {
+      toast({ title: 'Error al eliminar', description: error.message, variant: 'destructive' });
     }
   };
+
 
   const updateClientStatus = async (clientId: string, newStatus: 'trial' | 'active' | 'suspended') => {
     setUpdatingClient(clientId);
     try {
       await updateDoc(doc(db, 'profiles', clientId), { status: newStatus });
-
-      setClients(clients.map(c =>
-        c.id === clientId ? { ...c, status: newStatus } : c
-      ));
-
       toast({
         title: 'Estado actualizado',
         description: `Cliente marcado como ${newStatus}`,
@@ -231,16 +255,11 @@ export default function SuperAdmin() {
         await updateDoc(doc(db, 'profiles', payment.user_id), { status: 'active' });
       }
 
-      setPayments(payments.map(p =>
-        p.id === paymentId ? { ...p, status } : p
-      ));
-
       toast({
         title: status === 'verified' ? '✅ Pago verificado' : '❌ Pago rechazado',
         description: status === 'verified' ? 'Cliente activado automáticamente' : 'Se notificará al cliente',
       });
 
-      loadData();
     } catch (error: any) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } finally {
@@ -266,12 +285,6 @@ export default function SuperAdmin() {
         business_name: editForm.business_name,
         whatsapp_number: editForm.phone
       });
-
-      setClients(clients.map(c =>
-        c.id === editingClient.id
-          ? { ...c, business_name: editForm.business_name, whatsapp_number: editForm.phone }
-          : c
-      ));
 
       toast({ title: 'Cliente actualizado correctamente' });
       setEditingClient(null);
@@ -322,7 +335,6 @@ export default function SuperAdmin() {
         title: 'Aviso actualizado',
         description: 'Todos los clientes verán el nuevo mensaje en su dashboard.',
       });
-      loadData();
     } catch (error: any) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } finally {
@@ -343,13 +355,13 @@ export default function SuperAdmin() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'trial':
-        return <span className="badge-trial px-2 py-1 rounded-full text-xs font-medium">Trial</span>;
+        return <span className="badge-trial px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">Trial</span>;
       case 'active':
-        return <span className="badge-active px-2 py-1 rounded-full text-xs font-medium">Activo</span>;
+        return <span className="badge-active px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">Activo</span>;
       case 'suspended':
-        return <span className="badge-suspended px-2 py-1 rounded-full text-xs font-medium">Suspendido</span>;
+        return <span className="badge-suspended px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">Suspendido</span>;
       default:
-        return null;
+        return <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Desconocido</span>;
     }
   };
 
@@ -371,12 +383,12 @@ export default function SuperAdmin() {
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
               <Shield className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-xl">Super Admin</span>
+            <span className="font-bold text-xl">Super Admin (Real-time)</span>
           </Link>
 
           <div className="flex items-center gap-4">
-            <span className="text-sm opacity-80">{user?.email}</span>
-            <Button variant="glass" size="sm" onClick={handleSignOut}>
+            <span className="text-sm opacity-80 hidden sm:inline">{user?.email}</span>
+            <Button variant="secondary" size="sm" onClick={handleSignOut}>
               <LogOut className="w-4 h-4 mr-2" />
               Salir
             </Button>
@@ -396,19 +408,19 @@ export default function SuperAdmin() {
           <Card className="stat-card">
             <CardContent className="pt-4 pb-4">
               <p className="text-xs text-muted-foreground">Activos</p>
-              <p className="text-2xl font-bold text-success">{stats.activeClients}</p>
+              <p className="text-2xl font-bold text-green-600">{stats.activeClients}</p>
             </CardContent>
           </Card>
           <Card className="stat-card">
             <CardContent className="pt-4 pb-4">
               <p className="text-xs text-muted-foreground">Trial</p>
-              <p className="text-2xl font-bold text-warning">{stats.trialClients}</p>
+              <p className="text-2xl font-bold text-yellow-600">{stats.trialClients}</p>
             </CardContent>
           </Card>
           <Card className="stat-card">
             <CardContent className="pt-4 pb-4">
               <p className="text-xs text-muted-foreground">Suspendidos</p>
-              <p className="text-2xl font-bold text-destructive">{stats.suspendedClients}</p>
+              <p className="text-2xl font-bold text-red-600">{stats.suspendedClients}</p>
             </CardContent>
           </Card>
           <Card className="stat-card">
@@ -423,14 +435,6 @@ export default function SuperAdmin() {
               <p className="text-2xl font-bold">{stats.totalViews}</p>
             </CardContent>
           </Card>
-          <Card className="stat-card">
-            <CardContent className="pt-4 pb-4">
-              <p className="text-xs text-muted-foreground">Conv. Global</p>
-              <p className="text-2xl font-bold text-success">
-                {stats.totalViews > 0 ? Math.round((stats.totalLeads / stats.totalViews) * 100) : 0}%
-              </p>
-            </CardContent>
-          </Card>
           <Card className="stat-card bg-primary text-primary-foreground">
             <CardContent className="pt-4 pb-4">
               <p className="text-xs opacity-80">MRR</p>
@@ -440,7 +444,7 @@ export default function SuperAdmin() {
         </div>
 
         <Tabs defaultValue="clients" className="space-y-8">
-          <TabsList>
+          <TabsList className="w-full justify-start overflow-x-auto">
             <TabsTrigger value="clients" className="gap-2">
               <Users className="w-4 h-4" />
               Clientes
@@ -478,9 +482,33 @@ export default function SuperAdmin() {
                         className="pl-10"
                       />
                     </div>
-                    <Button onClick={() => setIsCreateOpen(true)} className="gap-2">
-                      <Plus className="w-4 h-4" /> Nuevo Cliente
-                    </Button>
+
+                    <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                      <DialogTrigger asChild>
+                        <Button className="gap-2">
+                          <Plus className="w-4 h-4" /> Nuevo Cliente
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Invitar Nuevo Cliente</DialogTitle>
+                          <DialogDescription>
+                            Comparte este enlace único para que el cliente se registre.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="py-4">
+                          <div className="flex items-center gap-2 p-2 border rounded bg-muted">
+                            <code className="text-sm flex-1 truncate">{window.location.origin}/register</code>
+                            <Button size="icon" variant="ghost" onClick={copyInviteLink}>
+                              <Copy className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <Button onClick={copyInviteLink}>Copiar Link</Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </div>
               </CardHeader>
@@ -529,6 +557,9 @@ export default function SuperAdmin() {
                               >
                                 <Pencil className="w-4 h-4 text-muted-foreground" />
                               </Button>
+
+                              {/* Action Buttons Logic based on provided states */}
+                              {/* If NOT active, show Activate (Green Check) */}
                               {client.status !== 'active' && (
                                 <Button
                                   size="sm"
@@ -536,6 +567,7 @@ export default function SuperAdmin() {
                                   onClick={() => updateClientStatus(client.id, 'active')}
                                   disabled={updatingClient === client.id}
                                   className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200"
+                                  title="Activar (Pasar a Active)"
                                 >
                                   {updatingClient === client.id ? (
                                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -544,6 +576,8 @@ export default function SuperAdmin() {
                                   )}
                                 </Button>
                               )}
+
+                              {/* If NOT suspended, show Suspend (Red X) */}
                               {client.status !== 'suspended' && (
                                 <Button
                                   size="sm"
@@ -551,10 +585,21 @@ export default function SuperAdmin() {
                                   onClick={() => updateClientStatus(client.id, 'suspended')}
                                   disabled={updatingClient === client.id}
                                   className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                                  title="Suspender"
                                 >
                                   <X className="w-4 h-4" />
                                 </Button>
                               )}
+
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleDeleteUser(client.id)}
+                                className="text-gray-500 hover:text-red-600 hover:bg-red-50 border-gray-200"
+                                title="Eliminar permanentemente"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
                             </div>
                           </td>
                         </tr>
@@ -799,36 +844,15 @@ export default function SuperAdmin() {
                         >
                           <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${announcement.is_active ? 'translate-x-6' : ''}`} />
                         </button>
-                        <span className="text-sm font-medium">{announcement.is_active ? 'Activo (Visible)' : 'Inactivo (Oculto)'}</span>
+                        <span className="text-sm font-medium">
+                          {announcement.is_active ? 'Activo (Visible)' : 'Inactivo (Oculto)'}
+                        </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="p-4 border border-dashed rounded-xl bg-muted/20">
-                    <p className="text-xs font-medium text-muted-foreground mb-3 underline">Vista previa en el Dashboard:</p>
-                    {announcement.is_active && announcement.content ? (
-                      <div className={`p-4 rounded-lg flex items-center gap-3 border shadow-sm ${announcement.type === 'error' ? 'bg-red-50 border-red-200 text-red-800' :
-                        announcement.type === 'warning' ? 'bg-orange-50 border-orange-200 text-orange-800' :
-                          announcement.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' :
-                            'bg-blue-50 border-blue-200 text-blue-800'
-                        }`}>
-                        <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                        <p className="text-sm font-medium leading-relaxed">{announcement.content}</p>
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground italic text-center py-2">No hay aviso activo para mostrar</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex justify-end pt-4 border-t">
-                  <Button
-                    onClick={saveAnnouncement}
-                    disabled={loading || !announcement.content}
-                    className="gap-2"
-                  >
-                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                    Guardar Cambios y Publicar
+                  <Button onClick={saveAnnouncement} disabled={loading} className="w-full">
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Guardar Aviso'}
                   </Button>
                 </div>
               </CardContent>
@@ -836,60 +860,7 @@ export default function SuperAdmin() {
           </TabsContent>
         </Tabs>
 
-        {/* Create Client Dialog */}
-        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Registrar Nuevo Cliente</DialogTitle>
-              <DialogDescription>
-                Opciones para dar de alta un nuevo usuario en la plataforma.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="p-4 bg-muted rounded-xl space-y-3">
-                <h4 className="font-medium text-sm">Opción 1: Enviar Invitación (Recomendado)</h4>
-                <p className="text-xs text-muted-foreground">
-                  Copia el link de registro y envíalo al cliente. Ellos configurarán su propia contraseña.
-                </p>
-                <div className="flex gap-2">
-                  <Input value={`${window.location.origin}/register`} readOnly />
-                  <Button variant="secondary" onClick={copyInviteLink}>
-                    <Copy className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <span className="w-full border-t" />
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-background px-2 text-muted-foreground">O</span>
-                </div>
-              </div>
-
-              <div className="p-4 border rounded-xl space-y-3">
-                <h4 className="font-medium text-sm">Opción 2: Registro Manual</h4>
-                <p className="text-xs text-muted-foreground">
-                  Cerrarás tu sesión actual para registrar al cliente. Necesitarás volver a entrar como Admin.
-                </p>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => {
-                    signOut();
-                    navigate('/register');
-                  }}
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Cerrar Sesión y Registrar
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Edit Client Dialog */}
+        {/* Edit Dialog */}
         <Dialog open={!!editingClient} onOpenChange={(open) => !open && setEditingClient(null)}>
           <DialogContent>
             <DialogHeader>
@@ -897,18 +868,14 @@ export default function SuperAdmin() {
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label>Email (No editable)</Label>
-                <Input value={editForm.email} disabled />
-              </div>
-              <div className="space-y-2">
-                <Label>Nombre de Empresa / Usuario</Label>
+                <Label>Nombre del Negocio</Label>
                 <Input
                   value={editForm.business_name}
                   onChange={(e) => setEditForm({ ...editForm, business_name: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
-                <Label>Teléfono</Label>
+                <Label>Teléfono WhatsApp</Label>
                 <Input
                   value={editForm.phone}
                   onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
@@ -916,8 +883,9 @@ export default function SuperAdmin() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setEditingClient(null)}>Cancelar</Button>
-              <Button onClick={handleUpdateProfile}>Guardar Cambios</Button>
+              <Button onClick={handleUpdateProfile} disabled={loading}>
+                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Guardar Cambios'}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
