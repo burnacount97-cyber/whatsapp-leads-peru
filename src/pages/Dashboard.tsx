@@ -401,39 +401,47 @@ export default function Dashboard() {
 
       // Load analytics and blocked IPs if widget exists
       if (configData) {
-        // Analytics - Views
-        // Analytics - Views
-        const qViews = query(collection(db, 'analytics'),
-          where('widget_id', '==', configData.id),
-          where('event_type', '==', 'view'));
-        const viewsSnap = await getDocs(qViews);
+        try {
+          // Analytics - Views (using widget_id field, not Doc ID)
+          const qViews = query(collection(db, 'analytics'),
+            where('widget_id', '==', configData.widget_id),
+            where('event_type', '==', 'view'));
+          const viewsSnap = await getDocs(qViews);
 
-        // Analytics - Interactions
-        const qInteractions = query(collection(db, 'analytics'),
-          where('widget_id', '==', configData.id),
-          where('event_type', 'in', ['chat_open', 'message_sent']));
-        const interactionsSnap = await getDocs(qInteractions);
+          // Analytics - Interactions
+          const qInteractions = query(collection(db, 'analytics'),
+            where('widget_id', '==', configData.widget_id),
+            where('event_type', '==', 'chat_open'));
+          const interactionsSnap = await getDocs(qInteractions);
 
-        setAnalytics({
-          views: viewsSnap.size,
-          interactions: interactionsSnap.size
-        });
+          setAnalytics({
+            views: viewsSnap.size,
+            interactions: interactionsSnap.size
+          });
+        } catch (analyticsError) {
+          console.error('Non-critical: Error loading analytics:', analyticsError);
+          // Don't fail the whole loadData for analytics
+        }
 
-        // Load blocked IPs
-        const qBlocked = query(collection(db, 'blocked_ips'), where('widget_id', '==', configData.id));
-        const blockedSnap = await getDocs(qBlocked);
-        const blockedData = blockedSnap.docs
-          .map(doc => ({ id: doc.id, ...doc.data() }))
-          .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+        try {
+          // Load blocked IPs
+          const qBlocked = query(collection(db, 'blocked_ips'), where('widget_id', '==', configData.id));
+          const blockedSnap = await getDocs(qBlocked);
+          const blockedData = blockedSnap.docs
+            .map(doc => ({ id: doc.id, ...doc.data() }))
+            .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-        setBlockedIps(blockedData);
+          setBlockedIps(blockedData);
+        } catch (blockedError) {
+          console.error('Non-critical: Error loading blocked IPs:', blockedError);
+        }
       }
 
-    } catch (error) {
-      console.error('Error loading data:', error);
+    } catch (error: any) {
+      console.error('CRITICAL: Error loading dashboard data:', error);
       toast({
         title: 'Error al cargar datos',
-        description: 'No se pudo cargar la información del dashboard',
+        description: `Error: ${error.message || 'Error desconocido'}`,
         variant: 'destructive',
       });
     } finally {
