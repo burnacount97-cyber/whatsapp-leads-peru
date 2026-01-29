@@ -160,17 +160,42 @@ export default function Dashboard() {
   const [canInstall, setCanInstall] = useState(false);
 
   useEffect(() => {
+    // Check if already installed
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    if (isStandalone) {
+      console.log('App already installed');
+      return;
+    }
+
     const handler = (e: any) => {
+      console.log('beforeinstallprompt event fired');
       e.preventDefault();
       setDeferredPrompt(e);
       setCanInstall(true);
     };
+
     window.addEventListener('beforeinstallprompt', handler);
+
+    // For testing: show button after 2 seconds if in development
+    if (import.meta.env.DEV) {
+      setTimeout(() => {
+        console.log('Dev mode: enabling install button for testing');
+        setCanInstall(true);
+      }, 2000);
+    }
+
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
   const installApp = async () => {
-    if (!deferredPrompt) return;
+    if (!deferredPrompt) {
+      toast({
+        title: 'Instalación no disponible',
+        description: 'Abre esta app en Chrome o Edge para instalarla.',
+        variant: 'destructive'
+      });
+      return;
+    }
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
     if (outcome === 'accepted') {
