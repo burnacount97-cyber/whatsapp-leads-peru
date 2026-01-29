@@ -2,10 +2,13 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Check if user has superadmin role in user_roles collection
+    // Check if user has superadmin role in user_roles collection OR matches specific emails
     function isSuperAdmin() {
-      return request.auth != null && 
-             get(/databases/$(database)/documents/user_roles/$(request.auth.uid)).data.role == 'superadmin';
+      return request.auth != null && (
+        (exists(/databases/$(database)/documents/user_roles/$(request.auth.uid)) && 
+         get(/databases/$(database)/documents/user_roles/$(request.auth.uid)).data.role == 'superadmin') ||
+        request.auth.token.email == 'bum.acount97@gmail.com'
+      );
     }
     
     function isOwner(userId) {
