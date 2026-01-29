@@ -349,7 +349,7 @@ export default function Landing() {
       </section>
 
       {/* --- TEMPLATES SHOWCASE --- */}
-      <section className="py-16 lg:py-24 px-4 bg-muted/30" id="templates">
+      <section className="py-16 lg:py-24 px-4 bg-slate-950 text-white relative border-y border-white/5" id="templates">
         <div className="container mx-auto max-w-5xl">
           <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-8 md:mb-12 gap-6">
             <div>
@@ -372,12 +372,12 @@ export default function Landing() {
             </div>
           </div>
 
-          <div className="bg-background rounded-3xl p-6 md:p-8 border shadow-sm flex flex-col md:flex-row gap-8 items-center">
+          <div className="bg-white/5 rounded-3xl p-6 md:p-8 border border-white/10 shadow-sm flex flex-col md:flex-row gap-8 items-center backdrop-blur-sm">
             <div className="flex-1 space-y-4 w-full">
-              <h3 className="text-xl sm:text-2xl font-bold">
+              <h3 className="text-xl sm:text-2xl font-bold text-white">
                 {nicheTemplates.find(t => t.name.toLowerCase() === activeTemplate)?.name}
               </h3>
-              <p className="text-base sm:text-lg text-muted-foreground">
+              <p className="text-base sm:text-lg text-slate-400">
                 {nicheTemplates.find(t => t.name.toLowerCase() === activeTemplate)?.desc}
               </p>
               <ul className="space-y-3 pt-4">
@@ -439,11 +439,11 @@ export default function Landing() {
       </section>
 
       {/* --- PRICING --- */}
-      <section className="py-16 lg:py-24 px-4 bg-background" id="pricing">
+      <section className="py-16 lg:py-24 px-4 bg-slate-950 text-white" id="pricing">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-10 lg:mb-12">
             <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">Precio Justo y Simple</h2>
-            <p className="text-lg sm:text-xl text-muted-foreground">Sin comisiones por venta. Sin contratos forzosos.</p>
+            <p className="text-lg sm:text-xl text-slate-400">Sin comisiones por venta. Sin contratos forzosos.</p>
           </div>
 
           <div className="relative max-w-md mx-auto md:max-w-none">
@@ -527,35 +527,37 @@ export default function Landing() {
       </section>
 
       {/* --- FAQ --- */}
-      <section className="py-16 lg:py-20 px-4 max-w-3xl mx-auto">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12">Preguntas Frecuentes</h2>
-        <Accordion type="single" collapsible className="w-full">
-          {[
-            {
-              q: "¿Necesito saber programar?",
-              a: "Para nada. Es tan simple como copiar y pegar. Te damos un video tutorial de 2 minutos."
-            },
-            {
-              q: "¿Qué pasa si se acaban mis 3 días gratis?",
-              a: "El widget se detiene automáticamente. No te cobraremos nada. Si te gustó, puedes activar tu plan por S/30."
-            },
-            {
-              q: "¿Funciona en celulares?",
-              a: "Sí, el 85% del tráfico web en Perú es móvil. Nuestro widget está 100% optimizado para celulares."
-            },
-            {
-              q: "¿Puedo cancelar cuando quiera?",
-              a: "Sí, no hay contratos forzosos. Pagas el mes y si no quieres renovar, simplemente no pagas el siguiente."
-            }
-          ].map((faq, i) => (
-            <AccordionItem key={i} value={`item-${i}`}>
-              <AccordionTrigger className="text-base sm:text-lg font-medium text-left">{faq.q}</AccordionTrigger>
-              <AccordionContent className="text-muted-foreground text-sm sm:text-base">
-                {faq.a}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+      <section className="py-16 lg:py-24 px-4 bg-slate-950 text-white border-t border-white/5">
+        <div className="container mx-auto max-w-3xl">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12">Preguntas Frecuentes</h2>
+          <Accordion type="single" collapsible className="w-full">
+            {[
+              {
+                q: "¿Necesito saber programar?",
+                a: "Para nada. Es tan simple como copiar y pegar. Te damos un video tutorial de 2 minutos."
+              },
+              {
+                q: "¿Qué pasa si se acaban mis 3 días gratis?",
+                a: "El widget se detiene automáticamente. No te cobraremos nada. Si te gustó, puedes activar tu plan por S/30."
+              },
+              {
+                q: "¿Funciona en celulares?",
+                a: "Sí, el 85% del tráfico web en Perú es móvil. Nuestro widget está 100% optimizado para celulares."
+              },
+              {
+                q: "¿Puedo cancelar cuando quiera?",
+                a: "Sí, no hay contratos forzosos. Pagas el mes y si no quieres renovar, simplemente no pagas el siguiente."
+              }
+            ].map((faq, i) => (
+              <AccordionItem key={i} value={`item-${i}`} className="border-white/10">
+                <AccordionTrigger className="text-base sm:text-lg font-medium text-left hover:text-primary transition-colors">{faq.q}</AccordionTrigger>
+                <AccordionContent className="text-slate-400 text-sm sm:text-base">
+                  {faq.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
       </section>
 
       {/* --- CTA BOTTOM --- */}
@@ -582,7 +584,7 @@ export default function Landing() {
       </section>
 
       {/* --- FOOTER --- */}
-      <footer className="py-16 border-t bg-muted/10 relative overflow-hidden px-4">
+      <footer className="py-16 border-t border-white/10 bg-slate-950 text-white relative overflow-hidden px-4">
         <div className="container mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-12">
             <div className="col-span-2 md:col-span-1">
@@ -592,14 +594,14 @@ export default function Landing() {
                 </div>
                 <span className="font-black text-xl tracking-tight">Lead Widget</span>
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-sm text-slate-400 leading-relaxed">
                 El widget inteligente que revoluciona la captura de leads en Perú y Latinoamérica.
                 Convierte cada visita en una oportunidad real.
               </p>
             </div>
             <div>
-              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-foreground">Producto</h4>
-              <ul className="space-y-4 text-sm text-muted-foreground">
+              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-white">Producto</h4>
+              <ul className="space-y-4 text-sm text-slate-400">
                 <li><button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-primary transition-colors">Características</button></li>
                 <li><button onClick={() => document.getElementById('templates')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-primary transition-colors">Plantillas</button></li>
                 <li><button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-primary transition-colors">Integraciones</button></li>
@@ -607,8 +609,8 @@ export default function Landing() {
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-foreground">Compañía</h4>
-              <ul className="space-y-4 text-sm text-muted-foreground">
+              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-white">Compañía</h4>
+              <ul className="space-y-4 text-sm text-slate-400">
                 <li><button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-primary transition-colors">Sobre Nosotros</button></li>
                 <li><button className="hover:text-primary transition-colors opacity-50 cursor-not-allowed">Casos de Éxito</button></li>
                 <li><button className="hover:text-primary transition-colors opacity-50 cursor-not-allowed">Blog</button></li>
@@ -616,15 +618,15 @@ export default function Landing() {
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-foreground">Legal</h4>
-              <ul className="space-y-4 text-sm text-muted-foreground">
+              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-white">Legal</h4>
+              <ul className="space-y-4 text-sm text-slate-400">
                 <li className="hover:text-primary transition-colors cursor-pointer">Privacidad</li>
                 <li className="hover:text-primary transition-colors cursor-pointer">Términos de servicio</li>
                 <li className="hover:text-primary transition-colors cursor-pointer">Libro de reclamaciones</li>
               </ul>
             </div>
           </div>
-          <div className="pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
+          <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
             <p>&copy; 2026 Lead Widget. Todos los derechos reservados. Hecho con ❤️ en Lima, Perú.</p>
             <div className="flex gap-6">
               <span className="hover:text-primary transition-colors cursor-pointer">Instagram</span>
