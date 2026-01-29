@@ -1,20 +1,23 @@
 (function () {
   'use strict';
 
-  // Widget configuration - will be replaced with actual config from server
-  // UPDATE THESE VALUES WITH YOUR FIREBASE CONFIG AND CLIENT ID
-  const config = {
+  // Widget configuration
+  // Uses external config if available (for real clients), otherwise falls back to defaults (demo)
+  const defaultConfig = {
     primaryColor: '#00C185',
     businessName: 'LeadWidget',
     welcomeMessage: '¡Hola! ¿En qué podemos ayudarte?',
     nicheQuestion: '¿En qué distrito te encuentras?',
     whatsappDestination: '+51987654321',
     template: 'general',
-    // Backend Config for Lead Capture
-    projectId: 'whatsapp-leads-peru', // From .env
-    apiKey: 'AIzaSyDoUHZtRvgEwhEUhZj6x4xEZvVmxliMCJo', // From .env
-    clientId: 'demo_client_id' // Needs to be replaced with the specific user's ID
+    projectId: 'whatsapp-leads-peru',
+    apiKey: 'AIzaSyDoUHZtRvgEwhEUhZj6x4xEZvVmxliMCJo',
+    clientId: 'demo_client_id'
   };
+
+  // Merge default config with user provided config
+  const userConfig = window.LEADWIDGET_CONFIG || {};
+  const config = { ...defaultConfig, ...userConfig };
 
   // Helper: Save to Firestore
   async function saveLeadToFirestore(name, phone, interest) {
@@ -33,19 +36,18 @@
         }
       };
 
-      const response = await fetch(url, {
+      // Non-blocking fetch
+      fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
-      });
+      }).then(response => {
+        if (!response.ok) console.warn('LeadWidget: Failed to save lead');
+        else console.log('LeadWidget: Lead saved');
+      }).catch(err => console.error('LeadWidget: Error', err));
 
-      if (!response.ok) {
-        console.warn('LeadWidget: Failed to save lead', await response.text());
-      } else {
-        console.log('LeadWidget: Lead saved successfully');
-      }
     } catch (error) {
       console.error('LeadWidget: Error saving lead', error);
     }
@@ -344,6 +346,7 @@
       document.getElementById('step-success').style.display = 'block';
 
       // Save to Firestore in background
+      // Don't await here, let it run
       saveLeadToFirestore(name, phone, interest);
 
       // Build WhatsApp message

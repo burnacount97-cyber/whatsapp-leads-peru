@@ -564,15 +564,32 @@ export default function Dashboard() {
   };
 
   const copyEmbedCode = () => {
-    // Dynamically generate the widget URL based on current domain
+    // Generate the widget URL (pointing to the public static file for now)
     const currentDomain = window.location.origin;
-    const widgetUrl = `${currentDomain}/api/w/${widgetConfig?.widget_id}.js`;
-    const code = `<script src="${widgetUrl}" async></script>`;
+    const widgetUrl = `${currentDomain}/widget-embed.js`;
 
-    navigator.clipboard.writeText(code);
+    // Create a configuration object with all current settings
+    // This ensures the widget looks exactly like the preview
+    const configScript = `
+<script>
+  window.LEADWIDGET_CONFIG = {
+    clientId: '${user?.uid}',
+    businessName: '${formConfig.business_name || 'LeadWidget'}',
+    whatsappDestination: '${formConfig.whatsapp_destination || ''}',
+    primaryColor: '${formConfig.primary_color}',
+    welcomeMessage: '${formConfig.welcome_message}',
+    nicheQuestion: '${formConfig.niche_question}',
+    template: '${formConfig.template}'
+  };
+</script>
+<script src="${widgetUrl}" async></script>
+`.trim();
+
+    navigator.clipboard.writeText(configScript);
     toast({
-      title: 'Código copiado',
-      description: 'Pega el código en tu sitio web antes de </body>',
+      title: 'Código Inteligente copiado',
+      description: 'Este código incluye tu configuración y ID único. Pégalo antes de </body>.',
+      duration: 5000,
     });
   };
 
