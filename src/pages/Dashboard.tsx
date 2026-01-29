@@ -926,7 +926,8 @@ export default function Dashboard() {
                     <CardTitle>Vista Previa</CardTitle>
                     <CardDescription>Así se verá tu widget en tu sitio web</CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="space-y-6">
+                    {/* Widget Preview Container */}
                     <div className="relative h-[500px] bg-slate-50 border border-slate-200 rounded-xl overflow-hidden p-6 flex justify-center items-center">
                       <div className="w-[320px] h-[480px] shadow-2xl rounded-2xl overflow-hidden border border-slate-200 bg-white">
                         <WidgetPreview
@@ -946,38 +947,36 @@ export default function Dashboard() {
                           mode="dashboard"
                         />
                       </div>
+                    </div>
 
-                      <div className="space-y-4 p-4 bg-muted/50 rounded-xl border">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Label className="cursor-pointer">Mensajes de Recaptura (Teaser)</Label>
-                            <p className="text-[10px] text-muted-foreground mt-1">Se mostrarán aleatoriamente si el usuario cierra el chat.</p>
-                          </div>
-                        </div>
-                        <textarea
-                          value={formConfig.teaser_messages}
-                          onChange={(e) => setFormConfig({ ...formConfig, teaser_messages: e.target.value })}
-                          className="w-full p-3 text-xs border rounded-md bg-background min-h-[80px]"
-                          placeholder="Escribe un mensaje por línea..."
-                        />
-                        <p className="text-[10px] text-primary italic">💡 Pon un mensaje atractivo por cada línea.</p>
+                    {/* Teaser Messages Editor */}
+                    <div className="space-y-3 p-4 bg-muted/50 rounded-xl border">
+                      <div>
+                        <Label>Mensajes de Recaptura (Teaser)</Label>
+                        <p className="text-[10px] text-muted-foreground mt-1">Se mostrarán aleatoriamente si el usuario cierra el chat.</p>
                       </div>
+                      <textarea
+                        value={formConfig.teaser_messages}
+                        onChange={(e) => setFormConfig({ ...formConfig, teaser_messages: e.target.value })}
+                        className="w-full p-3 text-xs border rounded-md bg-background min-h-[80px]"
+                        placeholder="Escribe un mensaje por línea..."
+                      />
+                      <p className="text-[10px] text-primary italic">💡 Pon un mensaje atractivo por cada línea.</p>
+                    </div>
 
-                      <div className="space-y-4 p-4 bg-muted/50 rounded-xl border">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Label className="cursor-pointer">Atajos Rápidos (Quick Replies)</Label>
-                            <p className="text-[10px] text-muted-foreground mt-1">Botones de respuesta rápida que aparecen al inicio del chat.</p>
-                          </div>
-                        </div>
-                        <textarea
-                          value={formConfig.quick_replies}
-                          onChange={(e) => setFormConfig({ ...formConfig, quick_replies: e.target.value })}
-                          className="w-full p-3 text-xs border rounded-md bg-background min-h-[80px]"
-                          placeholder="Escribe un atajo por línea..."
-                        />
-                        <p className="text-[10px] text-primary italic">💡 Cada línea será un botón que el usuario puede pulsar para enviar automáticamente.</p>
+                    {/* Quick Replies Editor */}
+                    <div className="space-y-3 p-4 bg-muted/50 rounded-xl border">
+                      <div>
+                        <Label>Atajos Rápidos (Quick Replies)</Label>
+                        <p className="text-[10px] text-muted-foreground mt-1">Botones de respuesta rápida que aparecen al inicio del chat.</p>
                       </div>
+                      <textarea
+                        value={formConfig.quick_replies}
+                        onChange={(e) => setFormConfig({ ...formConfig, quick_replies: e.target.value })}
+                        className="w-full p-3 text-xs border rounded-md bg-background min-h-[80px]"
+                        placeholder="Escribe un atajo por línea..."
+                      />
+                      <p className="text-[10px] text-primary italic">💡 Cada línea será un botón que el usuario puede pulsar para enviar automáticamente.</p>
                     </div>
                   </CardContent>
                 </Card>
