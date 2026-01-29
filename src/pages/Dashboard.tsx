@@ -130,7 +130,7 @@ const templates = [
 ];
 
 export default function Dashboard() {
-  const { user, signOut, loading: authLoading } = useAuth();
+  const { user, signOut, loading: authLoading, isSuperAdmin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -215,7 +215,7 @@ export default function Dashboard() {
           ai_api_key: profileData.ai_api_key || '',
           ai_model: profileData.ai_model || 'gpt-4o-mini',
           ai_temperature: profileData.ai_temperature || 0.7,
-          ai_max_tokens: 500, // Fixed value or add to interface if needed
+          ai_max_tokens: 500,
           ai_system_prompt: profileData.ai_system_prompt || 'Eres un asistente virtual amable y profesional que ayuda a capturar leads para un negocio. Tu objetivo es obtener información del cliente de manera natural y amigable.',
         });
       }
@@ -223,14 +223,49 @@ export default function Dashboard() {
       // Load widget config
       const qConfig = query(collection(db, 'widget_configs'), where('user_id', '==', userId));
       const configSnap = await getDocs(qConfig);
-      const configData = configSnap.empty ? null : { id: configSnap.docs[0].id, ...configSnap.docs[0].data() } as any;
 
-      // Load Announcement
-      const qAnnounce = query(collection(db, 'system_announcements'), where('is_active', '==', true), orderBy('updated_at', 'desc'));
+      let configData: any = null;
+
+      if (configSnap.empty) {
+        // AUTO-CREATE DEFAULT CONFIG FOR NEW USER
+        const newWidgetRef = doc(collection(db, 'widget_configs'));
+        const defaultConfig = {
+          user_id: userId,
+          widget_id: Math.random().toString(36).substring(2, 12),
+          template: 'general',
+          primary_color: '#00C165',
+          welcome_message: '¡Hola! ¿En qué podemos ayudarte?',
+          whatsapp_destination: '',
+          niche_question: '¿En qué distrito te encuentras?',
+          trigger_delay: 3,
+          chat_placeholder: 'Escribe tu mensaje...',
+          vibration_intensity: 'soft',
+          trigger_exit_intent: true,
+          exit_intent_title: '¡Espera!',
+          exit_intent_description: 'Prueba Lead Widget gratis por 3 días y aumenta tus ventas.',
+          exit_intent_cta: 'Probar Demo Ahora',
+          teaser_messages: [
+            '¿Cómo podemos ayudarte? 👋',
+            '¿Tienes alguna duda sobre el servicio? ✨',
+            '¡Hola! Estamos en línea para atenderte 🚀'
+          ],
+          created_at: new Date().toISOString()
+        };
+        await setDoc(newWidgetRef, defaultConfig);
+        configData = { id: newWidgetRef.id, ...defaultConfig };
+      } else {
+        configData = { id: configSnap.docs[0].id, ...configSnap.docs[0].data() };
+      }
+
+      // Load Announcement (remove orderBy to avoid index error)
+      const qAnnounce = query(collection(db, 'system_announcements'), where('is_active', '==', true));
       const announceSnap = await getDocs(qAnnounce);
 
       if (!announceSnap.empty) {
-        setAnnouncement({ id: announceSnap.docs[0].id, ...announceSnap.docs[0].data() } as any);
+        // Sort manually
+        const anns = announceSnap.docs.map(d => ({ id: d.id, ...d.data() }) as any);
+        anns.sort((a: any, b: any) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+        setAnnouncement(anns[0]);
       }
 
       if (configData) {
@@ -242,11 +277,11 @@ export default function Dashboard() {
           welcome_message: configData.welcome_message || '¡Hola! ¿En qué podemos ayudarte?',
           whatsapp_destination: configData.whatsapp_destination || '',
           niche_question: configData.niche_question || '¿En qué distrito te encuentras?',
-          trigger_delay: configData.trigger_delay || 15,
+          trigger_delay: configData.trigger_delay ?? 3,
+          chat_placeholder: configData.chat_placeholder || 'Escribe tu mensaje...',
           custom_placeholder: 'Tu respuesta',
           custom_button_text: 'Continuar',
           custom_confirmation_message: '¡Listo! Te pasamos al WhatsApp del equipo',
-          chat_placeholder: configData.chat_placeholder || 'Escribe tu mensaje...',
           vibration_intensity: configData.vibration_intensity || 'soft',
           exit_intent_enabled: configData.trigger_exit_intent ?? true,
           exit_intent_title: configData.exit_intent_title || '¡Espera!',
@@ -262,16 +297,22 @@ export default function Dashboard() {
         });
       }
 
-      // Load leads
-      const qLeads = query(collection(db, 'leads'), where('client_id', '==', userId), orderBy('created_at', 'desc'));
+      // Load leads (remove orderBy)
+      const qLeads = query(collection(db, 'leads'), where('client_id', '==', userId));
       const leadsSnap = await getDocs(qLeads);
-      const leadsData = leadsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Lead[];
+      const leadsData = leadsSnap.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) as Lead[];
 
       setLeads(leadsData);
-      // Load payments
-      const qPayments = query(collection(db, 'payments'), where('user_id', '==', userId), orderBy('created_at', 'desc'));
+
+      // Load payments (remove orderBy)
+      const qPayments = query(collection(db, 'payments'), where('user_id', '==', userId));
       const paymentSnap = await getDocs(qPayments);
-      const paymentsData = paymentSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Payment[];
+      const paymentsData = paymentSnap.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) as Payment[];
+
       setPayments(paymentsData);
 
       // Load analytics and blocked IPs if widget exists
@@ -294,11 +335,11 @@ export default function Dashboard() {
         });
 
         // Load blocked IPs
-        const qBlocked = query(collection(db, 'blocked_ips'),
-          where('widget_id', '==', configData.id),
-          orderBy('created_at', 'desc'));
+        const qBlocked = query(collection(db, 'blocked_ips'), where('widget_id', '==', configData.id));
         const blockedSnap = await getDocs(qBlocked);
-        const blockedData = blockedSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const blockedData = blockedSnap.docs
+          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
         setBlockedIps(blockedData);
       }
@@ -559,9 +600,18 @@ export default function Dashboard() {
           </div>
 
           <div className="flex items-center gap-4">
+            {isSuperAdmin && (
+              <Link to="/superadmin">
+                <Button variant="outline" size="sm" className="hidden sm:flex border-primary text-primary hover:bg-primary/10">
+                  <Shield className="w-4 h-4 mr-2" />
+                  Panel SuperAdmin
+                </Button>
+              </Link>
+            )}
+
             {getStatusBadge(profile?.subscription_status || 'trial')}
             {profile?.subscription_status === 'trial' && (
-              <span className="text-sm text-muted-foreground">
+              <span className="text-sm text-muted-foreground hidden md:inline">
                 {getTrialDaysLeft()} días restantes
               </span>
             )}
