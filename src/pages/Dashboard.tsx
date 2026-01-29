@@ -13,7 +13,8 @@ import {
   updateDoc,
   deleteDoc,
   orderBy,
-  addDoc
+  addDoc,
+  onSnapshot
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Button } from '@/components/ui/button';
@@ -204,6 +205,30 @@ export default function Dashboard() {
     }
   }, [user, authLoading, navigate]);
 
+  // Real-time listener for announcements
+  useEffect(() => {
+    if (!user) return;
+
+    // Listen for active announcements
+    // We cannot use orderBy with where('is_active', '==', true) without a composite index
+    // So we just filter for active ones and sort client-side, or use a simple query if volume is low.
+    // Given system announcements are few, fetching all active ones is fine.
+    const q = query(collection(db, 'system_announcements'), where('is_active', '==', true));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      if (!snapshot.empty) {
+        const anns = snapshot.docs.map(d => ({ id: d.id, ...d.data() }) as any);
+        // Sort by updated_at descending to show latest
+        anns.sort((a: any, b: any) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+        setAnnouncement(anns[0]);
+      } else {
+        setAnnouncement(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
   const loadData = async () => {
     if (!user) return;
 
@@ -263,17 +288,6 @@ export default function Dashboard() {
         configData = { id: newWidgetRef.id, ...defaultConfig };
       } else {
         configData = { id: configSnap.docs[0].id, ...configSnap.docs[0].data() };
-      }
-
-      // Load Announcement (remove orderBy to avoid index error)
-      const qAnnounce = query(collection(db, 'system_announcements'), where('is_active', '==', true));
-      const announceSnap = await getDocs(qAnnounce);
-
-      if (!announceSnap.empty) {
-        // Sort manually
-        const anns = announceSnap.docs.map(d => ({ id: d.id, ...d.data() }) as any);
-        anns.sort((a: any, b: any) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
-        setAnnouncement(anns[0]);
       }
 
       if (configData) {
