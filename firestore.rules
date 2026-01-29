@@ -11,47 +11,57 @@ service cloud.firestore {
     function isOwner(userId) {
       return request.auth != null && request.auth.uid == userId;
     }
+
+    function isDocOwner(docData) {
+      return request.auth != null && docData.user_id == request.auth.uid;
+    }
+
+    function isLeadOwner(docData) {
+      return request.auth != null && docData.client_id == request.auth.uid;
+    }
     
-    // Allow users to see their own roles, SuperAdmin can see all
+    // User Roles - Highly sensitive
     match /user_roles/{userId} {
       allow read: if isOwner(userId) || isSuperAdmin();
       allow write: if isSuperAdmin(); 
     }
     
+    // Profiles
     match /profiles/{userId} {
-      allow read, write: if request.auth != null;
+      allow read: if isOwner(userId) || isSuperAdmin();
+      allow write: if isOwner(userId) || isSuperAdmin();
     }
     
+    // Widget Configs
     match /widget_configs/{configId} {
-      allow read: if true; 
-      allow write: if request.auth != null;
+      allow read: if true; // Public for the widget to load
+      allow write: if request.auth != null && (isDocOwner(request.resource.data) || isSuperAdmin());
     }
     
+    // Leads
     match /leads/{leadId} {
-      allow read: if request.auth != null;
-      allow create: if true;
-      allow update, delete: if request.auth != null;
+      allow read: if request.auth != null && (isLeadOwner(resource.data) || isSuperAdmin());
+      allow create: if true; // Public for widget script
+      allow update, delete: if request.auth != null && (isLeadOwner(resource.data) || isSuperAdmin());
     }
     
+    // Blocked IPs
     match /blocked_ips/{ipId} {
-      allow read: if true;
-      allow create: if true;
-      allow delete: if request.auth != null;
+      allow read: if true; // Widget needs to check this
+      allow create: if true; // API/Widget can block
+      allow delete: if request.auth != null; // Owners/Admins can unblock
     }
     
+    // Analytics
     match /analytics/{analyticsId} {
-      allow read: if request.auth != null;
-      allow create: if true;
+      allow read: if request.auth != null; // Simplified list access
+      allow create: if true; // Public tracking
       allow delete: if isSuperAdmin();
     }
     
-    match /system_announcements/{announcementId} {
-      allow read: if request.auth != null;
-      allow write: if isSuperAdmin();
-    }
-    
+    // Payments
     match /payments/{paymentId} {
-      allow read: if request.auth != null;
+      allow read: if request.auth != null && (isDocOwner(resource.data) || isSuperAdmin());
       allow create: if request.auth != null;
       allow update, delete: if isSuperAdmin();
     }
