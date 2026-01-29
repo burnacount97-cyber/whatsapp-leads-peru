@@ -422,16 +422,27 @@ export default function Landing() {
                 <div className="bg-muted/30 rounded-3xl p-8 border text-center">
                   <h4 className="font-bold mb-6">Métodos de Pago Locales</h4>
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border flex flex-col items-center gap-2 hover:scale-105 transition-transform">
-                      <div className="w-8 h-8 rounded bg-[#742284]" />
-                      <span className="font-bold text-xs">Yape</span>
+                    {/* YAPE CARD */}
+                    <div className="bg-[#0f172a] p-4 rounded-xl border border-slate-700/50 flex flex-col items-center gap-3 hover:border-[#742284]/50 hover:bg-[#742284]/10 transition-all group cursor-default">
+                      <div className="w-12 h-12 rounded-xl bg-[#742284] flex items-center justify-center shadow-lg shadow-purple-900/20 group-hover:scale-110 transition-transform duration-300">
+                        {/* CSS Yape Logo Simulation */}
+                        <span className="font-black italic text-white text-[13px] tracking-tighter transform -rotate-2">Yape</span>
+                      </div>
+                      <span className="font-bold text-xs text-slate-300 group-hover:text-white transition-colors">Yape</span>
                     </div>
-                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border flex flex-col items-center gap-2 hover:scale-105 transition-transform">
-                      <div className="w-8 h-8 rounded bg-[#00D1D1]" />
-                      <span className="font-bold text-xs">Plin</span>
+
+                    {/* PLIN CARD */}
+                    <div className="bg-[#0f172a] p-4 rounded-xl border border-slate-700/50 flex flex-col items-center gap-3 hover:border-[#00D1D1]/50 hover:bg-[#00D1D1]/10 transition-all group cursor-default">
+                      <div className="w-12 h-12 rounded-xl bg-[#00D1D1] flex items-center justify-center shadow-lg shadow-cyan-900/20 group-hover:scale-110 transition-transform duration-300">
+                        {/* CSS Plin Logo Simulation */}
+                        <span className="font-bold text-white text-[13px] tracking-tight">Plin</span>
+                      </div>
+                      <span className="font-bold text-xs text-slate-300 group-hover:text-white transition-colors">Plin</span>
                     </div>
-                    <div className="col-span-2 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border flex items-center justify-center gap-2 hover:scale-105 transition-transform">
-                      <span className="font-bold text-xs">Transferencia BCP / Interbank</span>
+
+                    {/* TRANSFER CARD */}
+                    <div className="col-span-2 bg-[#0f172a] p-4 rounded-xl border border-slate-700/50 flex items-center justify-center gap-2 hover:border-primary/50 transition-all cursor-default">
+                      <span className="font-bold text-xs text-slate-400">Transferencia BCP / Interbank</span>
                     </div>
                   </div>
                 </div>
