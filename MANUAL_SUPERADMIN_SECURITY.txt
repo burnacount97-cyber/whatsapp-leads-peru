@@ -1,0 +1,143 @@
+// ====================================================================================
+// INSTRUCCIONES PARA AGREGAR LA SECCIÓN DE SEGURIDAD AL SUPERADMIN
+// ====================================================================================
+// Este archivo contiene los fragmentos de código que necesitas agregar manualmente
+// ====================================================================================
+
+// --------------------------
+// PASO 1: Agregar el import (línea ~27)
+// --------------------------
+// Busca la línea que dice:   Shield,
+// Y agrégale debajo:         ShieldCheck,
+
+/* ANTES:
+  Shield,
+  Plus,
+
+DESPUÉS:
+  Shield,
+  ShieldCheck,
+  Plus,
+*/
+
+// --------------------------
+// PASO 2: Agregar la función unblockDemoIp (después de updateClientStatus, línea ~240)
+// --------------------------
+// Busca el final de la función updateClientStatus (termina con   };)
+// Y agrega DESPUÉS de ella:
+
+const unblockDemoIp = async (id: string) => {
+  try {
+    await deleteDoc(doc(db, 'blocked_ips', id));
+    toast({
+      title: "✅ IP Desbloqueada",
+      description: "El usuario ahora puede volver a usar el chat del demo.",
+    });
+  } catch (error: any) {
+    toast({
+      title: "Error",
+      description: error.message,
+      variant: "destructive",
+    });
+  }
+};
+
+// --------------------------
+// PASO 3: Agregar Tab Trigger (después de Analytics, línea ~432)
+// --------------------------
+// Busca:   </TabsTrigger>  que está después de "Analytics"
+// Y agrega debajo:
+
+<TabsTrigger value="security" className="gap-2">
+  <ShieldCheck className="w-4 h-4" />
+  Seguridad
+</TabsTrigger>
+
+// --------------------------
+// PASO 4: Agregar TabsContent (ANTES del cierre </Tabs>, casi al final del archivo)
+// --------------------------
+// Busca:   </TabsContent>  (el último)
+// Y agrega DESPUÉS de él (pero ANTES de </Tabs>):
+
+{/* Security Tab - Demo Widget Blocked IPs */}
+<TabsContent value="security">
+  <Card>
+    <CardHeader>
+      <div className="flex items-center gap-2">
+        <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center">
+          <ShieldCheck className="w-5 h-5 text-white" />
+        </div>
+        <div>
+          <CardTitle>Seguridad - Widget Demo</CardTitle>
+          <CardDescription>IPs bloqueadas en el widget de la landing page</CardDescription>
+        </div>
+      </div>
+    </CardHeader>
+    <CardContent>
+      <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl flex gap-3">
+        <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+        <p className="text-sm text-amber-800 dark:text-amber-200">
+          Estas IPs fueron bloqueadas automáticamente por intentar manipular el chat demo de tu landing page. 
+          Si crees que algún bloqueo fue un error, puedes rehabilitar manualmente.
+        </p>
+      </div>
+
+      {blockedDemoIps.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-2xl">
+          <ShieldCheck className="w-12 h-12 mx-auto mb-4 opacity-10" />
+          <p>No hay IPs bloqueadas en el widget demo actualmente</p>
+          <p className="text-sm mt-1">El sistema de seguridad está activo y vigilando.</p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b text-xs uppercase tracking-wider text-muted-foreground">
+                <th className="text-left py-3 px-4 font-medium">Dirección IP</th>
+                <th className="text-left py-3 px-4 font-medium">Motivo</th>
+                <th className="text-left py-3 px-4 font-medium">Fecha de Bloqueo</th>
+                <th className="text-right py-3 px-4 font-medium">Acción</th>
+              </tr>
+            </thead>
+            <tbody className="text-sm">
+              {blockedDemoIps.map((ip) => (
+                <tr key={ip.id} className="border-b hover:bg-muted/50 transition-colors">
+                  <td className="py-4 px-4 font-mono text-xs">{ip.ip_address}</td>
+                  <td className="py-4 px-4">
+                    <span className="px-2 py-1 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded-md text-xs font-medium">
+                      {ip.reason || 'AI detected abuse'}
+                    </span>
+                  </td>
+                  <td className="py-4 px-4 text-muted-foreground">
+                    {new Date(ip.created_at).toLocaleString('es-PE')}
+                  </td>
+                  <td className="py-4 px-4 text-right">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => unblockDemoIp(ip.id)}
+                      className="text-primary border-primary/20 hover:bg-primary/10"
+                    >
+                      Desbloquear
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </CardContent>
+  </Card>
+</TabsContent>
+
+// ====================================================================================
+// RESUMEN VISUAL DE LOS 4 CAMBIOS:
+// ====================================================================================
+// 
+// 1. Import:           Shield, → Shield, ShieldCheck,
+// 2. Función (L~240):  updateClientStatus(...) { } → ...función unblockDemoIp
+// 3. Tab (L~432):      Analytics Tab → + Security Tab
+// 4. Content (final):  Antes de </Tabs> → nuevo <TabsContent value="security">
+//
+// ====================================================================================
