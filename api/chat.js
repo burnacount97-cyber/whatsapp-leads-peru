@@ -65,7 +65,7 @@ export default async function handler(req, res) {
                 ai_api_key: process.env.OPENAI_API_KEY,
                 ai_model: 'gpt-4o-mini',
                 ai_temperature: 0.7,
-                ai_system_prompt: 'Eres un asistente amable de Lead Widget.',
+                ai_system_prompt: 'Eres un asistente experto. Tus respuestas DEBEN ser CORTAS (máximo 2-3 oraciones). Sé muy directo, amable y termina siempre con una pregunta para calificar al lead.',
                 business_name: 'Lead Widget'
             };
         } else {
@@ -97,8 +97,9 @@ export default async function handler(req, res) {
 
         const openai = new OpenAI({ apiKey: apiKey });
 
+        const brevityInstruction = "\n\nIMPORTANTE: Tus respuestas deben ser MUY CORTAS (máximo 2-3 oraciones). Evita párrafos largos. Sé directo y amable.";
         const messages = [
-            { role: 'system', content: aiConfig.ai_system_prompt || 'Eres un asistente amable.' },
+            { role: 'system', content: (aiConfig.ai_system_prompt || 'Eres un asistente amable.') + brevityInstruction },
             ...(history || []).map(m => ({ role: m.role, content: m.content })),
             { role: 'user', content: message }
         ];
