@@ -1638,7 +1638,7 @@ export default function Dashboard() {
                   <CardTitle>Mi Plan</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="p-6 bg-slate-50 border rounded-2xl">
+                  <div className="p-6 bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-2xl">
                     <div className="flex justify-between items-start mb-4">
                       <div>
                         <p className="text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">Plan Actual</p>
@@ -1650,17 +1650,17 @@ export default function Dashboard() {
                     <div className="space-y-3 py-4 border-t border-slate-200 mt-4">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Precio:</span>
-                        <span className="font-bold text-slate-900">S/ 30.00 / mes</span>
+                        <span className="font-bold text-slate-900 dark:text-white">S/ 30.00 / mes</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Siguiente Pago:</span>
-                        <span className="font-bold text-slate-900">{getTrialEndDateString()}</span>
+                        <span className="font-bold text-slate-900 dark:text-white">{getTrialEndDateString()}</span>
                       </div>
                     </div>
 
                     {profile?.subscription_status === 'trial' && (
-                      <div className="mt-4 p-4 bg-amber-50 border border-amber-100 rounded-xl">
-                        <p className="text-xs text-amber-800 font-medium leading-relaxed">
+                      <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-800 rounded-xl">
+                        <p className="text-xs text-amber-800 dark:text-amber-200 font-medium leading-relaxed">
                           ⚠️ Te quedan {getTrialDaysLeft()} días de prueba. Paga S/ 30 hoy para mantener tu bot activo ilimitadamente.
                         </p>
                       </div>
@@ -1677,7 +1677,7 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-4">
-                    <div className="p-4 bg-sky-50 border border-sky-100 rounded-xl">
+                    <div className="p-4 bg-sky-50 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-800 rounded-xl">
                       <h4 className="font-bold flex items-center gap-2 mb-3">
                         <div className="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center text-white text-[10px]">BCP</div>
                         Transferencia BCP
@@ -1688,7 +1688,7 @@ export default function Dashboard() {
                       </div>
                     </div>
 
-                    <div className="p-4 bg-purple-50 border border-purple-100 rounded-xl">
+                    <div className="p-4 bg-purple-50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-800 rounded-xl">
                       <h4 className="font-bold flex items-center gap-2 mb-3">
                         <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-fuchsia-500 rounded-lg flex items-center justify-center text-white text-[10px]">Y/P</div>
                         Yape o Plin
@@ -1700,8 +1700,8 @@ export default function Dashboard() {
                     </div>
                   </div>
 
-                  <div className="p-8 border-2 border-dashed rounded-2xl bg-slate-50 text-center space-y-4">
-                    <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mx-auto mb-2 border border-slate-100">
+                  <div className="p-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900 text-center space-y-4">
+                    <div className="w-16 h-16 bg-white dark:bg-slate-800 rounded-full shadow-sm flex items-center justify-center mx-auto mb-2 border border-slate-100 dark:border-slate-700">
                       <MessageCircle className="w-8 h-8 text-primary/40" />
                     </div>
                     <div>
@@ -1794,10 +1794,10 @@ export default function Dashboard() {
                         {payments.map((p) => (
                           <tr key={p.id} className="border-b group hover:bg-slate-50/50 transition-colors">
                             <td className="py-4 px-6">
-                              <div className="font-bold text-slate-900">{p.description || 'Suscripción Lead Widget'}</div>
+                              <div className="font-bold text-slate-900 dark:text-slate-100">{p.description || 'Suscripción Lead Widget'}</div>
                               <div className="text-[10px] text-muted-foreground font-mono">ID: {p.id.substring(0, 8)}</div>
                             </td>
-                            <td className="py-4 px-6 font-bold text-slate-700">S/ {Number(p.amount).toFixed(2)}</td>
+                            <td className="py-4 px-6 font-bold text-slate-700 dark:text-slate-300">S/ {Number(p.amount).toFixed(2)}</td>
                             <td className="py-4 px-6 text-muted-foreground">{new Date(p.created_at).toLocaleDateString('es-PE')}</td>
                             <td className="py-4 px-6">
                               <span className="text-xs font-medium px-2 py-1 bg-slate-100 rounded text-slate-600 uppercase tracking-tighter">{p.payment_method || 'Varios'}</span>
