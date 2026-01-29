@@ -1,70 +1,31 @@
-/* Import Google Fonts first */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* LeadWidget.pe Design System */
-
 @layer base {
   :root {
-    /* Core Brand Colors */
     --background: 0 0% 100%;
     --foreground: 220 20% 10%;
-
-    /* Yape Green - Primary */
     --primary: 161 100% 38%;
     --primary-foreground: 0 0% 100%;
-
-    /* BCP Blue - Secondary */
     --secondary: 210 100% 36%;
     --secondary-foreground: 0 0% 100%;
-
-    /* Surfaces */
     --card: 0 0% 100%;
     --card-foreground: 220 20% 10%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 220 20% 10%;
-
-    /* Muted/Subtle */
     --muted: 160 20% 96%;
     --muted-foreground: 220 10% 45%;
-
-    /* Accent - Warm Orange for CTAs */
     --accent: 25 95% 53%;
     --accent-foreground: 0 0% 100%;
-
-    /* Status Colors */
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
-
-    --success: 161 100% 38%;
-    --success-foreground: 0 0% 100%;
-
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
-
-    --info: 210 100% 36%;
-    --info-foreground: 0 0% 100%;
-
-    /* UI Elements */
     --border: 220 13% 91%;
     --input: 220 13% 91%;
     --ring: 161 100% 38%;
-
     --radius: 0.75rem;
-
-    /* Sidebar */
-    --sidebar-background: 160 30% 98%;
-    --sidebar-foreground: 220 20% 20%;
-    --sidebar-primary: 161 100% 38%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 160 30% 95%;
-    --sidebar-accent-foreground: 220 20% 20%;
-    --sidebar-border: 160 20% 90%;
-    --sidebar-ring: 161 100% 38%;
   }
 
   .dark {
@@ -72,29 +33,11 @@
     --foreground: 0 0% 98%;
     --primary: 161 100% 45%;
     --primary-foreground: 220 20% 8%;
-    --secondary: 210 80% 50%;
-    --secondary-foreground: 0 0% 100%;
     --card: 220 20% 10%;
     --card-foreground: 0 0% 98%;
-    --popover: 220 20% 10%;
-    --popover-foreground: 0 0% 98%;
-    --muted: 220 20% 15%;
-    --muted-foreground: 220 10% 60%;
-    --accent: 25 90% 55%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 70% 50%;
-    --destructive-foreground: 0 0% 100%;
     --border: 220 20% 18%;
     --input: 220 20% 18%;
     --ring: 161 100% 45%;
-    --sidebar-background: 220 20% 6%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 161 100% 45%;
-    --sidebar-primary-foreground: 220 20% 8%;
-    --sidebar-accent: 220 20% 12%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 220 20% 15%;
-    --sidebar-ring: 161 100% 45%;
   }
 }
 
@@ -104,40 +47,25 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply font-bold tracking-tight;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Plus Jakarta Sans', sans-serif;
   }
 }
 
 @layer components {
-
-  /* Iridescent Button Effect - Professional Edition */
   .btn-iridescent {
-    @apply relative overflow-hidden transition-all duration-500 rounded-xl font-bold;
+    @apply relative overflow-hidden transition-all duration-500 rounded-xl font-bold text-white;
     background: linear-gradient(135deg, hsl(var(--primary)), #34d399, #10b981);
     background-size: 200% 200%;
     animation: gradient-flow 4s ease infinite;
     box-shadow: 0 4px 15px -1px hsl(var(--primary) / 0.4);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    color: white;
   }
 
   .btn-iridescent::after {
     content: "";
     @apply absolute inset-0 opacity-0 transition-opacity duration-500;
-    background: linear-gradient(110deg,
-        transparent 25%,
-        rgba(255, 255, 255, 0.3) 50%,
-        transparent 75%);
+    background: linear-gradient(110deg, transparent 25%, rgba(255, 255, 255, 0.3) 50%, transparent 75%);
     background-size: 200% 100%;
     animation: shine 3s infinite;
   }
@@ -155,11 +83,6 @@
     @apply backdrop-blur-md border shadow-sm;
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
     border-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .dark .glass-premium {
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.2));
-    border-color: rgba(255, 255, 255, 0.05);
   }
 
   .hero-text-gradient {
@@ -206,26 +129,8 @@
     }
   }
 
-  @keyframes pulse-subtle {
-
-    0%,
-    100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-
-    50% {
-      opacity: 0.8;
-      transform: scale(0.98);
-    }
-  }
-
   .animate-float {
     animation: float 6s ease-in-out infinite;
-  }
-
-  .animate-pulse-subtle {
-    animation: pulse-subtle 4s ease-in-out infinite;
   }
 
   .no-scrollbar::-webkit-scrollbar {
