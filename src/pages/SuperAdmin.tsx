@@ -917,6 +917,15 @@ export default function SuperAdmin() {
                           {savingConfig ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Guardar'}
                         </Button>
                       </div>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs text-muted-foreground">¿Eres tú el dueño?</span>
+                        <button
+                          onClick={() => setDemoWidgetOwnerId(user?.uid || '')}
+                          className="text-xs text-primary font-medium hover:underline"
+                        >
+                          Usar mi ID ({user?.uid?.substring(0, 8)}...)
+                        </button>
+                      </div>
                       <p className="text-sm text-muted-foreground mt-2">
                         El widget de la landing page cargará la configuración (Prompt, Colores, Textos) definida en la cuenta de usuario con este ID.
                         <br />
@@ -960,6 +969,6 @@ export default function SuperAdmin() {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
+    </div >
   );
 }
