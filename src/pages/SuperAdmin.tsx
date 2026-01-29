@@ -47,9 +47,10 @@ interface Profile {
   email: string;
   business_name: string;
   whatsapp_number?: string;
-  status?: string;
+  subscription_status?: string;
   created_at: string;
   trial_ends_at?: string;
+  plan_type?: string;
 }
 
 interface Payment {
@@ -188,9 +189,9 @@ export default function SuperAdmin() {
 
   // Update stats when clients/payments change
   useEffect(() => {
-    const activeCount = clients.filter(c => c.status === 'active').length;
-    const trialCount = clients.filter(c => c.status === 'trial').length;
-    const suspendedCount = clients.filter(c => c.status === 'suspended').length;
+    const activeCount = clients.filter(c => c.subscription_status === 'active').length;
+    const trialCount = clients.filter(c => c.subscription_status === 'trial' || !c.subscription_status).length;
+    const suspendedCount = clients.filter(c => c.subscription_status === 'suspended').length;
     const pendingPaymentsCount = payments.filter(p => p.status === 'pending').length;
 
     setStats(prev => ({
@@ -227,7 +228,7 @@ export default function SuperAdmin() {
   const updateClientStatus = async (clientId: string, newStatus: 'trial' | 'active' | 'suspended') => {
     setUpdatingClient(clientId);
     try {
-      await updateDoc(doc(db, 'profiles', clientId), { status: newStatus });
+      await updateDoc(doc(db, 'profiles', clientId), { subscription_status: newStatus });
       toast({
         title: 'Estado actualizado',
         description: `Cliente marcado como ${newStatus}`,
@@ -252,7 +253,7 @@ export default function SuperAdmin() {
 
       // If verified, activate client
       if (status === 'verified' && payment) {
-        await updateDoc(doc(db, 'profiles', payment.user_id), { status: 'active' });
+        await updateDoc(doc(db, 'profiles', payment.user_id), { subscription_status: 'active' });
       }
 
       toast({
@@ -538,7 +539,7 @@ export default function SuperAdmin() {
                             {new Date(client.created_at).toLocaleDateString('es-PE')}
                           </td>
                           <td className="py-3 px-4">
-                            {getStatusBadge(client.status || 'trial')}
+                            {getStatusBadge(client.subscription_status || 'trial')}
                           </td>
                           <td className="py-3 px-4">
                             <span className="font-semibold">{client.leads_count}</span>
@@ -563,7 +564,7 @@ export default function SuperAdmin() {
 
                               {/* Action Buttons Logic based on provided states */}
                               {/* If NOT active, show Activate (Green Check) */}
-                              {client.status !== 'active' && (
+                              {client.subscription_status !== 'active' && (
                                 <Button
                                   size="sm"
                                   variant="outline"
@@ -581,7 +582,7 @@ export default function SuperAdmin() {
                               )}
 
                               {/* If NOT suspended, show Suspend (Red X) */}
-                              {client.status !== 'suspended' && (
+                              {client.subscription_status !== 'suspended' && (
                                 <Button
                                   size="sm"
                                   variant="outline"
