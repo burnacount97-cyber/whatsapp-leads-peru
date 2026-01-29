@@ -286,8 +286,7 @@ export function SalesWidget() {
                         {[
                             "¿Cómo funciona?",
                             "Quiero una demo",
-                            "Ver precios",
-                            "Hablar con un humano"
+                            "Ver precios"
                         ].map((text, i) => (
                             <button
                                 key={i}
