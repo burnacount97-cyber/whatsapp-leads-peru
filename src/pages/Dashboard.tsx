@@ -497,21 +497,37 @@ export default function Dashboard() {
     const file = e.target.files?.[0];
     if (!file || !user) return;
 
+    // Optional: Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: 'Archivo muy grande',
+        description: 'La imagen no debe superar los 5MB.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setUploading(true);
+    console.log('Iniciando subida de comprobante...');
+
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.uid}-${Math.floor(Date.now() / 1000)}.${fileExt}`;
       const storageRef = ref(storage, `proofs/${fileName}`);
 
       // Upload to Firebase Storage
+      console.log('Subiendo a Storage:', fileName);
       await uploadBytes(storageRef, file);
       const publicUrl = await getDownloadURL(storageRef);
+      console.log('URL obtenida:', publicUrl);
 
       // Add to payments collection
+      console.log('Guardando en Firestore...');
       await addDoc(collection(db, 'payments'), {
         user_id: user.uid,
         amount: 30,
         payment_method: 'Yape/Plin',
+        description: 'Suscripción Mensual Lead Widget',
         proof_url: publicUrl,
         status: 'pending',
         created_at: new Date().toISOString()
@@ -522,16 +538,22 @@ export default function Dashboard() {
         description: 'Revisaremos tu pago pronto para activar tu cuenta.',
       });
 
-      loadData();
+      console.log('Actualizando datos del dashboard...');
+      await loadData();
     } catch (error: any) {
-      console.error(error);
+      console.error('Error detallado de subida:', error);
       toast({
         title: 'Error de subida',
-        description: 'No se pudo subir el archivo. Verifica tu conexión.',
+        description: error.code === 'storage/unauthorized'
+          ? 'No tienes permiso para subir. Revisa las reglas de Storage.'
+          : 'No se pudo subir el archivo. Verifica tu conexión.',
         variant: 'destructive',
       });
     } finally {
+      console.log('Proceso de subida finalizado.');
       setUploading(false);
+      // Reset input
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -1529,31 +1551,65 @@ export default function Dashboard() {
 
                   <div className="p-8 border-2 border-dashed rounded-2xl bg-slate-50 text-center space-y-4">
                     <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mx-auto mb-2 border border-slate-100">
-                      <Upload className="w-8 h-8 text-primary/40" />
+                      <MessageCircle className="w-8 h-8 text-primary/40" />
                     </div>
                     <div>
-                      <p className="font-bold mb-1">Subir Comprobante</p>
-                      <p className="text-sm text-muted-foreground max-w-sm mx-auto">
-                        Selecciona una foto o captura de pantalla de tu transferencia para que nuestro equipo valide el pago.
+                      <p className="font-bold mb-1">Reportar Pago Realizado</p>
+                      <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-4">
+                        Ingresa el número de operación o el nombre del titular del pago para que podamos validarlo.
                       </p>
                     </div>
 
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      className="hidden"
-                      accept="image/*"
-                      onChange={handleUploadProof}
-                    />
+                    <div className="max-w-xs mx-auto space-y-3">
+                      <Input
+                        placeholder="Nro de Operación o Nombre"
+                        id="payment-ref"
+                        className="text-center font-bold h-12 border-primary/20 focus:ring-primary"
+                      />
+                      <Button
+                        className="w-full h-12 font-bold text-lg"
+                        onClick={async () => {
+                          const refInput = document.getElementById('payment-ref') as HTMLInputElement;
+                          const reference = refInput?.value;
+                          if (!reference || reference.trim().length < 3) {
+                            toast({ title: 'Dato requerido', description: 'Por favor ingresa una referencia válida.', variant: 'destructive' });
+                            return;
+                          }
 
-                    <Button
-                      className="gap-2 h-12 px-8 font-bold text-lg"
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={uploading}
-                    >
-                      {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-5 h-5" />}
-                      Seleccionar Archivo
-                    </Button>
+                          setUploading(true);
+                          try {
+                            await addDoc(collection(db, 'payments'), {
+                              user_id: user.uid,
+                              amount: 30,
+                              payment_method: 'Yape/Plin/BCP',
+                              description: 'Plan Mensual Lead Widget',
+                              operation_ref: reference, // Using text reference instead of file
+                              status: 'pending',
+                              created_at: new Date().toISOString()
+                            });
+
+                            toast({
+                              title: '¡Pago reportado!',
+                              description: 'Lo validaremos en unos minutos.',
+                            });
+
+                            if (refInput) refInput.value = '';
+                            loadData();
+                          } catch (e: any) {
+                            toast({ title: 'Error', description: 'No se pudo reportar el pago.', variant: 'destructive' });
+                          } finally {
+                            setUploading(false);
+                          }
+                        }}
+                        disabled={uploading}
+                      >
+                        {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Reportar y Activar'}
+                      </Button>
+
+                      <p className="text-[10px] text-muted-foreground mt-2">
+                        * Si tienes la captura, puedes enviarla a nuestro <a href="https://wa.me/51902105668" target="_blank" className="underline text-primary">WhatsApp</a> para acelerar el proceso.
+                      </p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -1597,8 +1653,8 @@ export default function Dashboard() {
                             </td>
                             <td className="py-4 px-6 text-right">
                               <span className={`px-3 py-1 rounded-full text-xs font-bold ${p.status === 'completed' || p.status === 'active'
-                                  ? 'bg-green-100 text-green-700 border border-green-200'
-                                  : 'bg-amber-100 text-amber-700 border border-amber-200'
+                                ? 'bg-green-100 text-green-700 border border-green-200'
+                                : 'bg-amber-100 text-amber-700 border border-amber-200'
                                 }`}>
                                 {p.status === 'completed' || p.status === 'active' ? '✓ Pagado' : '⏳ Pendiente'}
                               </span>

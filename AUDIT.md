@@ -380,6 +380,7 @@ Variables necesarias en producción:
 
 ### Configuración
 - [ ] Firestore security rules configuradas
+- [ ] Storage rules configuradas (para comprobantes)
 - [ ] Variables de entorno en Vercel
 - [ ] `.env` en `.gitignore`
 - [ ] Dominio personalizado configurado

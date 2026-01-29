@@ -60,6 +60,7 @@ interface Payment {
   status: string;
   payment_method: string;
   proof_url?: string;
+  operation_ref?: string;
   created_at: string;
 }
 
@@ -646,18 +647,14 @@ export default function SuperAdmin() {
                               <p className="text-xs text-muted-foreground">
                                 {new Date(payment.created_at).toLocaleString('es-PE')}
                               </p>
+                              {payment.operation_ref && (
+                                <p className="text-xs font-mono bg-slate-100 px-2 py-0.5 rounded mt-1 border border-slate-200">
+                                  REF: {payment.operation_ref}
+                                </p>
+                              )}
                             </div>
                           </div>
                           <div className="flex gap-2">
-                            {payment.proof_url && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => window.open(payment.proof_url!, '_blank')}
-                              >
-                                <Eye className="w-4 h-4 mr-1" /> Ver
-                              </Button>
-                            )}
                             <Button
                               size="sm"
                               onClick={() => verifyPayment(payment.id, 'verified')}
@@ -894,6 +891,6 @@ export default function SuperAdmin() {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
+    </div >
   );
 }
