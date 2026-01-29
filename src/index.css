@@ -102,46 +102,66 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   }
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-bold tracking-tight;
   }
 }
 
 @layer components {
-  /* Iridescent Button Effect */
+
+  /* Iridescent Button Effect - Balanced */
   .btn-iridescent {
-    background: linear-gradient(135deg, hsl(var(--primary)), #34d399, #a7f3d0, hsl(var(--primary)), #059669, #34d399);
-    background-size: 300% 300%;
-    animation: shimmer 3s ease-in-out infinite, vibrate-btn 2.5s ease-in-out infinite;
-    box-shadow: 0 0 20px hsl(var(--primary) / 0.4), 0 0 40px hsl(var(--primary) / 0.2);
-    transition: all .3s ease;
+    background: linear-gradient(135deg, hsl(var(--primary)), #34d399, hsl(var(--primary)));
+    background-size: 200% 100%;
+    animation: shimmer 6s ease-in-out infinite;
+    box-shadow: 0 4px 14px hsl(var(--primary) / 0.4);
+    transition: all .5s cubic-bezier(0.4, 0, 0.2, 1);
     border: none;
-    color: white; 
+    color: white;
+    position: relative;
+    overflow: hidden;
   }
-  
+
   .dark .btn-iridescent {
-     color: black; /* Contrast for dark mode primary (bright green) */
+    color: white;
+    /* Green bg usually needs white text */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   }
 
+  /* Hover State: Make it pop but smooth */
   .btn-iridescent:hover {
-    box-shadow: 0 0 30px hsl(var(--primary) / 0.6), 0 0 60px hsl(var(--primary) / 0.3);
-    transform: scale(1.05);
+    background-size: 150% 100%;
+    box-shadow: 0 6px 20px hsl(var(--primary) / 0.6);
+    transform: translateY(-2px);
   }
 
+  /* Shimmer: Pass through then wait */
   @keyframes shimmer {
-    0%{background-position:0% 50%}
-    50%{background-position:100% 50%}
-    to{background-position:0% 50%}
-  }
-  
-  @keyframes vibrate-btn {
-    0%,to{transform:translate(0) scale(1)}
-    10%,30%,50%,70%,90%{transform:translate(-1px) scale(1.02)}
-    20%,40%,60%,80%{transform:translate(1px) scale(1.02)}
+    0% {
+      background-position: 100% 50%;
+    }
+
+    15% {
+      background-position: 0% 50%;
+    }
+
+    /* Fast pass */
+    100% {
+      background-position: 0% 50%;
+    }
+
+    /* Long wait */
   }
 
   /* Utility Classes for Landing */
@@ -151,12 +171,12 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
+
   .glass {
     background: hsl(0 0% 100% / 0.8);
     backdrop-filter: blur(12px);
   }
-  
+
   .glass-dark {
     background: hsl(220 20% 10% / 0.8);
     backdrop-filter: blur(12px);
@@ -164,8 +184,19 @@
 }
 
 @layer utilities {
-  .text-yape { color: hsl(161 100% 38%); }
-  .text-bcp { color: hsl(210 100% 36%); }
-  .bg-yape { background-color: hsl(161 100% 38%); }
-  .bg-bcp { background-color: hsl(210 100% 36%); }
+  .text-yape {
+    color: hsl(161 100% 38%);
+  }
+
+  .text-bcp {
+    color: hsl(210 100% 36%);
+  }
+
+  .bg-yape {
+    background-color: hsl(161 100% 38%);
+  }
+
+  .bg-bcp {
+    background-color: hsl(210 100% 36%);
+  }
 }
