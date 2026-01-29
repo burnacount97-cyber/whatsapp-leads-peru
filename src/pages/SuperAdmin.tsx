@@ -87,8 +87,7 @@ export default function SuperAdmin() {
   const [editingClient, setEditingClient] = useState<Profile | null>(null);
   const [editForm, setEditForm] = useState({ business_name: '', phone: '', email: '' });
   const [blockedDemoIps, setBlockedDemoIps] = useState<any[]>([]);
-  const [demoWidgetOwnerId, setDemoWidgetOwnerId] = useState('');
-  const [savingConfig, setSavingConfig] = useState(false);
+
 
 
   // Stats
@@ -180,12 +179,7 @@ export default function SuperAdmin() {
 
 
 
-    // Fetch System Config (Demo Widget ID)
-    getDoc(doc(db, 'system_settings', 'demo')).then(docSnap => {
-      if (docSnap.exists()) {
-        setDemoWidgetOwnerId(docSnap.data().owner_id || '');
-      }
-    });
+
 
     setLoading(false);
 
@@ -330,22 +324,6 @@ export default function SuperAdmin() {
     setIsCreateOpen(false);
   };
 
-  const handleSaveSystemConfig = async () => {
-    setSavingConfig(true);
-    try {
-      await setDoc(doc(db, 'system_settings', 'demo'), {
-        owner_id: demoWidgetOwnerId,
-        updated_at: new Date().toISOString(),
-        updated_by: user?.uid
-      }, { merge: true });
-      toast({ title: 'Configuración guardada', description: 'El widget de la landing ahora usará este ID.' });
-    } catch (error: any) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    } finally {
-      setSavingConfig(false);
-    }
-  };
-
   const filteredClients = clients.filter(client =>
     client.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     client.business_name?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -474,10 +452,6 @@ export default function SuperAdmin() {
             <TabsTrigger value="security" className="gap-2">
               <ShieldCheck className="w-4 h-4" />
               Seguridad
-            </TabsTrigger>
-            <TabsTrigger value="config" className="gap-2">
-              <Settings className="w-4 h-4" />
-              Configuración
             </TabsTrigger>
 
           </TabsList>
@@ -885,58 +859,6 @@ export default function SuperAdmin() {
                     </table>
                   </div>
                 )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-
-          {/* Config Tab */}
-          <TabsContent value="config">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center">
-                    <Settings className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle>Configuración del Sistema</CardTitle>
-                    <CardDescription>Controla aspectos globales de la plataforma</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="p-6 border rounded-xl bg-slate-50 dark:bg-slate-900">
-                  <h3 className="font-semibold mb-4">Widget de la Landing Page (Demo)</h3>
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>ID del Usuario Dueño</Label>
-                      <div className="flex gap-2">
-                        <Input
-                          value={demoWidgetOwnerId}
-                          onChange={(e) => setDemoWidgetOwnerId(e.target.value)}
-                          placeholder="Pega aquí el UID de tu cuenta de usuario..."
-                        />
-                        <Button onClick={handleSaveSystemConfig} disabled={savingConfig}>
-                          {savingConfig ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Guardar'}
-                        </Button>
-                      </div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-xs text-muted-foreground">¿Eres tú el dueño?</span>
-                        <button
-                          onClick={() => setDemoWidgetOwnerId(user?.uid || '')}
-                          className="text-xs text-primary font-medium hover:underline"
-                        >
-                          Usar mi ID ({user?.uid?.substring(0, 8)}...)
-                        </button>
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-2">
-                        El widget de la landing page cargará la configuración (Prompt, Colores, Textos) definida en la cuenta de usuario con este ID.
-                        <br />
-                        <b>Tip:</b> Usa tu propia cuenta de usuario en el Dashboard para configurar el widget demo.
-                      </p>
-                    </div>
-                  </div>
-                </div>
               </CardContent>
             </Card>
           </TabsContent>
