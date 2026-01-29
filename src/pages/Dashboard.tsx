@@ -410,6 +410,30 @@ export default function Dashboard() {
         }
       }
 
+      // Load analytics data
+      try {
+        if (widgetConfig?.id) {
+          const analyticsQuery = query(
+            collection(db, 'analytics'),
+            where('widget_id', '==', widgetConfig.id)
+          );
+          const analyticsSnap = await getDocs(analyticsQuery);
+
+          const viewCount = analyticsSnap.docs.filter(doc => doc.data().event_type === 'view').length;
+          const interactionCount = analyticsSnap.docs.filter(doc =>
+            ['chat_open', 'message_sent'].includes(doc.data().event_type)
+          ).length;
+
+          setAnalytics({
+            views: viewCount,
+            interactions: interactionCount
+          });
+        }
+      } catch (analyticsError) {
+        console.error('Non-critical: Error loading analytics:', analyticsError);
+        // Keep default values if analytics fail
+      }
+
     } catch (error: any) {
       console.error('CRITICAL: Error loading dashboard data:', error);
       toast({
