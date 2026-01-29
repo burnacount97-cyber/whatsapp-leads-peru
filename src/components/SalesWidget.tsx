@@ -79,13 +79,21 @@ export function SalesWidget() {
         };
     }, []);
 
-    const handleSendMessage = async () => {
-        if (!inputText.trim()) return;
+    const handleSendMessage = async (overrideText?: string) => {
+        const textToSend = typeof overrideText === 'string' ? overrideText : inputText;
+        if (!textToSend.trim()) return;
 
-        const userMsg = inputText.trim();
-        setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
-        setInputText('');
+        const userMsg = textToSend.trim();
+
+        // If manual send, we handle UI updates here.
+        if (!overrideText) {
+            setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+            setInputText('');
+        }
         setIsLoading(true);
+
+        const currentHistory = messages.map(m => ({ role: m.role, content: m.content })).filter(m => m.role !== 'system');
+        const historyToSend = [...currentHistory, { role: 'user', content: userMsg }];
 
         try {
             const response = await fetch('/api/chat', {
@@ -93,7 +101,7 @@ export function SalesWidget() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     message: userMsg,
-                    history: messages.map(m => ({ role: m.role, content: m.content })).filter(m => m.role !== 'system'), // Filter out system messages from history
+                    history: historyToSend,
                     widgetId: MY_WIDGET_ID
                 })
             });
@@ -271,6 +279,33 @@ export function SalesWidget() {
 
             {/* Input Area */}
             <div className="p-4 bg-white border-t border-slate-100 space-y-3">
+
+                {/* Quick Actions / Atajos */}
+                {messages.length < 3 && (
+                    <div className="flex flex-wrap gap-2 mb-2">
+                        {[
+                            "¿Cómo funciona?",
+                            "Quiero una demo",
+                            "Ver precios",
+                            "Hablar con un humano"
+                        ].map((text, i) => (
+                            <button
+                                key={i}
+                                onClick={() => {
+                                    // Add to UI immediately for better UX
+                                    setMessages(prev => [...prev, { role: 'user', content: text }]);
+                                    setInputText('');
+                                    // Handle send (API call)
+                                    handleSendMessage(text);
+                                }}
+                                className="text-[11px] bg-slate-100 hover:bg-[#00C185] hover:text-white text-slate-600 px-3 py-1.5 rounded-full transition-colors border border-slate-200"
+                            >
+                                {text}
+                            </button>
+                        ))}
+                    </div>
+                )}
+
                 {isIdle && messages.length === 1 && (
                     <div className="text-center animate-bounce-subtle">
                         <span className="text-[11px] bg-primary/10 text-primary px-3 py-1 rounded-full font-semibold border border-primary/20">
@@ -297,7 +332,7 @@ export function SalesWidget() {
                         type="submit"
                         size="icon"
                         className={`bg-[#00C185] hover:bg-[#00A16E] text-white shrink-0 h-12 w-12 shadow-lg transition-all ${isIdle ? 'animate-pulse' : ''}`}
-                        disabled={isLoading || !inputText.trim()}
+                        disabled={isLoading || (!inputText.trim() && !isLoading)} // Fix disabled logic: allow button if loading? No, standard disable.
                     >
                         <Send className="w-5 h-5" />
                     </Button>
