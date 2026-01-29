@@ -236,6 +236,15 @@ export default function SuperAdmin() {
   };
 
 
+  const unblockDemoIp = async (id: string) => {
+    try {
+      await deleteDoc(doc(db, 'blocked_ips', id));
+      toast({ title: 'IP desbloqueada para demo' });
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    }
+  };
+
   const updateClientStatus = async (clientId: string, newStatus: 'trial' | 'active' | 'suspended') => {
     setUpdatingClient(clientId);
     try {
@@ -876,6 +885,49 @@ export default function SuperAdmin() {
               </CardContent>
             </Card>
           </TabsContent>
+
+
+          {/* Config Tab */}
+          <TabsContent value="config">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center">
+                    <Settings className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle>Configuración del Sistema</CardTitle>
+                    <CardDescription>Controla aspectos globales de la plataforma</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="p-6 border rounded-xl bg-slate-50 dark:bg-slate-900">
+                  <h3 className="font-semibold mb-4">Widget de la Landing Page (Demo)</h3>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label>ID del Usuario Dueño</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          value={demoWidgetOwnerId}
+                          onChange={(e) => setDemoWidgetOwnerId(e.target.value)}
+                          placeholder="Pega aquí el UID de tu cuenta de usuario..."
+                        />
+                        <Button onClick={handleSaveSystemConfig} disabled={savingConfig}>
+                          {savingConfig ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Guardar'}
+                        </Button>
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        El widget de la landing page cargará la configuración (Prompt, Colores, Textos) definida en la cuenta de usuario con este ID.
+                        <br />
+                        <b>Tip:</b> Usa tu propia cuenta de usuario en el Dashboard para configurar el widget demo.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
 
         {/* Edit Dialog */}
@@ -908,6 +960,6 @@ export default function SuperAdmin() {
           </DialogContent>
         </Dialog>
       </div>
-    </div >
+    </div>
   );
 }
