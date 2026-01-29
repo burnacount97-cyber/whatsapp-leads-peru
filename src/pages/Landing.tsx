@@ -219,15 +219,34 @@ export default function Landing() {
       </section>
 
       {/* --- TRUST BADGE SECTION --- */}
-      <section className="py-8 lg:py-10 border-y border-border/40 bg-muted/20">
-        <div className="container mx-auto text-center px-4">
-          <p className="text-xs sm:text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-6 sm:mb-8">
-            Compatible con todas las plataformas
-          </p>
-          <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-6 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
-            {['WordPress', 'Shopify', 'Wix', 'React', 'Webflow', 'Carrd'].map(p => (
-              <div key={p} className="flex items-center gap-2 font-bold text-lg sm:text-xl text-slate-500 hover:text-primary cursor-default select-none">
-                <Globe className="w-4 h-4 sm:w-5 sm:h-5" /> {p}
+      <section className="py-12 lg:py-16 bg-background overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-10 max-w-xs mx-auto md:max-w-none">
+            <div className="h-px w-12 bg-primary mx-auto mb-4 opacity-50" />
+            <p className="text-[10px] sm:text-xs font-black text-muted-foreground uppercase tracking-[0.3em] mb-2 px-6">
+              Funciona con cualquier ecosistema
+            </p>
+          </div>
+
+          <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8 md:gap-24">
+            {[
+              { name: 'WordPress', icon: Globe },
+              { name: 'Shopify', icon: Globe },
+              { name: 'Wix', icon: Globe },
+              { name: 'React', icon: Globe },
+              { name: 'Webflow', icon: Globe },
+              { name: 'Carrd', icon: Globe }
+            ].map((p, i) => (
+              <div
+                key={p.name}
+                className="flex items-center gap-2 group cursor-pointer transition-all hover:scale-110"
+              >
+                <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                  <p.icon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
+                <span className="font-bold text-sm sm:text-base text-muted-foreground group-hover:text-foreground tracking-tight transition-colors">
+                  {p.name}
+                </span>
               </div>
             ))}
           </div>
@@ -301,7 +320,7 @@ export default function Landing() {
       </section>
 
       {/* --- FEATURES GRID --- */}
-      <section className="py-16 lg:py-24 px-4 bg-background">
+      <section className="py-16 lg:py-24 px-4 bg-background" id="features">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12 lg:mb-16 max-w-3xl mx-auto">
             <h2 className="text-3xl md:text-5xl font-bold mb-4 text-balance">Todo lo que necesitas para escalar</h2>
@@ -330,7 +349,7 @@ export default function Landing() {
       </section>
 
       {/* --- TEMPLATES SHOWCASE --- */}
-      <section className="py-16 lg:py-24 px-4 bg-muted/30">
+      <section className="py-16 lg:py-24 px-4 bg-muted/30" id="templates">
         <div className="container mx-auto max-w-5xl">
           <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-8 md:mb-12 gap-6">
             <div>
@@ -581,19 +600,19 @@ export default function Landing() {
             <div>
               <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-foreground">Producto</h4>
               <ul className="space-y-4 text-sm text-muted-foreground">
-                <li className="hover:text-primary transition-colors cursor-pointer">Características</li>
-                <li className="hover:text-primary transition-colors cursor-pointer">Plantillas</li>
-                <li className="hover:text-primary transition-colors cursor-pointer">Integraciones</li>
-                <li className="hover:text-primary transition-colors cursor-pointer">Precios</li>
+                <li><button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-primary transition-colors">Características</button></li>
+                <li><button onClick={() => document.getElementById('templates')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-primary transition-colors">Plantillas</button></li>
+                <li><button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-primary transition-colors">Integraciones</button></li>
+                <li><button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-primary transition-colors">Precios</button></li>
               </ul>
             </div>
             <div>
               <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-foreground">Compañía</h4>
               <ul className="space-y-4 text-sm text-muted-foreground">
-                <li className="hover:text-primary transition-colors cursor-pointer">Sobre Nosotros</li>
-                <li className="hover:text-primary transition-colors cursor-pointer">Casos de Éxito</li>
-                <li className="hover:text-primary transition-colors cursor-pointer">Blog</li>
-                <li className="hover:text-primary transition-colors cursor-pointer">Soporte</li>
+                <li><button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-primary transition-colors">Sobre Nosotros</button></li>
+                <li><button className="hover:text-primary transition-colors opacity-50 cursor-not-allowed">Casos de Éxito</button></li>
+                <li><button className="hover:text-primary transition-colors opacity-50 cursor-not-allowed">Blog</button></li>
+                <li><button onClick={() => window.dispatchEvent(new Event('open-lead-widget'))} className="hover:text-primary transition-colors">Soporte</button></li>
               </ul>
             </div>
             <div>
