@@ -383,69 +383,80 @@ export default function Landing() {
             <p className="text-lg sm:text-xl text-muted-foreground">Sin comisiones por venta. Sin contratos forzosos.</p>
           </div>
 
-          <div className="relative p-1 rounded-[2rem] sm:rounded-[2.5rem] bg-gradient-to-b from-primary/50 to-transparent">
-            <div className="bg-card rounded-[1.8rem] sm:rounded-[2.3rem] p-6 md:p-12 border shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-4 py-1.5 sm:px-6 sm:py-2 rounded-bl-3xl font-bold text-xs sm:text-sm">
-                OFERTA LANZAMIENTO
+          <div className="relative max-w-md mx-auto md:max-w-none">
+            {/* Gradient Outline Effect */}
+            <div className="absolute -inset-1 rounded-[2.5rem] bg-gradient-to-b from-primary/50 to-transparent blur-sm opacity-50" />
+
+            <div className="relative bg-card rounded-[2rem] border shadow-2xl overflow-hidden">
+              {/* Badge */}
+              <div className="absolute top-0 right-0 left-0 h-1 bg-gradient-to-r from-primary via-emerald-400 to-primary" />
+              <div className="absolute top-4 right-4 sm:top-6 sm:right-6">
+                <span className="bg-primary/10 text-primary border border-primary/20 px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-wide">
+                  Oferta Lanzamiento
+                </span>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center mt-6 md:mt-0">
-                <div>
-                  <p className="text-xs sm:text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-2">Plan Mensual</p>
-                  <div className="flex items-baseline gap-1 mb-6">
-                    <span className="text-5xl sm:text-6xl font-black tracking-tighter">S/30</span>
-                    <span className="text-lg sm:text-xl text-muted-foreground font-medium">/mes</span>
+              <div className="p-6 sm:p-10 md:p-12 flex flex-col md:flex-row gap-8 md:gap-12 items-center">
+
+                {/* Left: Price & Features */}
+                <div className="flex-1 w-full text-center md:text-left mt-6 md:mt-0">
+                  <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-2">Plan Mensual</p>
+                  <div className="flex items-baseline justify-center md:justify-start gap-1 mb-8">
+                    <span className="text-5xl sm:text-7xl font-black tracking-tighter text-foreground">S/30</span>
+                    <span className="text-lg text-muted-foreground font-medium">/mes</span>
                   </div>
 
-                  <div className="space-y-4 mb-8">
+                  <div className="space-y-4 mb-8 text-left max-w-xs mx-auto md:mx-0">
                     {[
                       "Widget Proactivo Ilimitado",
                       "Captura de Leads Ilimitada",
                       "Acceso al Dashboard",
                       "Soporte Prioritario WhatsApp"
                     ].map((f, i) => (
-                      <div key={i} className="flex items-center gap-3">
-                        <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                      <div key={i} className="flex items-start gap-3">
+                        <div className="rounded-full bg-primary/10 p-1 mt-0.5">
+                          <Check className="w-3.5 h-3.5 text-primary" />
+                        </div>
                         <span className="font-medium text-sm sm:text-base">{f}</span>
                       </div>
                     ))}
                   </div>
 
-                  <Link to="/register">
-                    <Button size="xl" className="w-full font-bold text-lg h-12 sm:h-14 btn-iridescent text-white shadow-xl shadow-primary/20">
+                  <Link to="/register" className="block w-full">
+                    <Button size="lg" className="w-full font-bold text-base sm:text-lg h-12 sm:h-14 btn-iridescent text-white shadow-lg sm:shadow-xl shadow-primary/20 rounded-xl hover:scale-[1.02] transition-transform">
                       Comenzar Prueba Gratis
                     </Button>
                   </Link>
-                  <p className="text-center text-xs text-muted-foreground mt-3">3 días de prueba sin tarjeta</p>
+                  <p className="text-center text-xs text-muted-foreground mt-3">No requiere tarjeta de crédito</p>
                 </div>
 
-                <div className="bg-muted/30 rounded-3xl p-6 sm:p-8 border text-center">
-                  <h4 className="font-bold mb-4 sm:mb-6 text-sm sm:text-base">Métodos de Pago Locales</h4>
-                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                    {/* YAPE CARD */}
-                    <div className="bg-[#0f172a] p-3 sm:p-4 rounded-xl border border-slate-700/50 flex flex-col items-center gap-2 sm:gap-3 hover:border-[#742284]/50 hover:bg-[#742284]/10 transition-all group cursor-default">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#742284] flex items-center justify-center shadow-lg shadow-purple-900/20 group-hover:scale-110 transition-transform duration-300">
-                        {/* CSS Yape Logo Simulation */}
-                        <span className="font-black italic text-white text-[10px] sm:text-[13px] tracking-tighter transform -rotate-2">Yape</span>
+                {/* Right: Payment Methods */}
+                <div className="w-full md:w-80 bg-muted/30 rounded-3xl p-6 border border-border/50 text-center">
+                  <h4 className="font-bold mb-4 text-sm text-muted-foreground uppercase tracking-wide">Pagos Locales Flexibles</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* YAPE */}
+                    <div className="bg-background p-3 rounded-xl border shadow-sm flex flex-col items-center gap-2 hover:border-[#742284] transition-colors group">
+                      <div className="w-10 h-10 rounded-lg bg-[#742284] flex items-center justify-center text-white font-black italic text-[10px] transform -rotate-3 group-hover:scale-110 transition-transform">
+                        Yape
                       </div>
-                      <span className="font-bold text-[10px] sm:text-xs text-slate-300 group-hover:text-white transition-colors">Yape</span>
+                      <span className="text-[10px] font-bold text-muted-foreground">Yape</span>
                     </div>
 
-                    {/* PLIN CARD */}
-                    <div className="bg-[#0f172a] p-3 sm:p-4 rounded-xl border border-slate-700/50 flex flex-col items-center gap-2 sm:gap-3 hover:border-[#00D1D1]/50 hover:bg-[#00D1D1]/10 transition-all group cursor-default">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#00D1D1] flex items-center justify-center shadow-lg shadow-cyan-900/20 group-hover:scale-110 transition-transform duration-300">
-                        {/* CSS Plin Logo Simulation */}
-                        <span className="font-bold text-white text-[10px] sm:text-[13px] tracking-tight">Plin</span>
+                    {/* PLIN */}
+                    <div className="bg-background p-3 rounded-xl border shadow-sm flex flex-col items-center gap-2 hover:border-[#00D1D1] transition-colors group">
+                      <div className="w-10 h-10 rounded-lg bg-[#00D1D1] flex items-center justify-center text-white font-bold text-[10px] group-hover:scale-110 transition-transform">
+                        Plin
                       </div>
-                      <span className="font-bold text-[10px] sm:text-xs text-slate-300 group-hover:text-white transition-colors">Plin</span>
+                      <span className="text-[10px] font-bold text-muted-foreground">Plin</span>
                     </div>
 
-                    {/* TRANSFER CARD */}
-                    <div className="col-span-2 bg-[#0f172a] p-3 sm:p-4 rounded-xl border border-slate-700/50 flex items-center justify-center gap-2 hover:border-primary/50 transition-all cursor-default">
-                      <span className="font-bold text-[10px] sm:text-xs text-slate-400">Transferencia BCP / Interbank</span>
+                    {/* BCP */}
+                    <div className="col-span-2 bg-background p-3 rounded-xl border shadow-sm flex items-center justify-center gap-2 hover:border-primary/50 transition-colors">
+                      <span className="text-[10px] font-semibold text-muted-foreground">Transferencias BCP / Interbank</span>
                     </div>
                   </div>
                 </div>
+
               </div>
             </div>
           </div>
