@@ -192,6 +192,7 @@ export default function Dashboard() {
     id: string;
     content: string;
     type: 'info' | 'warning' | 'error' | 'success';
+    updated_at: string;
   } | null>(null);
   const [dismissedAnnouncement, setDismissedAnnouncement] = useState<string | null>(
     localStorage.getItem('dismissed_announcement')
@@ -615,7 +616,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-muted/30">
       {/* System Announcement Banner */}
-      {announcement && dismissedAnnouncement !== announcement.id && (
+      {announcement && dismissedAnnouncement !== `${announcement.id}_${announcement.updated_at}` && (
         <div className={`p-2 flex items-center justify-center gap-3 relative transition-colors ${announcement.type === 'error' ? 'bg-red-600 text-white' :
           announcement.type === 'warning' ? 'bg-orange-500 text-white' :
             announcement.type === 'success' ? 'bg-emerald-600 text-white' :
@@ -625,8 +626,9 @@ export default function Dashboard() {
           <p className="text-sm font-medium pr-8">{announcement.content}</p>
           <button
             onClick={() => {
-              setDismissedAnnouncement(announcement.id);
-              localStorage.setItem('dismissed_announcement', announcement.id);
+              const uniqueKey = `${announcement.id}_${announcement.updated_at}`;
+              setDismissedAnnouncement(uniqueKey);
+              localStorage.setItem('dismissed_announcement', uniqueKey);
             }}
             className="absolute right-2 p-1 hover:bg-white/20 rounded-full transition-colors"
           >
