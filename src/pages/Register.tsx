@@ -6,7 +6,6 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/lib/auth';
 import { MessageCircle, Loader2, ArrowLeft, Check, Mail, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { ModeToggle } from '@/components/mode-toggle';
 
 const benefits = [
   'Widget proactivo ilimitado',
@@ -52,9 +51,6 @@ export default function Register() {
   if (isSubmitted) {
     return (
       <div className="min-h-screen flex items-center justify-center p-8 bg-slate-50 dark:bg-[#020617]">
-        <div className="absolute top-4 right-4 z-50">
-          <ModeToggle />
-        </div>
         <div className="w-full max-w-md text-center space-y-8 animate-in fade-in zoom-in duration-300 bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl">
           <div className="flex justify-center">
             <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
@@ -106,9 +102,7 @@ export default function Register() {
 
   return (
     <div className="min-h-screen flex bg-slate-50 dark:bg-[#020617]">
-      <div className="absolute top-4 right-4 z-50">
-        <ModeToggle />
-      </div>
+      {/* Theme Toggle - Removed */}
 
       {/* Left Panel - Decoration */}
       <div className="hidden lg:flex flex-1 hero-gradient items-center justify-center p-12 relative overflow-hidden">

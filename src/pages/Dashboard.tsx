@@ -24,7 +24,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { ModeToggle } from '@/components/mode-toggle';
 import { WidgetPreview } from '@/components/WidgetPreview';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -810,7 +809,7 @@ export default function Dashboard() {
           </div>
 
           <div className="flex items-center gap-3">
-            <ModeToggle />
+            {/* Theme Toggle - Removed */}
             {isSuperAdmin && (
               <Link to="/superadmin">
                 <Button variant="outline" size="sm" className="flex border-primary text-primary hover:bg-primary/10">

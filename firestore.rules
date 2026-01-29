@@ -68,5 +68,11 @@ service cloud.firestore {
       allow create: if request.auth != null;
       allow update, delete: if isSuperAdmin();
     }
+
+    // System Settings (Global Config like Landing Widget ID)
+    match /system_settings/{docId} {
+      allow read: if true; // Public for Landing Page
+      allow write: if isSuperAdmin(); // Only SuperAdmin controls this
+    }
   }
 }

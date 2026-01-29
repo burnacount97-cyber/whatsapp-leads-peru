@@ -6,7 +6,6 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/lib/auth';
 import { MessageCircle, Loader2, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { ModeToggle } from '@/components/mode-toggle';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -61,10 +60,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex bg-slate-50 dark:bg-[#020617]">
-      {/* Theme Toggle - Absolute Position */}
-      <div className="absolute top-4 right-4 z-50">
-        <ModeToggle />
-      </div>
+      {/* Theme Toggle - Removed */}
 
       {/* Left Panel - Form */}
       <div className="flex-1 flex items-center justify-center p-8">

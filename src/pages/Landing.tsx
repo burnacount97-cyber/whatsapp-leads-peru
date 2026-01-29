@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { SalesWidget } from '@/components/SalesWidget';
-import { ModeToggle } from '@/components/mode-toggle';
 import { SocialProofToast } from '@/components/SocialProofToast';
 import {
   MessageCircle,
@@ -93,7 +92,6 @@ export default function Landing() {
               Iniciar Sesión
             </Link>
             <div className="flex items-center gap-2 pl-2 border-l border-border">
-              <ModeToggle />
               <Link to="/register">
                 <Button className="font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all btn-iridescent text-white">
                   Probar Gratis <ArrowRight className="w-4 h-4 ml-2" />
@@ -104,7 +102,6 @@ export default function Landing() {
 
           {/* Mobile Nav */}
           <div className="md:hidden flex items-center gap-2">
-            <ModeToggle />
             <Link to="/register">
               <Button size="sm" className="font-bold">
                 Probar
