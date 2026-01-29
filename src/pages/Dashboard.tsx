@@ -155,6 +155,7 @@ export default function Dashboard() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [savingAI, setSavingAI] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
 
   // PWA Install Prompt
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -701,6 +702,90 @@ export default function Dashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const isTrialExpired = getTrialDaysLeft() <= 0 && profile?.subscription_status !== 'active';
+
+  // BLOCKING OVERLAY
+  if (isTrialExpired) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <Card className="max-w-md w-full shadow-2xl border-primary/20">
+          <CardHeader className="text-center pb-2">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <LogOut className="w-8 h-8 text-red-600 ml-1" />
+            </div>
+            <CardTitle className="text-2xl font-black text-slate-800">¡Tu prueba ha terminado!</CardTitle>
+            <CardDescription className="text-base mt-2">
+              Esperamos que Lead Widget haya sido útil. Para seguir capturando leads ilimitadamente, activa tu plan hoy.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6 pt-6">
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
+              <p className="text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">Plan Mensual</p>
+              <div className="flex items-center justify-center gap-1">
+                <span className="text-3xl font-black text-primary">S/ 30.00</span>
+                <span className="text-sm text-muted-foreground">/mes</span>
+              </div>
+            </div>
+
+            {!showPayment ? (
+              <Button
+                className="w-full h-12 text-lg font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
+                onClick={() => setShowPayment(true)}
+              >
+                Pagar Ahora
+              </Button>
+            ) : null}
+
+            {showPayment && (
+              <div id="billing-action" className="space-y-4 pt-4 border-t animate-in fade-in slide-in-from-top-4 duration-500">
+                <p className="text-center text-sm font-medium mb-2">Métodos de Pago:</p>
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="p-2 bg-sky-50 rounded border border-sky-100">
+                    <span className="font-bold block text-sky-700">BCP</span>
+                    193-XXXXXXXX-X-XX
+                  </div>
+                  <div className="p-2 bg-purple-50 rounded border border-purple-100">
+                    <span className="font-bold block text-purple-700">Yape/Plin</span>
+                    902 105 668
+                  </div>
+                </div>
+
+                <div className="pt-4">
+                  <p className="text-xs text-center text-muted-foreground mb-2">Ingresa tu Nro. de Operación o Titular:</p>
+                  <div className="flex gap-2">
+                    <Input id="blocked-ref" placeholder="Ej: 123456 o Juan Perez" />
+                    <Button onClick={async () => {
+                      const refInput = document.getElementById('blocked-ref') as HTMLInputElement;
+                      if (!refInput.value) return toast({ title: "Requerido", variant: "destructive" });
+
+                      try {
+                        await addDoc(collection(db, 'payments'), {
+                          user_id: user?.uid,
+                          amount: 30,
+                          description: 'Renovación (Blocked)',
+                          operation_ref: refInput.value,
+                          status: 'pending',
+                          created_at: new Date().toISOString()
+                        });
+                        toast({ title: "Pago reportado", description: "Espera la activación manual." });
+                      } catch (e) { toast({ title: "Error", variant: "destructive" }); }
+                    }}>Enviar</Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </CardContent>
+          <div className="p-4 bg-slate-50 text-center text-xs text-muted-foreground border-t rounded-b-xl">
+            <button onClick={handleSignOut} className="hover:text-red-500 underline flex items-center justify-center gap-1 w-full">
+              <LogOut className="w-3 h-3" /> Cerrar Sesión
+            </button>
+          </div>
+        </Card>
       </div>
     );
   }
