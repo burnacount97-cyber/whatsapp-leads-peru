@@ -349,22 +349,22 @@ export default function Landing() {
       {/* --- TEMPLATES SHOWCASE --- */}
       <section className="py-16 lg:py-24 px-4 bg-slate-950 text-white relative border-y border-white/5" id="templates">
         <div className="container mx-auto max-w-5xl">
-          <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-8 md:mb-12 gap-6">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold mb-2">Plantillas por Industria</h2>
-              <p className="text-muted-foreground text-sm sm:text-base">La IA ya está entrenada para tu nicho.</p>
+          <div className="mb-8 md:mb-12">
+            <div className="text-left mb-6">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-2">Plantillas por Industria</h2>
+              <p className="text-slate-400 text-sm sm:text-base">La IA ya está entrenada para tu nicho. Elige una para ver la demo.</p>
             </div>
-            <div className="flex gap-2 w-full md:w-auto overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 no-scrollbar">
+            <div className="flex flex-wrap gap-3 w-full overflow-x-auto pb-2 no-scrollbar">
               {nicheTemplates.map(t => (
                 <button
                   key={t.name}
                   onClick={() => setActiveTemplate(t.name.toLowerCase())}
-                  className={`px-4 py-2 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 ${activeTemplate === t.name.toLowerCase()
-                    ? 'bg-primary text-primary-foreground shadow-md'
-                    : 'bg-background hover:bg-muted-foreground/10 border'
+                  className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-all border flex items-center gap-2 ${activeTemplate === t.name.toLowerCase()
+                    ? 'bg-primary border-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105'
+                    : 'bg-slate-900 border-white/10 text-slate-400 hover:border-white/20 hover:text-white'
                     }`}
                 >
-                  {t.emoji} {t.name}
+                  <span className="text-lg">{t.emoji}</span> {t.name}
                 </button>
               ))}
             </div>
