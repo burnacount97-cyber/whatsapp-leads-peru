@@ -377,9 +377,7 @@ export default function SuperAdmin() {
 
           <div className="flex items-center gap-4">
             <span className="text-sm opacity-80 hidden sm:inline">{user?.email}</span>
-            <Button variant="ghost" size="sm" onClick={() => navigate('/app')}>
-              Ir al App
-            </Button>
+
             <Button variant="secondary" size="sm" onClick={handleSignOut}>
               <LogOut className="w-4 h-4 mr-2" />
               Salir
