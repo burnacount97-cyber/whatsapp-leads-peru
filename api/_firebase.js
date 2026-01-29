@@ -3,21 +3,34 @@ import { getFirestore } from 'firebase-admin/firestore';
 
 if (!getApps().length) {
     try {
-        const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT
-            ? JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT)
-            : null;
+        let serviceAccount = null;
+        const saVar = process.env.FIREBASE_SERVICE_ACCOUNT;
 
-        if (serviceAccount) {
+        if (saVar) {
+            try {
+                // Handle both stringified JSON and potential formatting issues
+                serviceAccount = JSON.parse(saVar);
+
+                // Fix for private_key newlines which often break in Env Vars
+                if (serviceAccount.private_key) {
+                    serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+                }
+            } catch (jsonError) {
+                console.error('Firebase SA JSON Parse Error:', jsonError.message);
+            }
+        }
+
+        if (serviceAccount && serviceAccount.project_id) {
             initializeApp({
                 credential: cert(serviceAccount)
             });
+            console.log('Firebase Admin initialized successfully with Service Account');
         } else {
-            // Fallback: This will attempt to use Google Application Default Credentials
-            // or fail if not configured.
+            console.warn('Firebase Admin: No valid Service Account found, using default credentials');
             initializeApp();
         }
     } catch (error) {
-        console.error('Firebase Admin Init Error:', error);
+        console.error('Firebase Admin Init Critical Error:', error);
     }
 }
 
