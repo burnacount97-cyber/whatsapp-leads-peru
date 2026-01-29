@@ -86,13 +86,22 @@ export default async function handler(req, res) {
         }
 
         if (!aiConfig.ai_enabled) {
-            return res.status(200).json({ response: "El asistente virtual no está habilitado actualmente para este negocio." });
+            return res.status(200).json({ response: "El asistente virtual no está habilitado actualmente. Por favor, actívalo desde tu panel de control." });
         }
 
-        const apiKey = aiConfig.ai_api_key || process.env.OPENAI_API_KEY;
+        // BYOK Policy: Only demo uses system key, clients must provide their own
+        let apiKey;
+        if (widgetId === 'demo-landing') {
+            apiKey = process.env.OPENAI_API_KEY;
+        } else {
+            apiKey = aiConfig.ai_api_key;
+        }
+
         if (!apiKey) {
-            console.error('CRITICAL: No OpenAI API Key found for widget:', widgetId);
-            return res.status(200).json({ response: "Lo siento, el servicio de IA no está configurado correctamente. Por favor, contacta al administrador." });
+            console.error('Missing OpenAI API Key for widget:', widgetId);
+            return res.status(200).json({
+                response: "⚙️ Para que pueda responder, necesitas configurar tu API Key de OpenAI en el Dashboard → Pestaña IA. Es gratis obtenerla en platform.openai.com y solo pagas por lo que uses. ¡Es rápido!"
+            });
         }
 
         const openai = new OpenAI({ apiKey: apiKey });

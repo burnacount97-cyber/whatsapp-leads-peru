@@ -1122,6 +1122,67 @@ export default function Dashboard() {
                   </p>
                 </div>
 
+                {/* NUEVO: Guía de Autoservicio */}
+                <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <ShieldCheck className="w-5 h-5 text-blue-600" />
+                      ¿Cómo obtener tu API Key de OpenAI? (Gratis + Paso a Paso)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="bg-white/80 p-4 rounded-lg space-y-3 text-sm">
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0">1</div>
+                        <div>
+                          <p className="font-semibold">Crea tu cuenta gratuita</p>
+                          <p className="text-muted-foreground">Ve a <a href="https://platform.openai.com/signup" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">platform.openai.com/signup</a> y regístrate con tu correo.</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0">2</div>
+                        <div>
+                          <p className="font-semibold">Genera tu API Key</p>
+                          <p className="text-muted-foreground">Accede a <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">platform.openai.com/api-keys</a> y haz clic en "Create new secret key". Cópiala inmediatamente.</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0">3</div>
+                        <div>
+                          <p className="font-semibold">Pégala aquí arriba</p>
+                          <p className="text-muted-foreground">Copia la API Key (empieza con <code className="bg-slate-200 px-1 rounded">sk-...</code>) y pégala en el campo de arriba. ¡Listo!</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-amber-50 border border-amber-200 p-3 rounded-lg">
+                      <p className="text-xs text-amber-800 font-medium flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                        <span><strong>Importante sobre costos:</strong> OpenAI cobra solo por lo que uses. Un widget promedio con 100 conversaciones al mes cuesta ~$2-5 USD. Puedes ver tu uso en tiempo real en tu panel de OpenAI.</span>
+                      </p>
+                    </div>
+
+                    <div className="bg-green-50 border border-green-200 p-3 rounded-lg">
+                      <p className="text-xs text-green-800 flex items-start gap-2">
+                        <Check className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                        <span><strong>¿Por qué es seguro?</strong> Tu API Key nunca se comparte con terceros. Se almacena de forma cifrada y solo se usa para que TU widget responda a TUS clientes.</span>
+                      </p>
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => window.open('https://platform.openai.com/api-keys', '_blank')}
+                    >
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      Abrir OpenAI Platform
+                    </Button>
+                  </CardContent>
+                </Card>
+
                 {/* Model Selection */}
                 <div className="space-y-2">
                   <Label>Modelo</Label>
