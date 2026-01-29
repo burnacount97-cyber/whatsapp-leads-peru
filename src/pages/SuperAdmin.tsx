@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { db } from '@/lib/firebase';
+import { collection, query, orderBy, getDocs, doc, updateDoc, setDoc, where, limit } from 'firebase/firestore';
 import { useAuth } from '@/lib/auth';
-import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -38,10 +39,27 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import type { Tables } from '@/integrations/supabase/types';
 
-type Profile = Tables<'profiles'>;
-type Payment = Tables<'payments'>;
+// Define simple interfaces for TS
+interface Profile {
+  id: string;
+  email: string;
+  business_name: string;
+  whatsapp_number?: string;
+  status?: string;
+  created_at: string;
+  trial_ends_at?: string;
+}
+
+interface Payment {
+  id: string;
+  user_id: string;
+  amount: number;
+  status: string;
+  payment_method: string;
+  proof_url?: string;
+  created_at: string;
+}
 
 interface ClientWithLeads extends Profile {
   leads_count: number;
@@ -106,24 +124,21 @@ export default function SuperAdmin() {
   const loadData = async () => {
     try {
       // Load all profiles
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const qProfiles = query(collection(db, 'profiles'), orderBy('created_at', 'desc'));
+      const profilesSnap = await getDocs(qProfiles);
+      // Map doc.id into the data
+      const profilesData = profilesSnap.docs.map(d => ({ id: d.id, ...d.data() })) as Profile[];
 
-      if (profilesError) throw profilesError;
+      // Load leads (to count) - In production, maybe use aggregation or counter fields
+      const leadsSnap = await getDocs(collection(db, 'leads'));
+      const leadsData = leadsSnap.docs.map(d => d.data());
 
-      // Load leads count per client
-      const { data: leadsData } = await supabase
-        .from('leads')
-        .select('client_id');
-
-      const leadsCounts = (leadsData || []).reduce((acc: Record<string, number>, lead) => {
-        acc[lead.client_id] = (acc[lead.client_id] || 0) + 1;
+      const leadsCounts = leadsData.reduce((acc: Record<string, number>, lead: any) => {
+        if (lead.client_id) acc[lead.client_id] = (acc[lead.client_id] || 0) + 1;
         return acc;
       }, {});
 
-      const clientsWithLeads: ClientWithLeads[] = (profilesData || []).map(profile => ({
+      const clientsWithLeads: ClientWithLeads[] = profilesData.map(profile => ({
         ...profile,
         leads_count: leadsCounts[profile.id] || 0,
       }));
@@ -131,26 +146,22 @@ export default function SuperAdmin() {
       setClients(clientsWithLeads);
 
       // Load all payments
-      const { data: paymentsData } = await supabase
-        .from('payments')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const qPayments = query(collection(db, 'payments'), orderBy('created_at', 'desc'));
+      const paymentsSnap = await getDocs(qPayments);
+      const paymentsData = paymentsSnap.docs.map(d => ({ id: d.id, ...d.data() })) as Payment[];
 
-      setPayments(paymentsData || []);
+      setPayments(paymentsData);
 
       // Calculate stats
       const activeCount = clientsWithLeads.filter(c => c.status === 'active').length;
       const trialCount = clientsWithLeads.filter(c => c.status === 'trial').length;
       const suspendedCount = clientsWithLeads.filter(c => c.status === 'suspended').length;
       const totalLeadsCount = Object.values(leadsCounts).reduce((a: number, b: number) => a + b, 0);
-      const pendingPayments = (paymentsData || []).filter(p => p.status === 'pending').length;
+      const pendingPaymentsCount = paymentsData.filter(p => p.status === 'pending').length;
 
       // Load global analytics
-      const { data: analyticsData } = await supabase
-        .from('widget_analytics')
-        .select('event_type');
-
-      const totalViews = (analyticsData || []).filter(a => a.event_type === 'view').length;
+      const analyticsSnap = await getDocs(collection(db, 'widget_analytics'));
+      const totalViews = analyticsSnap.docs.filter(d => d.data().event_type === 'view').length;
 
       setStats({
         totalClients: clientsWithLeads.length,
@@ -158,20 +169,18 @@ export default function SuperAdmin() {
         trialClients: trialCount,
         suspendedClients: suspendedCount,
         totalLeads: totalLeadsCount as number,
-        pendingPayments,
+        pendingPayments: pendingPaymentsCount,
         totalViews,
         mrr: activeCount * 30,
       });
 
       // Load Announcement
-      const { data: announcementData } = await supabase
-        .from('system_announcements')
-        .select('*')
-        .order('updated_at', { ascending: false })
-        .limit(1);
+      const qAnnounce = query(collection(db, 'system_announcements'), orderBy('updated_at', 'desc'), limit(1));
+      const announceSnap = await getDocs(qAnnounce);
 
-      if (announcementData?.[0]) {
-        setAnnouncement(announcementData[0] as any);
+      if (!announceSnap.empty) {
+        const d = announceSnap.docs[0].data();
+        setAnnouncement({ id: announceSnap.docs[0].id, ...d } as any);
       }
 
     } catch (error) {
@@ -189,12 +198,7 @@ export default function SuperAdmin() {
   const updateClientStatus = async (clientId: string, newStatus: 'trial' | 'active' | 'suspended') => {
     setUpdatingClient(clientId);
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ status: newStatus })
-        .eq('id', clientId);
-
-      if (error) throw error;
+      await updateDoc(doc(db, 'profiles', clientId), { status: newStatus });
 
       setClients(clients.map(c =>
         c.id === clientId ? { ...c, status: newStatus } : c
@@ -205,11 +209,7 @@ export default function SuperAdmin() {
         description: `Cliente marcado como ${newStatus}`,
       });
     } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } finally {
       setUpdatingClient(null);
     }
@@ -220,23 +220,15 @@ export default function SuperAdmin() {
     try {
       const payment = payments.find(p => p.id === paymentId);
 
-      const { error } = await supabase
-        .from('payments')
-        .update({
-          status,
-          verified_at: new Date().toISOString(),
-          verified_by: user?.id,
-        })
-        .eq('id', paymentId);
-
-      if (error) throw error;
+      await updateDoc(doc(db, 'payments', paymentId), {
+        status,
+        verified_at: new Date().toISOString(),
+        verified_by: user?.uid,
+      });
 
       // If verified, activate client
       if (status === 'verified' && payment) {
-        await supabase
-          .from('profiles')
-          .update({ status: 'active' })
-          .eq('id', payment.user_id);
+        await updateDoc(doc(db, 'profiles', payment.user_id), { status: 'active' });
       }
 
       setPayments(payments.map(p =>
@@ -250,11 +242,7 @@ export default function SuperAdmin() {
 
       loadData();
     } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } finally {
       setVerifyingPayment(null);
     }
@@ -274,15 +262,10 @@ export default function SuperAdmin() {
 
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          business_name: editForm.business_name,
-          whatsapp_number: editForm.phone
-        })
-        .eq('id', editingClient.id);
-
-      if (error) throw error;
+      await updateDoc(doc(db, 'profiles', editingClient.id), {
+        business_name: editForm.business_name,
+        whatsapp_number: editForm.phone
+      });
 
       setClients(clients.map(c =>
         c.id === editingClient.id
@@ -321,17 +304,19 @@ export default function SuperAdmin() {
   const saveAnnouncement = async () => {
     setLoading(true);
     try {
-      const { error } = await supabase
-        .from('system_announcements')
-        .upsert({
-          id: announcement.id || undefined,
-          content: announcement.content,
-          type: announcement.type,
-          is_active: announcement.is_active,
-          updated_at: new Date().toISOString()
-        });
+      const data = {
+        content: announcement.content,
+        type: announcement.type,
+        is_active: announcement.is_active,
+        updated_at: new Date().toISOString()
+      };
 
-      if (error) throw error;
+      if (announcement.id) {
+        await updateDoc(doc(db, 'system_announcements', announcement.id), data);
+      } else {
+        const ref = doc(collection(db, 'system_announcements')); // auto-id
+        await setDoc(ref, data);
+      }
 
       toast({
         title: 'Aviso actualizado',
@@ -339,11 +324,7 @@ export default function SuperAdmin() {
       });
       loadData();
     } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive',
-      });
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -371,6 +352,7 @@ export default function SuperAdmin() {
         return null;
     }
   };
+
 
   if (authLoading || loading) {
     return (
