@@ -84,7 +84,7 @@ export default function SuperAdmin() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Profile | null>(null);
   const [editForm, setEditForm] = useState({ business_name: '', phone: '', email: '' });
-
+  const [blockedDemoIps, setBlockedDemoIps] = useState<any[]>([]);
 
 
   // Stats
@@ -166,6 +166,14 @@ export default function SuperAdmin() {
 
 
 
+    // Real-time Blocked IPs (Demo Widget Only)
+    const unsubBlockedIps = onSnapshot(
+      query(collection(db, 'blocked_ips'), where('widget_id', '==', 'demo-landing'), orderBy('created_at', 'desc')),
+      (snapshot) => {
+        setBlockedDemoIps(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+      }
+    );
+
     setLoading(false);
 
     return () => {
@@ -173,6 +181,7 @@ export default function SuperAdmin() {
       unsubPayments();
       unsubLeads();
       unsubAnalytics();
+      unsubBlockedIps();
     };
   }, [user]);
 
