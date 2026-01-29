@@ -83,6 +83,7 @@ interface Profile {
   business_name: string;
   subscription_status: string;
   status?: string; // Used in UI
+  created_at?: string;
   trial_ends_at?: string;
   plan_type?: string;
   ai_enabled: boolean;
@@ -549,9 +550,33 @@ export default function Dashboard() {
   };
 
   const getTrialDaysLeft = () => {
-    if (!profile?.trial_ends_at) return 0;
-    const diff = new Date(profile.trial_ends_at).getTime() - new Date().getTime();
+    let endDate: Date;
+
+    if (profile?.trial_ends_at) {
+      endDate = new Date(profile.trial_ends_at);
+    } else if (profile?.created_at) {
+      const created = new Date(profile.created_at);
+      endDate = new Date(created);
+      endDate.setDate(created.getDate() + 3);
+    } else {
+      return 0; // Fallback
+    }
+
+    const diff = endDate.getTime() - new Date().getTime();
     return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+  };
+
+  const getTrialEndDateString = () => {
+    if (profile?.trial_ends_at) {
+      return new Date(profile.trial_ends_at).toLocaleDateString('es-PE');
+    }
+    if (profile?.created_at) {
+      const created = new Date(profile.created_at);
+      const end = new Date(created);
+      end.setDate(created.getDate() + 3);
+      return end.toLocaleDateString('es-PE');
+    }
+    return '...';
   };
 
   const handleSignOut = async () => {
@@ -640,7 +665,7 @@ export default function Dashboard() {
               </div>
               <div>
                 <p className="font-semibold text-sm">Estás en periodo de prueba</p>
-                <p className="text-xs text-muted-foreground">Tu trial de 3 días finaliza el {new Date(profile.trial_ends_at!).toLocaleDateString('es-PE')}</p>
+                <p className="text-xs text-muted-foreground">Tu trial de 3 días finaliza el {getTrialEndDateString()}</p>
               </div>
             </div>
             <div className="text-right">
