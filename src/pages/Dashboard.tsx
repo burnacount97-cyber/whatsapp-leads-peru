@@ -24,6 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { ModeToggle } from '@/components/mode-toggle';
 import { WidgetPreview } from '@/components/WidgetPreview';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -799,7 +800,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-muted/30 dark:bg-slate-950 transition-colors duration-300">
 
 
       {/* Header */}
@@ -812,7 +813,8 @@ export default function Dashboard() {
             <span className="font-bold text-xl">Lead Widget</span>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <ModeToggle />
             {isSuperAdmin && (
               <Link to="/superadmin">
                 <Button variant="outline" size="sm" className="hidden sm:flex border-primary text-primary hover:bg-primary/10">
@@ -1086,7 +1088,7 @@ export default function Dashboard() {
                   </CardHeader>
                   <CardContent className="space-y-6">
                     {/* Widget Preview Container */}
-                    <div className="relative h-[500px] bg-slate-50 border border-slate-200 rounded-xl overflow-hidden p-6 flex justify-center items-center">
+                    <div className="relative h-[500px] bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden p-6 flex justify-center items-center">
                       <div className="w-[320px] h-[480px] shadow-2xl rounded-2xl overflow-hidden border border-slate-200 bg-white">
                         <WidgetPreview
                           primaryColor={formConfig.primary_color}
@@ -1240,7 +1242,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* NUEVO: Guía de Autoservicio */}
-                <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+                <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 dark:from-blue-950/30 dark:to-indigo-950/30 dark:border-blue-800 transition-colors">
                   <CardHeader>
                     <CardTitle className="text-base flex items-center gap-2">
                       <ShieldCheck className="w-5 h-5 text-blue-600" />
@@ -1570,7 +1572,7 @@ export default function Dashboard() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl flex gap-3">
+                <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl flex gap-3">
                   <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
                   <p className="text-sm text-amber-800 dark:text-amber-200">
                     El sistema bloquea automáticamente IPs que intentan manipular la IA o realizan spam.
