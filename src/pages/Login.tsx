@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/lib/auth';
 import { MessageCircle, Loader2, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ModeToggle } from '@/components/mode-toggle';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -59,10 +60,15 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-slate-50 dark:bg-[#020617]">
+      {/* Theme Toggle - Absolute Position */}
+      <div className="absolute top-4 right-4 z-50">
+        <ModeToggle />
+      </div>
+
       {/* Left Panel - Form */}
       <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-md space-y-8">
+        <div className="w-full max-w-md space-y-8 bg-white dark:bg-slate-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl dark:shadow-primary/5 transition-all">
           <div>
             <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8">
               <ArrowLeft className="w-4 h-4" />
@@ -70,12 +76,12 @@ export default function Login() {
             </Link>
 
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center">
-                <MessageCircle className="w-6 h-6 text-primary-foreground" />
+              <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+                <MessageCircle className="w-6 h-6 text-white" />
               </div>
-              <span className="font-bold text-2xl">Lead <span className="text-primary">Widget</span></span>
+              <span className="font-bold text-2xl tracking-tight">Lead <span className="text-primary">Widget</span></span>
             </div>
-            <h1 className="text-3xl font-bold mt-6">Bienvenido de vuelta</h1>
+            <h1 className="text-3xl font-bold mt-6 tracking-tight">Bienvenido de vuelta</h1>
             <p className="text-muted-foreground mt-2">Ingresa a tu dashboard para gestionar tus leads</p>
           </div>
 
@@ -89,7 +95,7 @@ export default function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="h-12"
+                className="h-12 bg-slate-50 dark:bg-slate-950/50"
               />
             </div>
 
@@ -103,7 +109,7 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="h-12 pr-12"
+                  className="h-12 pr-12 bg-slate-50 dark:bg-slate-950/50"
                 />
                 <button
                   type="button"
@@ -117,9 +123,9 @@ export default function Login() {
 
             <Button
               type="submit"
-              variant="hero"
+              variant="default" // Changed from hero to default or a stronger variant
               size="lg"
-              className="w-full"
+              className="w-full h-12 text-lg font-bold btn-iridescent text-white"
               disabled={localLoading || authLoading}
             >
               {localLoading ? (
@@ -132,7 +138,7 @@ export default function Login() {
 
           <p className="text-center text-muted-foreground">
             ¿No tienes cuenta?{' '}
-            <Link to="/register" className="text-primary font-semibold hover:underline">
+            <Link to="/register" className="text-primary font-bold hover:underline">
               Regístrate gratis
             </Link>
           </p>
@@ -140,14 +146,17 @@ export default function Login() {
       </div>
 
       {/* Right Panel - Decoration */}
-      <div className="hidden lg:flex flex-1 hero-gradient items-center justify-center p-12">
-        <div className="text-center text-primary-foreground max-w-md">
-          <div className="w-24 h-24 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-8">
-            <MessageCircle className="w-12 h-12" />
+      <div className="hidden lg:flex flex-1 hero-gradient items-center justify-center p-12 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '40px 40px' }}></div>
+
+        <div className="text-center text-white max-w-md relative z-10 glass-dark p-12 rounded-3xl border border-white/10">
+          <div className="w-24 h-24 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-8 backdrop-blur-sm shadow-xl">
+            <MessageCircle className="w-12 h-12 text-white" />
           </div>
-          <h2 className="text-3xl font-bold mb-4">Captura leads 24/7</h2>
-          <p className="text-lg opacity-90">
-            Tu widget trabaja mientras duermes. Cada visita es una oportunidad de negocio.
+          <h2 className="text-4xl font-bold mb-6 tracking-tight">Captura leads 24/7</h2>
+          <p className="text-lg opacity-90 leading-relaxed">
+            Tu widget trabaja mientras duermes. Cada visita es una oportunidad de negocio que no puedes perder.
           </p>
         </div>
       </div>
