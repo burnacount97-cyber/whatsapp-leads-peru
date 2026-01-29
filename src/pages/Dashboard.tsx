@@ -813,7 +813,7 @@ export default function Dashboard() {
             <ModeToggle />
             {isSuperAdmin && (
               <Link to="/superadmin">
-                <Button variant="outline" size="sm" className="hidden sm:flex border-primary text-primary hover:bg-primary/10">
+                <Button variant="outline" size="sm" className="flex border-primary text-primary hover:bg-primary/10">
                   <Shield className="w-4 h-4 mr-2" />
                   Panel SuperAdmin
                 </Button>
