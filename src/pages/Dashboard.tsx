@@ -564,23 +564,14 @@ export default function Dashboard() {
   };
 
   const copyEmbedCode = () => {
-    // Generate the widget URL (pointing to the public static file for now)
+    // Generate the widget URL 
     const currentDomain = window.location.origin;
     const widgetUrl = `${currentDomain}/widget-embed.js`;
 
-    // Create a configuration object with all current settings
-    // This ensures the widget looks exactly like the preview
+    // SaaS Style: Only ID is needed. Config is fetched remotely.
     const configScript = `
 <script>
-  window.LEADWIDGET_CONFIG = {
-    clientId: '${user?.uid}',
-    businessName: '${formConfig.business_name || 'LeadWidget'}',
-    whatsappDestination: '${formConfig.whatsapp_destination || ''}',
-    primaryColor: '${formConfig.primary_color}',
-    welcomeMessage: '${formConfig.welcome_message}',
-    nicheQuestion: '${formConfig.niche_question}',
-    template: '${formConfig.template}'
-  };
+  window.LEADWIDGET_CLIENT_ID = '${user?.uid}';
 </script>
 <script src="${widgetUrl}" async></script>
 `.trim();
@@ -588,7 +579,7 @@ export default function Dashboard() {
     navigator.clipboard.writeText(configScript);
     toast({
       title: 'Código Inteligente copiado',
-      description: 'Este código incluye tu configuración y ID único. Pégalo antes de </body>.',
+      description: 'Pégalo antes de </body>. ¡Cualquier cambio que hagas aquí se actualizará automáticamente en tu web!',
       duration: 5000,
     });
   };
