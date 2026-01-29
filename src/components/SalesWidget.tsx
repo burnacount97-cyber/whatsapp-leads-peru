@@ -335,7 +335,7 @@ export function SalesWidget() {
                         onChange={(e) => setInputText(e.target.value)}
                         onFocus={() => setIsIdle(false)}
                         placeholder="Escribe tu consulta aquí..."
-                        className={`flex-1 bg-slate-50 border-slate-200 focus-visible:ring-[#00C185] h-12 shadow-inner transition-all ${isIdle ? 'ring-2 ring-primary/30 border-primary/50' : ''}`}
+                        className={`flex-1 bg-slate-50 text-slate-900 border-slate-200 focus-visible:ring-[#00C185] h-12 shadow-inner transition-all ${isIdle ? 'ring-2 ring-primary/30 border-primary/50' : ''}`}
                         disabled={isLoading}
                     />
                     <Button
