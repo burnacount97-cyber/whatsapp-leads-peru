@@ -17,7 +17,7 @@ CREATE TABLE public.profiles (
   plin_number TEXT DEFAULT '902105668',
   bcp_cci TEXT,
   status client_status DEFAULT 'trial',
-  trial_ends_at TIMESTAMP WITH TIME ZONE DEFAULT (now() + interval '7 days'),
+  trial_ends_at TIMESTAMP WITH TIME ZONE DEFAULT (now() + interval '3 days'),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );

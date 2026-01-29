@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { WidgetPreview } from '@/components/WidgetPreview';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -27,6 +28,13 @@ import {
   Check,
   Clock,
   AlertCircle,
+  Bot,
+  Key,
+  Sparkles,
+  ShieldCheck,
+  ExternalLink,
+  Shield,
+  X,
 } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -36,12 +44,36 @@ type Profile = Tables<'profiles'>;
 type Payment = Tables<'payments'>;
 
 const templates = [
-  { value: 'general', label: 'General', question: '¿En qué podemos ayudarte?' },
-  { value: 'inmobiliaria', label: 'Inmobiliaria', question: '¿Qué distrito y cuántas habitaciones buscas?' },
-  { value: 'clinica', label: 'Clínica', question: '¿Qué especialidad necesitas?' },
-  { value: 'taller', label: 'Taller', question: '¿Qué vehículo y qué problema tienes?' },
-  { value: 'delivery', label: 'Delivery', question: '¿Cuál es tu dirección de entrega?' },
-  { value: 'personalizado', label: 'Personalizado', question: '¿Qué te interesa?' },
+  {
+    value: 'general',
+    label: 'General / Servicios',
+    question: 'Eres un asistente virtual de ventas. Tu objetivo es responder amablemente dudas sobre nuestros servicios y capturar el interés del cliente. Al final, pide su nombre y celular para que un asesor humano lo contacte.'
+  },
+  {
+    value: 'inmobiliaria',
+    label: 'Inmobiliaria',
+    question: 'Eres un agente inmobiliario experto. Tu objetivo es perfilar al cliente. Pregunta: 1. ¿Busca comprar o alquilar? 2. ¿Qué distrito prefiere? 3. ¿Presupuesto aproximado? Sé profesional y persuasivo.'
+  },
+  {
+    value: 'clinica',
+    label: 'Clínica / Salud',
+    question: 'Eres un asistente de salud empático. Tu trabajo es ayudar a agendar citas. Pregunta: 1. ¿Qué especialidad necesita? 2. ¿Preferencia de horario? Recuerda transmitir confianza y calma.'
+  },
+  {
+    value: 'taller',
+    label: 'Taller Mecánico',
+    question: 'Eres un asesor de taller mecánico. Pregunta: 1. Marca y modelo del vehículo. 2. ¿Es mantenimiento preventivo o tiene una falla específica? Ofrece agendar una revisión técnica.'
+  },
+  {
+    value: 'delivery',
+    label: 'Restaurante / Delivery',
+    question: 'Eres un asistente de pedidos. Atiende consultas sobre la carta. Para cerrar el pedido, pregunta: 1. Dirección exacta de entrega. 2. Método de pago. Sé rápido y cordial.'
+  },
+  {
+    value: 'personalizado',
+    label: 'Personalizado',
+    question: ''
+  },
 ];
 
 export default function Dashboard() {
@@ -51,17 +83,31 @@ export default function Dashboard() {
 
   const [profile, setProfile] = useState<Profile | null>(null);
   const [widgetConfig, setWidgetConfig] = useState<WidgetConfig | null>(null);
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [payments, setPayments] = useState<Payment[]>([]);
+  const [leads, setLeads] = useState<any[]>([]);
+  const [analytics, setAnalytics] = useState({ views: 0, interactions: 0 });
+  const [payments, setPayments] = useState<any[]>([]);
+  const [blockedIps, setBlockedIps] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [savingAI, setSavingAI] = useState(false);
+
+  // AI config form state
+  const [aiConfig, setAiConfig] = useState({
+    ai_enabled: true,
+    ai_provider: 'openai',
+    ai_api_key: '',
+    ai_model: 'gpt-4o-mini',
+    ai_temperature: 0.7,
+    ai_max_tokens: 500,
+    ai_system_prompt: 'Eres un asistente virtual amable y profesional que ayuda a capturar leads para un negocio. Tu objetivo es obtener información del cliente de manera natural y amigable.',
+  });
 
   // Widget config form state
   const [formConfig, setFormConfig] = useState({
     template: 'general',
     primary_color: '#00C185',
-    business_name: 'LeadWidget',
+    business_name: 'Lead Widget',
     welcome_message: '¡Hola! ¿En qué podemos ayudarte?',
     whatsapp_destination: '',
     niche_question: '¿En qué distrito te encuentras?',
@@ -70,7 +116,24 @@ export default function Dashboard() {
     custom_placeholder: 'Tu respuesta',
     custom_button_text: 'Continuar',
     custom_confirmation_message: '¡Listo! Te pasamos al WhatsApp del equipo',
+    chat_placeholder: 'Escribe tu mensaje...',
+    // New behavioral settings
+    vibration_intensity: 'soft',
+    exit_intent_enabled: true,
+    exit_intent_title: '¡Espera!',
+    exit_intent_description: 'Prueba Lead Widget gratis por 3 días y aumenta tus ventas.',
+    exit_intent_cta: 'Probar Demo Ahora',
+    teaser_messages: '¿Cómo podemos ayudarte? 👋\n¿Tienes alguna duda sobre el servicio? ✨\n¡Hola! Estamos en línea para atenderte 🚀',
   });
+
+  const [announcement, setAnnouncement] = useState<{
+    id: string;
+    content: string;
+    type: 'info' | 'warning' | 'error' | 'success';
+  } | null>(null);
+  const [dismissedAnnouncement, setDismissedAnnouncement] = useState<string | null>(
+    localStorage.getItem('dismissed_announcement')
+  );
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -93,6 +156,19 @@ export default function Dashboard() {
 
       setProfile(profileData);
 
+      // Load AI config from profile
+      if (profileData) {
+        setAiConfig({
+          ai_enabled: true, // Always true now
+          ai_provider: profileData.ai_provider || 'openai',
+          ai_api_key: profileData.ai_api_key || '',
+          ai_model: profileData.ai_model || 'gpt-4o-mini',
+          ai_temperature: profileData.ai_temperature || 0.7,
+          ai_max_tokens: profileData.ai_max_tokens || 500,
+          ai_system_prompt: profileData.ai_system_prompt || 'Eres un asistente virtual amable y profesional que ayuda a capturar leads para un negocio. Tu objetivo es obtener información del cliente de manera natural y amigable.',
+        });
+      }
+
       // Load widget config
       const { data: configData } = await supabase
         .from('widget_configs')
@@ -100,12 +176,24 @@ export default function Dashboard() {
         .eq('user_id', user.id)
         .maybeSingle();
 
+      // Load Announcement
+      const { data: announcementData } = await supabase
+        .from('system_announcements')
+        .select('*')
+        .eq('is_active', true)
+        .order('updated_at', { ascending: false })
+        .limit(1);
+
+      if (announcementData?.[0]) {
+        setAnnouncement(announcementData[0] as any);
+      }
+
       if (configData) {
         setWidgetConfig(configData);
         setFormConfig({
           template: configData.template || 'general',
           primary_color: configData.primary_color || '#00C185',
-          business_name: profile?.business_name || 'LeadWidget',
+          business_name: profile?.business_name || 'Lead Widget',
           welcome_message: configData.welcome_message || '¡Hola! ¿En qué podemos ayudarte?',
           whatsapp_destination: configData.whatsapp_destination || '',
           niche_question: configData.niche_question || '¿En qué distrito te encuentras?',
@@ -113,6 +201,17 @@ export default function Dashboard() {
           custom_placeholder: 'Tu respuesta',
           custom_button_text: 'Continuar',
           custom_confirmation_message: '¡Listo! Te pasamos al WhatsApp del equipo',
+          chat_placeholder: configData.chat_placeholder || 'Escribe tu mensaje...',
+          vibration_intensity: configData.vibration_intensity || 'soft',
+          exit_intent_enabled: configData.trigger_exit_intent ?? true,
+          exit_intent_title: configData.exit_intent_title || '¡Espera!',
+          exit_intent_description: configData.exit_intent_description || 'Prueba Lead Widget gratis por 3 días y aumenta tus ventas.',
+          exit_intent_cta: configData.exit_intent_cta || 'Probar Demo Ahora',
+          teaser_messages: (configData.teaser_messages || [
+            '¿Cómo podemos ayudarte? 👋',
+            '¿Tienes alguna duda sobre el servicio? ✨',
+            '¡Hola! Estamos en línea para atenderte 🚀'
+          ]).join('\n'),
         });
       }
 
@@ -135,6 +234,35 @@ export default function Dashboard() {
 
       setPayments(paymentsData || []);
 
+      // Load analytics if widget exists
+      if (configData) {
+        const { data: viewsData } = await supabase
+          .from('widget_analytics')
+          .select('id', { count: 'exact' })
+          .eq('widget_id', configData.id)
+          .eq('event_type', 'view');
+
+        const { data: interactionsData } = await supabase
+          .from('widget_analytics')
+          .select('id', { count: 'exact' })
+          .eq('widget_id', configData.id)
+          .eq('event_type', 'chat_open');
+
+        setAnalytics({
+          views: viewsData?.length || 0,
+          interactions: interactionsData?.length || 0
+        });
+
+        // Load blocked IPs
+        const { data: blockedData } = await supabase
+          .from('blocked_ips')
+          .select('*')
+          .eq('widget_id', configData.id)
+          .order('created_at', { ascending: false });
+
+        setBlockedIps(blockedData || []);
+      }
+
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -156,6 +284,13 @@ export default function Dashboard() {
           whatsapp_destination: formConfig.whatsapp_destination,
           niche_question: formConfig.niche_question,
           trigger_delay: formConfig.trigger_delay,
+          chat_placeholder: formConfig.chat_placeholder,
+          vibration_intensity: formConfig.vibration_intensity,
+          trigger_exit_intent: formConfig.exit_intent_enabled,
+          exit_intent_title: formConfig.exit_intent_title,
+          exit_intent_description: formConfig.exit_intent_description,
+          exit_intent_cta: formConfig.exit_intent_cta,
+          teaser_messages: formConfig.teaser_messages.split('\n').filter(m => m.trim() !== ''),
         })
         .eq('id', widgetConfig.id);
 
@@ -186,8 +321,64 @@ export default function Dashboard() {
     }
   };
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleUploadProof = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}-${Math.floor(Date.now() / 1000)}.${fileExt}`;
+      const filePath = `proofs/${fileName}`;
+
+      // Upload to 'payments' bucket (ensure it exists in Supabase)
+      const { error: uploadError } = await supabase.storage
+        .from('payments')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('payments')
+        .getPublicUrl(filePath);
+
+      const { error: paymentError } = await supabase
+        .from('payments')
+        .insert({
+          user_id: user.id,
+          amount: 30,
+          payment_method: 'Yape/Plin',
+          proof_url: publicUrl,
+          status: 'pending'
+        });
+
+      if (paymentError) throw paymentError;
+
+      toast({
+        title: '¡Comprobante enviado!',
+        description: 'Revisaremos tu pago pronto para activar tu cuenta.',
+      });
+
+      loadData();
+    } catch (error: any) {
+      toast({
+        title: 'Error de subida',
+        description: 'No se pudo subir el archivo. Verifica que el bucket "payments" exista y sea público.',
+        variant: 'destructive',
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const copyEmbedCode = () => {
-    const code = `<script src="https://leadwidget.pe/w/${widgetConfig?.widget_id}.js" async></script>`;
+    // Dynamically generate the widget URL based on current domain
+    const currentDomain = window.location.origin;
+    const widgetUrl = `${currentDomain}/api/w/${widgetConfig?.widget_id}.js`;
+    const code = `<script src="${widgetUrl}" async></script>`;
+
     navigator.clipboard.writeText(code);
     toast({
       title: 'Código copiado',
@@ -196,31 +387,75 @@ export default function Dashboard() {
   };
 
   const exportLeadsCSV = () => {
-    const csv = [
-      ['Nombre', 'Teléfono', 'Interés', 'Página', 'Fecha'].join(','),
-      ...leads.map(lead => [
-        lead.name,
-        lead.phone,
-        lead.interest || '',
-        lead.page_url || '',
-        new Date(lead.created_at).toLocaleString('es-PE'),
-      ].join(','))
+    // Helper to escape CSV values
+    const escape = (val: any) => {
+      const s = val?.toString() || '';
+      return '"' + s.replace(/"/g, '""') + '"';
+    };
+
+    const headers = ['Nombre', 'Teléfono', 'Datos Capturados', 'URL de Origen', 'Trigger', 'Fecha'];
+
+    const rows = leads.map(lead => [
+      escape(lead.name),
+      escape(lead.phone),
+      escape(lead.interest),
+      escape(lead.page_url),
+      escape(lead.trigger_used || 'IA Chat'),
+      escape(new Date(lead.created_at).toLocaleString('es-PE'))
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
     ].join('\n');
 
-    const blob = new Blob([csv], { type: 'text/csv' });
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `leads-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `leads_lead_widget_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+
+    toast({
+      title: "✅ Exportación completada",
+      description: "Se ha descargado el archivo con todos tus leads.",
+    });
+  };
+
+  const unblockIp = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('blocked_ips')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      setBlockedIps(blockedIps.filter(ip => ip.id !== id));
+      toast({
+        title: "✅ IP Desbloqueada",
+        description: "El usuario ahora puede volver a usar el chat.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   const handleTemplateChange = (value: string) => {
     const template = templates.find(t => t.value === value);
+    // Don't overwrite description if switching TO personalizado, allowing user to keep custom text
+    const newDescription = value === 'personalizado'
+      ? formConfig.niche_question
+      : (template?.question || formConfig.niche_question);
+
     setFormConfig({
       ...formConfig,
       template: value,
-      niche_question: template?.question || formConfig.niche_question,
+      niche_question: newDescription,
     });
   };
 
@@ -243,6 +478,17 @@ export default function Dashboard() {
     return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
   };
 
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate('/login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      // Fallback redirect
+      window.location.href = '/login';
+    }
+  };
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -253,15 +499,36 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-muted/30">
+      {/* System Announcement Banner */}
+      {announcement && dismissedAnnouncement !== announcement.id && (
+        <div className={`p-2 flex items-center justify-center gap-3 relative transition-colors ${announcement.type === 'error' ? 'bg-red-600 text-white' :
+          announcement.type === 'warning' ? 'bg-orange-500 text-white' :
+            announcement.type === 'success' ? 'bg-emerald-600 text-white' :
+              'bg-indigo-600 text-white'
+          }`}>
+          <AlertCircle className="w-4 h-4 flex-shrink-0 animate-pulse" />
+          <p className="text-sm font-medium pr-8">{announcement.content}</p>
+          <button
+            onClick={() => {
+              setDismissedAnnouncement(announcement.id);
+              localStorage.setItem('dismissed_announcement', announcement.id);
+            }}
+            className="absolute right-2 p-1 hover:bg-white/20 rounded-full transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       {/* Header */}
       <header className="bg-background border-b sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
+          <div className="flex items-center gap-2 select-none">
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
               <MessageCircle className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-xl">LeadWidget<span className="text-primary">.pe</span></span>
-          </Link>
+            <span className="font-bold text-xl">Lead Widget</span>
+          </div>
 
           <div className="flex items-center gap-4">
             {getStatusBadge(profile?.status || 'trial')}
@@ -270,7 +537,7 @@ export default function Dashboard() {
                 {getTrialDaysLeft()} días restantes
               </span>
             )}
-            <Button variant="ghost" size="sm" onClick={() => signOut()}>
+            <Button variant="ghost" size="sm" onClick={handleSignOut}>
               <LogOut className="w-4 h-4 mr-2" />
               Salir
             </Button>
@@ -279,11 +546,34 @@ export default function Dashboard() {
       </header>
 
       <div className="container mx-auto px-4 py-8 max-w-6xl">
+        {/* Trial Alert Notice */}
+        {profile?.status === 'trial' && (
+          <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                <Clock className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="font-semibold text-sm">Estás en periodo de prueba</p>
+                <p className="text-xs text-muted-foreground">Tu trial de 3 días finaliza el {new Date(profile.trial_ends_at!).toLocaleDateString('es-PE')}</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-lg font-bold text-primary">{getTrialDaysLeft()} días</p>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Restantes</p>
+            </div>
+          </div>
+        )}
+
         <Tabs defaultValue="config" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-4 max-w-xl">
+          <TabsList className="grid w-full grid-cols-6 max-w-3xl">
             <TabsTrigger value="config" className="gap-2">
               <Settings className="w-4 h-4" />
               Widget
+            </TabsTrigger>
+            <TabsTrigger value="ai" className="gap-2">
+              <Bot className="w-4 h-4" />
+              IA
             </TabsTrigger>
             <TabsTrigger value="leads" className="gap-2">
               <Users className="w-4 h-4" />
@@ -291,7 +581,11 @@ export default function Dashboard() {
             </TabsTrigger>
             <TabsTrigger value="analytics" className="gap-2">
               <BarChart3 className="w-4 h-4" />
-              Analytics
+              Analíticas
+            </TabsTrigger>
+            <TabsTrigger value="security" className="gap-2">
+              <ShieldCheck className="w-4 h-4" />
+              Seguridad
             </TabsTrigger>
             <TabsTrigger value="billing" className="gap-2">
               <CreditCard className="w-4 h-4" />
@@ -310,7 +604,7 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="space-y-2">
-                    <Label>Template de nicho</Label>
+                    <Label>Industria / Nicho</Label>
                     <Select value={formConfig.template} onValueChange={handleTemplateChange}>
                       <SelectTrigger>
                         <SelectValue />
@@ -370,47 +664,46 @@ export default function Dashboard() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Pregunta de interés</Label>
+                    <Label>Placeholder del chat (Sugerencia)</Label>
                     <Input
-                      value={formConfig.niche_question}
-                      onChange={(e) => setFormConfig({ ...formConfig, niche_question: e.target.value })}
+                      value={formConfig.chat_placeholder}
+                      onChange={(e) => setFormConfig({ ...formConfig, chat_placeholder: e.target.value })}
+                      placeholder="Ej: Escribe tu duda aquí..."
                     />
+                    <p className="text-xs text-muted-foreground">Texto que invita al usuario a escribir en el chat.</p>
                   </div>
 
-                  {/* Campos exclusivos para modo personalizado */}
+                  {/* Info box for Personalizado mode */}
                   {formConfig.template === 'personalizado' && (
-                    <>
-                      <div className="space-y-2">
-                        <Label>Placeholder del campo de respuesta</Label>
-                        <Input
-                          value={formConfig.custom_placeholder}
-                          onChange={(e) => setFormConfig({ ...formConfig, custom_placeholder: e.target.value })}
-                          placeholder="Ej: Escribe tu respuesta aquí"
-                        />
-                        <p className="text-xs text-muted-foreground">Texto que aparece dentro del campo antes de que el usuario escriba</p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label>Texto del botón principal</Label>
-                        <Input
-                          value={formConfig.custom_button_text}
-                          onChange={(e) => setFormConfig({ ...formConfig, custom_button_text: e.target.value })}
-                          placeholder="Ej: Enviar, Continuar, Siguiente"
-                        />
-                        <p className="text-xs text-muted-foreground">Texto que aparece en el botón de avanzar</p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label>Mensaje de confirmación final</Label>
-                        <Input
-                          value={formConfig.custom_confirmation_message}
-                          onChange={(e) => setFormConfig({ ...formConfig, custom_confirmation_message: e.target.value })}
-                          placeholder="Ej: ¡Gracias! Nos contactaremos pronto"
-                        />
-                        <p className="text-xs text-muted-foreground">Mensaje que se muestra antes de redirigir a WhatsApp</p>
-                      </div>
-                    </>
+                    <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4 animate-in fade-in slide-in-from-top-2">
+                      <h4 className="font-semibold text-blue-800 dark:text-blue-300 text-sm mb-1 flex items-center gap-2">
+                        <Sparkles className="w-4 h-4" /> Modo Personalizado Activo
+                      </h4>
+                      <p className="text-xs text-blue-600 dark:text-blue-400">
+                        En este modo, la IA ignorará las plantillas predefinidas. Escribe abajo detalladamente qué vende tu negocio y cómo quieres que responda el asistente.
+                      </p>
+                    </div>
                   )}
+
+                  {/* Replaced 'Pregunta de interés' with 'Descripción del Negocio' for AI */}
+                  <div className="space-y-2">
+                    <Label>
+                      {formConfig.template === 'personalizado'
+                        ? 'Instrucciones Personalizadas (Prompt)'
+                        : 'Descripción del Negocio (Contexto para la IA)'}
+                    </Label>
+                    <textarea
+                      value={formConfig.niche_question}
+                      onChange={(e) => setFormConfig({ ...formConfig, niche_question: e.target.value })}
+                      className="w-full p-3 text-sm border border-input rounded-md bg-background focus:ring-2 focus:ring-ring focus:outline-none min-h-[100px]"
+                      placeholder="Ej: Vendemos repuestos de autos Toyota y Nissan. Horario 9am-6pm. Hacemos delivery en Lima."
+                    />
+                    <p className="text-xs text-muted-foreground">Esta información ayudará a la IA a responder dudas básicas sobre tu negocio.</p>
+                  </div>
+
+                  {/* Campos exclusivos para modo personalizado - REMOVED LEGACY FIELDS */}
+
+                  {/* Logic update for template change handled in function */}
 
                   <div className="space-y-2">
                     <Label>WhatsApp destino (+51...)</Label>
@@ -421,15 +714,64 @@ export default function Dashboard() {
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label>Segundos antes de aparecer</Label>
-                    <Input
-                      type="number"
-                      value={formConfig.trigger_delay}
-                      onChange={(e) => setFormConfig({ ...formConfig, trigger_delay: parseInt(e.target.value) })}
-                      min={5}
-                      max={60}
-                    />
+                  <div className="space-y-4 pt-4 border-t">
+                    <h4 className="font-semibold text-sm">Comportamiento Avanzado</h4>
+
+                    <div className="space-y-2">
+                      <Label>Intensidad del movimiento (Atención)</Label>
+                      <Select
+                        value={formConfig.vibration_intensity}
+                        onValueChange={(v) => setFormConfig({ ...formConfig, vibration_intensity: v })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Desactivado</SelectItem>
+                          <SelectItem value="soft">Suave (Recomendado)</SelectItem>
+                          <SelectItem value="strong">Fuerte</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">Define qué tan fuerte vibrará el widget para llamar la atención del usuario.</p>
+                    </div>
+
+                    <div className="space-y-4 p-4 bg-muted/50 rounded-xl border">
+                      <div className="flex items-center justify-between">
+                        <Label className="cursor-pointer" htmlFor="exit-intent">Activar Pop-up de Salida</Label>
+                        <Switch
+                          id="exit-intent"
+                          checked={formConfig.exit_intent_enabled}
+                          onCheckedChange={(checked) => setFormConfig({ ...formConfig, exit_intent_enabled: checked })}
+                        />
+                      </div>
+
+                      {formConfig.exit_intent_enabled && (
+                        <div className="space-y-4 mt-4 animate-in fade-in slide-in-from-top-2">
+                          <div className="space-y-2">
+                            <Label className="text-xs">Título del Pop-up</Label>
+                            <Input
+                              value={formConfig.exit_intent_title}
+                              onChange={(e) => setFormConfig({ ...formConfig, exit_intent_title: e.target.value })}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-xs">Descripción</Label>
+                            <textarea
+                              value={formConfig.exit_intent_description}
+                              onChange={(e) => setFormConfig({ ...formConfig, exit_intent_description: e.target.value })}
+                              className="w-full p-2 text-xs border rounded-md bg-background min-h-[60px]"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-xs">Texto del Botón (CTA)</Label>
+                            <Input
+                              value={formConfig.exit_intent_cta}
+                              onChange={(e) => setFormConfig({ ...formConfig, exit_intent_cta: e.target.value })}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   <Button onClick={saveWidgetConfig} disabled={saving} className="w-full">
@@ -439,31 +781,47 @@ export default function Dashboard() {
               </Card>
 
               {/* Preview */}
-              <div className="space-y-6">
+              <div className="space-y-6 lg:sticky lg:top-24 h-fit">
                 <Card>
                   <CardHeader>
                     <CardTitle>Vista Previa</CardTitle>
                     <CardDescription>Así se verá tu widget en tu sitio web</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="relative h-[400px] bg-muted/50 rounded-xl overflow-hidden">
-                      <div className="absolute inset-0 p-4 space-y-3">
-                        <div className="h-20 bg-background rounded-lg" />
-                        <div className="h-4 bg-background rounded w-3/4" />
-                        <div className="h-4 bg-background rounded w-1/2" />
-                        <div className="h-32 bg-background rounded-lg" />
-                      </div>
-                      <div className="absolute bottom-4 right-4">
+                    <div className="relative h-[500px] bg-slate-50 border border-slate-200 rounded-xl overflow-hidden p-6 flex justify-center items-center">
+                      <div className="w-[320px] h-[480px] shadow-2xl rounded-2xl overflow-hidden border border-slate-200 bg-white">
                         <WidgetPreview
                           primaryColor={formConfig.primary_color}
                           welcomeMessage={formConfig.welcome_message}
-                          nicheQuestion={formConfig.niche_question}
                           template={formConfig.template}
                           businessName={formConfig.business_name}
                           customPlaceholder={formConfig.custom_placeholder}
                           customButtonText={formConfig.custom_button_text}
                           customConfirmationMessage={formConfig.custom_confirmation_message}
+                          chatPlaceholder={formConfig.chat_placeholder}
+                          vibrationIntensity={formConfig.vibration_intensity as any}
+                          exitIntentEnabled={formConfig.exit_intent_enabled}
+                          exitIntentTitle={formConfig.exit_intent_title}
+                          exitIntentDescription={formConfig.exit_intent_description}
+                          exitIntentCTA={formConfig.exit_intent_cta}
+                          mode="dashboard"
                         />
+                      </div>
+
+                      <div className="space-y-4 p-4 bg-muted/50 rounded-xl border">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <Label className="cursor-pointer">Mensajes de Recaptura (Teaser)</Label>
+                            <p className="text-[10px] text-muted-foreground mt-1">Se mostrarán aleatoriamente si el usuario cierra el chat.</p>
+                          </div>
+                        </div>
+                        <textarea
+                          value={formConfig.teaser_messages}
+                          onChange={(e) => setFormConfig({ ...formConfig, teaser_messages: e.target.value })}
+                          className="w-full p-3 text-xs border rounded-md bg-background min-h-[80px]"
+                          placeholder="Escribe un mensaje por línea..."
+                        />
+                        <p className="text-[10px] text-primary italic">💡 Pon un mensaje atractivo por cada línea.</p>
                       </div>
                     </div>
                   </CardContent>
@@ -476,16 +834,229 @@ export default function Dashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="bg-muted rounded-lg p-4 font-mono text-sm break-all">
-                      {`<script src="https://leadwidget.pe/w/${widgetConfig?.widget_id}.js" async></script>`}
+                      {`<script src="${window.location.origin}/api/w/${widgetConfig?.widget_id}.js" async></script>`}
                     </div>
                     <Button onClick={copyEmbedCode} variant="outline" className="w-full mt-4">
                       <Copy className="w-4 h-4 mr-2" />
                       Copiar código
                     </Button>
+
+                    {/* Dynamic Domain Info Removed */}
                   </CardContent>
                 </Card>
               </div>
             </div>
+          </TabsContent>
+
+          {/* AI Configuration Tab */}
+          <TabsContent value="ai" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle>Configuración de IA</CardTitle>
+                    <CardDescription>Conecta tu chatbot con inteligencia artificial</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+
+
+                {/* AI Provider */}
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <Key className="w-4 h-4" />
+                    Proveedor de IA
+                  </Label>
+                  <Select value={aiConfig.ai_provider} onValueChange={(value) => setAiConfig({ ...aiConfig, ai_provider: value })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {aiConfig.ai_provider === 'openai' && (
+                        <>
+                          <SelectItem value="openai">OpenAI (GPT-4, GPT-3.5)</SelectItem>
+                          <SelectItem value="anthropic">Anthropic (Claude)</SelectItem>
+                          <SelectItem value="google">Google (Gemini)</SelectItem>
+                        </>
+                      )}
+                      {aiConfig.ai_provider === 'anthropic' && (
+                        <>
+                          <SelectItem value="openai">OpenAI (GPT-4, GPT-3.5)</SelectItem>
+                          <SelectItem value="anthropic">Anthropic (Claude)</SelectItem>
+                          <SelectItem value="google">Google (Gemini)</SelectItem>
+                        </>
+                      )}
+                      {aiConfig.ai_provider === 'google' && (
+                        <>
+                          <SelectItem value="openai">OpenAI (GPT-4, GPT-3.5)</SelectItem>
+                          <SelectItem value="anthropic">Anthropic (Claude)</SelectItem>
+                          <SelectItem value="google">Google (Gemini)</SelectItem>
+                        </>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* API Key */}
+                <div className="space-y-2">
+                  <Label>API Key</Label>
+                  <Input
+                    type="password"
+                    value={aiConfig.ai_api_key}
+                    onChange={(e) => setAiConfig({ ...aiConfig, ai_api_key: e.target.value })}
+                    placeholder="sk-..."
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {aiConfig.ai_provider === 'openai' && 'Obtén tu API key en platform.openai.com'}
+                    {aiConfig.ai_provider === 'anthropic' && 'Obtén tu API key en console.anthropic.com'}
+                    {aiConfig.ai_provider === 'google' && 'Obtén tu API key en makersuite.google.com'}
+                  </p>
+                </div>
+
+                {/* Model Selection */}
+                <div className="space-y-2">
+                  <Label>Modelo</Label>
+                  <Select value={aiConfig.ai_model} onValueChange={(value) => setAiConfig({ ...aiConfig, ai_model: value })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {aiConfig.ai_provider === 'openai' && (
+                        <>
+                          <SelectItem value="gpt-4o">GPT-4o (Más potente)</SelectItem>
+                          <SelectItem value="gpt-4o-mini">GPT-4o Mini (Recomendado)</SelectItem>
+                          <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo (Económico)</SelectItem>
+                        </>
+                      )}
+                      {aiConfig.ai_provider === 'anthropic' && (
+                        <>
+                          <SelectItem value="claude-3-opus">Claude 3 Opus</SelectItem>
+                          <SelectItem value="claude-3-sonnet">Claude 3 Sonnet</SelectItem>
+                          <SelectItem value="claude-3-haiku">Claude 3 Haiku</SelectItem>
+                        </>
+                      )}
+                      {aiConfig.ai_provider === 'google' && (
+                        <>
+                          <SelectItem value="gemini-pro">Gemini Pro</SelectItem>
+                          <SelectItem value="gemini-pro-vision">Gemini Pro Vision</SelectItem>
+                        </>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Temperature */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label>Temperatura ({aiConfig.ai_temperature})</Label>
+                    <span className="text-xs text-muted-foreground">Creatividad de las respuestas</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={aiConfig.ai_temperature}
+                    onChange={(e) => setAiConfig({ ...aiConfig, ai_temperature: parseFloat(e.target.value) })}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Preciso</span>
+                    <span>Creativo</span>
+                  </div>
+                </div>
+
+                {/* Max Tokens */}
+                <div className="space-y-2">
+                  <Label>Máximo de Tokens</Label>
+                  <Input
+                    type="number"
+                    value={aiConfig.ai_max_tokens}
+                    onChange={(e) => setAiConfig({ ...aiConfig, ai_max_tokens: parseInt(e.target.value) })}
+                    min={100}
+                    max={4000}
+                  />
+                  <p className="text-xs text-muted-foreground">Longitud máxima de las respuestas (100-4000)</p>
+                </div>
+
+                {/* System Prompt */}
+                <div className="space-y-2">
+                  <Label>Prompt del Sistema</Label>
+                  <textarea
+                    value={aiConfig.ai_system_prompt}
+                    onChange={(e) => setAiConfig({ ...aiConfig, ai_system_prompt: e.target.value })}
+                    rows={6}
+                    className="w-full p-3 text-sm border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                    placeholder="Instrucciones para el comportamiento de la IA..."
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Define cómo debe comportarse tu asistente IA y qué información debe capturar
+                  </p>
+                </div>
+
+                {/* Save Button */}
+                <Button
+                  onClick={async () => {
+                    if (!user) return;
+                    setSavingAI(true);
+                    try {
+                      const { error } = await supabase
+                        .from('profiles')
+                        .update({
+                          ai_enabled: true, // Force enabled on save
+                          ai_provider: aiConfig.ai_provider,
+                          ai_api_key: aiConfig.ai_api_key,
+                          ai_model: aiConfig.ai_model,
+                          ai_temperature: aiConfig.ai_temperature,
+                          ai_max_tokens: aiConfig.ai_max_tokens,
+                          ai_system_prompt: aiConfig.ai_system_prompt,
+                        })
+                        .eq('id', user.id);
+
+                      if (error) throw error;
+
+                      toast({
+                        title: '✅ Configuración guardada',
+                        description: 'Tu chatbot IA está listo para usar',
+                      });
+                    } catch (error: any) {
+                      toast({
+                        title: 'Error',
+                        description: error.message,
+                        variant: 'destructive',
+                      });
+                    } finally {
+                      setSavingAI(false);
+                    }
+                  }}
+                  disabled={savingAI}
+                  className="w-full"
+                >
+                  {savingAI ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Check className="w-4 h-4 mr-2" />}
+                  Guardar Configuración de IA
+                </Button>
+
+                {/* Info Card */}
+                <div className="p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                  <div className="flex gap-3">
+                    <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                    <div className="space-y-2 text-sm">
+                      <p className="font-medium text-blue-900 dark:text-blue-100">Cómo funciona el Chatbot IA</p>
+                      <ul className="space-y-1 text-blue-700 dark:text-blue-300 list-disc list-inside">
+                        <li>La IA responderá automáticamente a los visitantes de tu web</li>
+                        <li>Capturará información relevante según tu prompt del sistema</li>
+                        <li>Los leads se guardarán automáticamente en tu panel</li>
+                        <li>Puedes personalizar el comportamiento editando el prompt</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Leads Tab */}
@@ -503,8 +1074,8 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 {leads.length === 0 ? (
-                  <div className="text-center py-12 text-muted-foreground">
-                    <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-2xl">
+                    <Users className="w-12 h-12 mx-auto mb-4 opacity-10" />
                     <p>Aún no tienes leads</p>
                     <p className="text-sm mt-1">Instala el widget en tu web para empezar a capturar</p>
                   </div>
@@ -512,29 +1083,26 @@ export default function Dashboard() {
                   <div className="overflow-x-auto">
                     <table className="w-full">
                       <thead>
-                        <tr className="border-b">
+                        <tr className="border-b text-xs uppercase tracking-wider text-muted-foreground">
                           <th className="text-left py-3 px-4 font-medium">Nombre</th>
                           <th className="text-left py-3 px-4 font-medium">Teléfono</th>
                           <th className="text-left py-3 px-4 font-medium">Interés</th>
                           <th className="text-left py-3 px-4 font-medium">Fecha</th>
                         </tr>
                       </thead>
-                      <tbody>
+                      <tbody className="text-sm">
                         {leads.map((lead) => (
-                          <tr key={lead.id} className="border-b hover:bg-muted/50">
-                            <td className="py-3 px-4">{lead.name}</td>
-                            <td className="py-3 px-4">
-                              <a
-                                href={`https://wa.me/${lead.phone.replace(/\D/g, '')}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-primary hover:underline"
-                              >
-                                {lead.phone}
-                              </a>
+                          <tr key={lead.id} className="border-b hover:bg-muted/50 transition-colors">
+                            <td className="py-4 px-4 font-medium">{lead.name}</td>
+                            <td className="py-4 px-4 font-mono text-xs">
+                              {lead.phone === 'Pendiente (Click WA)' ? (
+                                <span className="text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100">Pendiente WA</span>
+                              ) : (
+                                <a href={`https://wa.me/${lead.phone.replace(/\D/g, '')}`} target="_blank" className="text-primary hover:underline">{lead.phone}</a>
+                              )}
                             </td>
-                            <td className="py-3 px-4 text-muted-foreground">{lead.interest || '-'}</td>
-                            <td className="py-3 px-4 text-muted-foreground text-sm">
+                            <td className="py-4 px-4 text-muted-foreground truncate max-w-[200px]">{lead.interest || '-'}</td>
+                            <td className="py-4 px-4 text-muted-foreground">
                               {new Date(lead.created_at).toLocaleString('es-PE')}
                             </td>
                           </tr>
@@ -555,7 +1123,7 @@ export default function Dashboard() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">Visitas</p>
-                      <p className="text-3xl font-bold">125</p>
+                      <p className="text-3xl font-bold">{analytics.views}</p>
                     </div>
                     <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center">
                       <Eye className="w-6 h-6 text-secondary" />
@@ -583,10 +1151,12 @@ export default function Dashboard() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">Tasa conversión</p>
-                      <p className="text-3xl font-bold">{leads.length > 0 ? '22%' : '0%'}</p>
+                      <p className="text-3xl font-bold">
+                        {analytics.views > 0 ? Math.round((leads.length / analytics.views) * 100) : 0}%
+                      </p>
                     </div>
-                    <div className="w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center">
-                      <Target className="w-6 h-6 text-success" />
+                    <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center">
+                      <TrendingUp className="w-6 h-6 text-green-600" />
                     </div>
                   </div>
                 </CardContent>
@@ -596,12 +1166,85 @@ export default function Dashboard() {
             <Card>
               <CardHeader>
                 <CardTitle>Rendimiento semanal</CardTitle>
+                <CardDescription>Tráfico y captación en los últimos 7 días</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-64 flex items-center justify-center text-muted-foreground">
-                  <TrendingUp className="w-12 h-12 opacity-50" />
-                  <span className="ml-4">Gráfica disponible próximamente</span>
+                <div className="h-64 flex flex-col items-center justify-center text-muted-foreground border-2 border-dashed rounded-xl">
+                  <BarChart3 className="w-12 h-12 opacity-10 mb-2" />
+                  <span className="text-sm">Gráfica detallada disponible próximamente</span>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Security Tab */}
+          <TabsContent value="security" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center">
+                    <ShieldCheck className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle>Seguridad y Bloqueos</CardTitle>
+                    <CardDescription>Controla quién tiene acceso a tu chat widget</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl flex gap-3">
+                  <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-amber-800 dark:text-amber-200">
+                    El sistema bloquea automáticamente IPs que intentan manipular la IA o realizan spam.
+                    Si crees que un cliente fue bloqueado por error, puedes rehabilitarlo aquí.
+                  </p>
+                </div>
+
+                {blockedIps.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-2xl">
+                    <ShieldCheck className="w-12 h-12 mx-auto mb-4 opacity-10" />
+                    <p>No hay usuarios bloqueados actualmente</p>
+                    <p className="text-sm">Tu escudo de seguridad está activo y vigilando.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b text-xs uppercase tracking-wider text-muted-foreground">
+                          <th className="text-left py-3 px-4 font-medium">Dirección IP</th>
+                          <th className="text-left py-3 px-4 font-medium">Motivo</th>
+                          <th className="text-left py-3 px-4 font-medium">Fecha</th>
+                          <th className="text-right py-3 px-4 font-medium">Acción</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-sm">
+                        {blockedIps.map((ip) => (
+                          <tr key={ip.id} className="border-b hover:bg-muted/50 transition-colors">
+                            <td className="py-4 px-4 font-mono">{ip.ip_address}</td>
+                            <td className="py-4 px-4">
+                              <span className="px-2 py-1 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded-md text-xs font-medium">
+                                {ip.reason || 'Actividad inusual'}
+                              </span>
+                            </td>
+                            <td className="py-4 px-4 text-muted-foreground">
+                              {new Date(ip.created_at).toLocaleString('es-PE')}
+                            </td>
+                            <td className="py-4 px-4 text-right">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => unblockIp(ip.id)}
+                                className="text-primary border-primary/20 hover:bg-primary/10"
+                              >
+                                Desbloquear
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -623,10 +1266,10 @@ export default function Dashboard() {
                   </div>
 
                   {profile?.status === 'trial' && (
-                    <div className="p-4 bg-warning/10 border border-warning/20 rounded-xl">
-                      <div className="flex items-center gap-2 text-warning mb-2">
+                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                      <div className="flex items-center gap-2 text-amber-600 mb-2 font-semibold">
                         <Clock className="w-5 h-5" />
-                        <span className="font-semibold">Trial activo</span>
+                        Trial activo
                       </div>
                       <p className="text-sm text-muted-foreground">
                         Te quedan {getTrialDaysLeft()} días de prueba. Paga para mantener tu widget activo.
@@ -638,83 +1281,48 @@ export default function Dashboard() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Pagar con Yape/Plin</CardTitle>
-                  <CardDescription>Envía S/30 y sube tu comprobante</CardDescription>
+                  <CardTitle>Renovar Suscripción</CardTitle>
+                  <CardDescription>Paga con Yape o Plin y sube tu captura</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-[#00C185]/10 rounded-xl text-center">
-                      <div className="w-12 h-12 bg-[#00C185] rounded-xl flex items-center justify-center mx-auto mb-2">
-                        <span className="text-white font-bold text-xs">YAPE</span>
-                      </div>
-                      <p className="font-semibold">902 105 668</p>
+                    <div className="p-4 bg-[#00C185]/10 rounded-xl text-center border border-[#00C185]/20">
+                      <div className="w-10 h-10 bg-[#00C185] rounded-lg flex items-center justify-center mx-auto mb-2 text-white font-bold text-xs">YAPE</div>
+                      <p className="text-sm font-bold">902 105 668</p>
+                      <p className="text-[10px] text-muted-foreground uppercase">Ken Ryzen</p>
                     </div>
-                    <div className="p-4 bg-[#7B2CBF]/10 rounded-xl text-center">
-                      <div className="w-12 h-12 bg-[#7B2CBF] rounded-xl flex items-center justify-center mx-auto mb-2">
-                        <span className="text-white font-bold text-xs">PLIN</span>
-                      </div>
-                      <p className="font-semibold">902 105 668</p>
+                    <div className="p-4 bg-[#7B2CBF]/10 rounded-xl text-center border border-[#7B2CBF]/20">
+                      <div className="w-10 h-10 bg-[#7B2CBF] rounded-lg flex items-center justify-center mx-auto mb-2 text-white font-bold text-xs">PLIN</div>
+                      <p className="text-sm font-bold">902 105 668</p>
+                      <p className="text-[10px] text-muted-foreground uppercase">Ken Ryzen</p>
                     </div>
                   </div>
-
-                  <div className="p-4 border border-dashed rounded-xl text-center">
-                    <Upload className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground mb-3">Sube tu comprobante de pago</p>
-                    <Button variant="outline" disabled={uploading}>
-                      {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Subir comprobante'}
+                  <div className="space-y-3">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleUploadProof}
+                    />
+                    <Button
+                      variant="outline"
+                      className="w-full h-12 border-dashed gap-2"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                    >
+                      {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                      Sube tu comprobante de pago
                     </Button>
                   </div>
                 </CardContent>
               </Card>
             </div>
-
-            {/* Payment History */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Historial de pagos</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {payments.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <CreditCard className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <p>No tienes pagos registrados</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {payments.map((payment) => (
-                      <div key={payment.id} className="flex items-center justify-between p-4 border rounded-xl">
-                        <div>
-                          <p className="font-medium">S/{payment.amount}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {new Date(payment.created_at).toLocaleDateString('es-PE')}
-                          </p>
-                        </div>
-                        <div>
-                          {payment.status === 'verified' && (
-                            <span className="badge-active px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
-                              <Check className="w-3 h-3" /> Verificado
-                            </span>
-                          )}
-                          {payment.status === 'pending' && (
-                            <span className="badge-trial px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
-                              <Clock className="w-3 h-3" /> Pendiente
-                            </span>
-                          )}
-                          {payment.status === 'rejected' && (
-                            <span className="badge-suspended px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
-                              <AlertCircle className="w-3 h-3" /> Rechazado
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
       </div>
     </div>
   );
 }
+
+

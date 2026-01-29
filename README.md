@@ -1,73 +1,72 @@
-# Welcome to your Lovable project
+# Lead Widget — SaaS de Captura de Leads Proactiva con IA
 
-## Project info
+Lead Widget es una plataforma SaaS de vanguardia que transforma sitios web estáticos en máquinas de generación de prospectos. Utilizando Inteligencia Artificial multimodelo y disparadores de comportamiento humano, el sistema pre-cualifica visitantes y los conecta directamente con el equipo de ventas vía WhatsApp.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+---
 
-## How can I edit this code?
+## 🚀 Características de Élite
 
-There are several ways of editing your application.
+### 1. Widget de Chat Proactivo e Inteligente
+*   **IA de Próxima Generación:** Soporte nativo para OpenAI (GPT-4o), Anthropic (Claude 3.5) y Google (Gemini).
+*   **Triggers de Conversión:**
+    *   **Retraso Temporal:** Saludo automático tras X segundos.
+    *   **Scroll Profundo:** Se activa cuando el usuario lee el contenido.
+    *   **Intento de Salida (Exit Intent):** Captura al usuario antes de que cierre la pestaña con ofertas irresistibles.
+*   **Personalización Visual:** Control total del color de marca, mensajes de bienvenida, placeholders de chat y vibraciones hápticas (Soft/Medium/Heavy).
+*   **Mensajes "Teaser":** Burbujas dinámicas que rotan mensajes para atraer la atención sin ser intrusivos.
+*   **Sistema de Avisos**: Posibilidad de publicar anuncios globales (mantenimiento, novedades) desde el panel de administración hacia todos los clientes.
 
-**Use Lovable**
+### 2. Dashboard de Gestión (Panel del Cliente)
+*   **Módulo de Leads:** Lista detallada de prospectos con datos extraídos automáticamente por la IA (Nombre, Teléfono, Interés, etc.).
+*   **Exportación Inteligente:** Descarga de leads en formato CSV optimizado con sistema de escape para compatibilidad total con CRMs.
+*   **Analytics Hub:** Visualización de tráfico (Visitas) vs. Conversiones (Leads) con cálculo automático de efectividad.
+*   **Configuración de IA:** Panel para editar el "Prompt del Sistema", temperatura de respuesta y longitud de tokens para cada modelo.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+### 3. Sistema de Seguridad y Ahorro de Créditos (NEW)
+*   **Cortafuegos de IA:** Detección autónoma de intentos de jailbreak, spam o insultos. El bot finaliza la charla para proteger la integridad del sistema.
+*   **Pestaña de Seguridad:** Módulo dedicado para gestionar IPs bloqueadas.
+*   **Bloqueo Automático (Ban):** Si un usuario intenta abusar del sistema, su IP es baneada permanentemente, evitando consumos innecesarios de API de OpenAI/Anthropic.
+*   **Control de Desbloqueo:** Los clientes pueden ver el motivo del bloqueo (ej: "Manipulación de IA") y rehabilitar IPs manualmente si lo desean.
 
-Changes made via Lovable will be committed automatically to this repo.
+### 4. Admin Master Panel (Panel de Control Global)
+*   **Gestión de Clientes:** Vista global de todos los usuarios registrados.
+*   **Control de Servicio:** Capacidad para pausar o activar cuentas instantáneamente (e.j. por falta de pago).
+*   **Métricas Globales:** Control total de la salud de la plataforma SaaS.
 
-**Use your preferred IDE**
+### 5. Facturación y Suscripciones (Trial System)
+*   **Trial Automático:** Sistema de 3 días de prueba gratuita activado al registro.
+*   **Flujo de Pago Local:** Módulo para que los clientes suban capturas de pantalla de pagos por Yape/Plin/Transferencia.
+*   **Validación Administrativa:** Los estados de suscripción (Trial, Activo, Suspendido) se actualizan tras la verificación del comprobante.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+---
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## 🛠️ Stack Tecnológico
+*   **Frontend:** React 18, TypeScript, Tailwind CSS, Vite.
+*   **Componentes:** shadcn/ui (Radix UI) para una estética premium.
+*   **Backend:** Vercel Edge & Serverless Functions (Node.js).
+*   **Base de Datos:** PostgreSQL con **Supabase**.
+*   **Autenticación:** Supabase Auth (con hooks para roles).
+*   **IA:** Integración vía SDK oficial de OpenAI y fetch optimizado para otros proveedores.
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 📦 Estructura de Archivos Clave
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+*   `api/chat.js`: Lógica central de la IA, seguridad y detección de leads.
+*   `api/w/[widgetId].js`: Script dinámico que inyecta el widget en cualquier sitio web mediante una sola línea de código.
+*   `src/pages/Dashboard.tsx`: El corazón de la gestión del cliente (Leads, Config, Seguridad).
+*   `src/pages/SuperAdmin.tsx`: Panel exclusivo de administración de la plataforma.
+*   `public/widget-embed.js`: Loader ultraligero que permite incrustar el sistema en sitios externos.
 
-# Step 3: Install the necessary dependencies.
-npm i
+---
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+## 🔒 Seguridad y Mejores Prácticas
+*   **CORS Strict:** La API solo responde a dominios autorizados.
+*   **IP Logging:** Rastreo de origen para prevención de spam.
+*   **Database RLS:** Políticas de Row Level Security en Supabase para que ningún cliente pueda ver los datos de otro.
+*   **Secret Management:** Claves de API gestionadas mediante variables de entorno en Vercel, nunca expuestas en el cliente.
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### 🇵🇪 Diseñado para el mercado peruano y latinoamericano. 
+*Eficiencia, IA y WhatsApp en una sola solución.*

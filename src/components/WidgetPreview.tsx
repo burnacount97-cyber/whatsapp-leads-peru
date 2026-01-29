@@ -1,8 +1,7 @@
-import { useState } from 'react';
-import { MessageCircle, X, Send, ArrowRight } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { MessageCircle, X, Send, Bot, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useWidgetTriggers } from '@/hooks/useWidgetTriggers';
 
 interface WidgetPreviewProps {
   primaryColor?: string;
@@ -13,195 +12,231 @@ interface WidgetPreviewProps {
   customPlaceholder?: string;
   customButtonText?: string;
   customConfirmationMessage?: string;
+  chatPlaceholder?: string;
+  mode?: 'landing' | 'dashboard';
+  vibrationIntensity?: 'none' | 'soft' | 'strong';
+  exitIntentEnabled?: boolean;
+  exitIntentTitle?: string;
+  exitIntentDescription?: string;
+  exitIntentCTA?: string;
 }
 
 export function WidgetPreview({
   primaryColor = '#00C185',
-  welcomeMessage = '¡Hola! ¿En qué podemos ayudarte?',
-  nicheQuestion = '¿En qué distrito te encuentras?',
-  template = 'general',
+  welcomeMessage = '👋 ¡Hola! Soy la IA de LeadWidget. ¿En qué te ayudo?',
   businessName = 'LeadWidget',
-  customPlaceholder = 'Tu respuesta',
-  customButtonText = 'Continuar',
-  customConfirmationMessage = '¡Listo! Te pasamos al WhatsApp del equipo'
+  chatPlaceholder = 'Escribe Hola...',
+  mode = 'landing',
+  vibrationIntensity = 'soft',
+  exitIntentEnabled = true,
+  exitIntentTitle = '¡Espera!',
+  exitIntentDescription = 'Prueba LeadWidget gratis por 3 días y aumenta tus ventas.',
+  exitIntentCTA = 'Probar Demo Ahora',
 }: WidgetPreviewProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true); // Default open for preview
+  const [messages, setMessages] = useState([
+    { role: 'assistant', content: welcomeMessage }
+  ]);
+  const [inputText, setInputText] = useState('');
+  const [isIdle, setIsIdle] = useState(false);
+  const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Implementación de triggers proactivos
-  useWidgetTriggers(isOpen, setIsOpen, {
-    timeDelay: 5000,       // 5 segundos
-    scrollThreshold: 35,   // 35% de scroll
-    enableExitIntent: true // Detectar intención de salida
-  });
-
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
-    interest: '',
-    name: '',
-    phone: '',
-  });
-
-  const getTemplateLabels = () => {
-    switch (template) {
-      case 'inmobiliaria':
-        return { interest: 'Distrito / Habitaciones', placeholder: 'Ej: Miraflores, 3 habitaciones' };
-      case 'clinica':
-        return { interest: 'Especialidad', placeholder: 'Ej: Dermatología' };
-      case 'taller':
-        return { interest: 'Tipo de vehículo / Problema', placeholder: 'Ej: Toyota Corolla, frenos' };
-      case 'delivery':
-        return { interest: 'Dirección de entrega', placeholder: 'Ej: Av. Javier Prado 123' };
-      case 'personalizado':
-        return { interest: nicheQuestion, placeholder: customPlaceholder };
-      default:
-        return { interest: nicheQuestion, placeholder: 'Tu respuesta' };
+  // Immediate demo on prop change
+  useEffect(() => {
+    if (vibrationIntensity !== 'none' && isOpen) {
+      setIsIdle(true);
+      const timer = setTimeout(() => setIsIdle(false), 2000);
+      return () => clearTimeout(timer);
     }
+  }, [vibrationIntensity, isOpen]);
+
+  // Idle animation logic
+  useEffect(() => {
+    if (!isOpen || inputText.trim() !== '' || vibrationIntensity === 'none') {
+      setIsIdle(false);
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+      return;
+    }
+
+    const startIdleTimer = () => {
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = setTimeout(() => {
+        setIsIdle(true);
+      }, 5000); // 5 seconds of inactivity
+    };
+
+    startIdleTimer();
+
+    return () => {
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    };
+  }, [isOpen, inputText, messages, vibrationIntensity]);
+
+  // Fake interactive demo
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputText.trim()) return;
+
+    setIsIdle(false);
+    if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+
+    // User message
+    const userMsg = inputText;
+    setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+    setInputText('');
+
+    // Fake AI response
+    setTimeout(() => {
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: '¡Genial! Esta es una demostración de cómo respondería la IA. En el widget real, aquí respondería con información de tu negocio.'
+      }]);
+    }, 1000);
   };
 
-  const labels = getTemplateLabels();
-
-  const handleSubmit = () => {
-    setStep(3);
-  };
-
-  const resetWidget = () => {
-    setStep(1);
-    setFormData({ interest: '', name: '', phone: '' });
-    setIsOpen(false);
-  };
-
-  return (
-    <div className="relative">
-      {/* Widget Panel */}
-      {isOpen && (
+  // Dashboard Mode: Render just the chat window, relative
+  if (mode === 'dashboard') {
+    return (
+      <div className="w-full h-full flex flex-col bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden font-sans">
+        {/* Header */}
         <div
-          className="widget-panel"
-          style={{
-            '--widget-primary': primaryColor
-          } as React.CSSProperties}
+          className="p-4 flex items-center justify-between text-white shadow-sm"
+          style={{ background: primaryColor }}
         >
-          {/* Header */}
-          <div
-            className="p-4 text-primary-foreground"
-            style={{ background: primaryColor }}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                  <MessageCircle className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="font-semibold text-sm">{businessName}</p>
-                  <p className="text-xs opacity-80">Respondemos al instante</p>
-                </div>
-              </div>
-              <button
-                onClick={resetWidget}
-                className="p-1 hover:bg-white/20 rounded-full transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center relative">
+              <Bot className="w-6 h-6" />
+              <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 rounded-full" style={{ borderColor: primaryColor }}></div>
+            </div>
+            <div>
+              <h3 className="font-bold text-sm">{businessName}</h3>
+              <p className="text-[10px] opacity-90 text-white/90">Responde al instante con IA</p>
             </div>
           </div>
+        </div>
 
-          {/* Content */}
-          <div className="p-4 min-h-[280px] flex flex-col">
-            {step === 1 && (
-              <div className="animate-fade-in space-y-4">
-                <div className="bg-muted rounded-2xl rounded-tl-sm p-3">
-                  <p className="text-sm">{welcomeMessage}</p>
-                </div>
-                <div className="bg-muted rounded-2xl rounded-tl-sm p-3">
-                  <p className="text-sm">{labels.interest}</p>
-                </div>
-                <div className="mt-auto">
-                  <Input
-                    placeholder={labels.placeholder}
-                    value={formData.interest}
-                    onChange={(e) => setFormData({ ...formData, interest: e.target.value })}
-                    className="rounded-xl"
-                  />
-                  <Button
-                    className="w-full mt-3 rounded-xl"
-                    style={{ background: primaryColor }}
-                    onClick={() => formData.interest && setStep(2)}
-                    disabled={!formData.interest}
-                  >
-                    {customButtonText} <ArrowRight className="w-4 h-4 ml-1" />
-                  </Button>
-                </div>
+        {/* Chat Area */}
+        <div className="flex-1 bg-slate-50 overflow-y-auto p-4 space-y-4">
+          {messages.map((msg, idx) => (
+            <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div
+                className={`max-w-[85%] p-3 rounded-2xl text-sm shadow-sm ${msg.role === 'user'
+                  ? 'text-white rounded-br-none'
+                  : 'bg-white text-slate-800 border border-slate-100 rounded-bl-none'
+                  }`}
+                style={msg.role === 'user' ? { background: primaryColor } : {}}
+              >
+                {msg.content}
               </div>
-            )}
+            </div>
+          ))}
+        </div>
 
-            {step === 2 && (
-              <div className="animate-fade-in space-y-4">
-                <div className="bg-muted rounded-2xl rounded-tl-sm p-3">
-                  <p className="text-sm">¡Perfecto! Para contactarte, necesitamos:</p>
-                </div>
-                <div className="space-y-3 mt-auto">
-                  <Input
-                    placeholder="Tu nombre"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="rounded-xl"
-                  />
-                  <Input
-                    placeholder="+51 987 654 321"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="rounded-xl"
-                  />
-                  <Button
-                    className="w-full rounded-xl"
-                    style={{ background: primaryColor }}
-                    onClick={handleSubmit}
-                    disabled={!formData.name || !formData.phone}
-                  >
-                    <Send className="w-4 h-4 mr-1" /> Enviar
-                  </Button>
-                </div>
-              </div>
-            )}
+        {/* Input Area */}
+        <div className="p-3 bg-white border-t border-slate-100">
+          <form onSubmit={handleSendMessage} className="flex gap-2">
+            <Input
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder={chatPlaceholder}
+              className="flex-1 bg-slate-50 border-slate-200"
+            />
+            <Button
+              type="submit"
+              size="icon"
+              className="text-white shrink-0"
+              style={{ background: primaryColor }}
+              disabled={!inputText.trim()}
+            >
+              <Send className="w-4 h-4" />
+            </Button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
-            {step === 3 && (
-              <div className="animate-fade-in space-y-4 flex flex-col items-center justify-center h-full text-center">
-                <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center">
-                  <svg className="w-8 h-8 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="font-semibold text-lg">¡Listo, {formData.name}!</p>
-                  <p className="text-muted-foreground text-sm mt-1">
-                    {customConfirmationMessage} 👇
-                  </p>
-                </div>
-                <Button
-                  variant="whatsapp"
-                  className="w-full rounded-xl"
-                >
-                  <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                  </svg>
-                  Abrir WhatsApp
-                </Button>
+  return (
+    <div className="relative h-[600px] w-full flex items-end justify-end p-4 font-sans">
+      {/* Widget Window */}
+      <div className={`
+            absolute bottom-20 right-0 w-[280px] h-[400px] bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100 flex flex-col
+            transition-all duration-300 origin-bottom-right
+            ${isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}
+            ${isIdle && vibrationIntensity === 'soft' ? 'animate-vibrate' : ''}
+            ${isIdle && vibrationIntensity === 'strong' ? 'animate-vibrate-strong' : ''}
+        `}>
+        {/* Header */}
+        <div
+          className="p-4 flex items-center justify-between text-white shadow-sm"
+          style={{ background: primaryColor }}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center relative">
+              <Bot className="w-6 h-6" />
+              <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 rounded-full" style={{ borderColor: primaryColor }}></div>
+            </div>
+            <div>
+              <h3 className="font-bold text-sm">{businessName}</h3>
+              <p className="text-[10px] opacity-90 text-white/90">Responde al instante con IA</p>
+            </div>
+          </div>
+          <button onClick={() => setIsOpen(false)} className="hover:bg-white/20 p-1 rounded-full transition-colors">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Chat Area */}
+        <div className="flex-1 bg-slate-50 h-[350px] overflow-y-auto p-4 space-y-4">
+          {messages.map((msg, idx) => (
+            <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div
+                className={`max-w-[85%] p-3 rounded-2xl text-sm shadow-sm ${msg.role === 'user'
+                  ? 'text-white rounded-br-none'
+                  : 'bg-white text-slate-800 border border-slate-100 rounded-bl-none'
+                  }`}
+                style={msg.role === 'user' ? { background: primaryColor } : {}}
+              >
+                {msg.content}
               </div>
-            )}
+            </div>
+          ))}
+        </div>
+
+        {/* Input Area */}
+        <div className="p-3 bg-white border-t border-slate-100">
+          <form onSubmit={handleSendMessage} className="flex gap-2">
+            <Input
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder="Escribe Hola..."
+              className="flex-1 bg-slate-50 border-slate-200"
+            />
+            <Button
+              type="submit"
+              size="icon"
+              className="text-white shrink-0"
+              style={{ background: primaryColor }}
+              disabled={!inputText.trim()}
+            >
+              <Send className="w-4 h-4" />
+            </Button>
+          </form>
+          <div className="text-center mt-2">
+            <p className="text-[10px] text-slate-400">
+              ⚡ Vista previa del Widget IA
+            </p>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Bubble */}
+      {/* Launcher Bubble */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="widget-bubble"
-        style={{ background: `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor}dd 100%)` }}
+        className="absolute bottom-4 right-0 w-14 h-14 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center z-10"
+        style={{ background: primaryColor }}
       >
-        {isOpen ? (
-          <X className="w-6 h-6 text-white" />
-        ) : (
-          <MessageCircle className="w-6 h-6 text-white" />
-        )}
+        {isOpen ? <X className="w-6 h-6 text-white" /> : <Bot className="w-7 h-7 text-white" />}
       </button>
     </div>
   );

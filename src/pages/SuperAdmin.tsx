@@ -64,6 +64,14 @@ export default function SuperAdmin() {
   const [editingClient, setEditingClient] = useState<Profile | null>(null);
   const [editForm, setEditForm] = useState({ business_name: '', phone: '', email: '' });
 
+  // System Announcements State
+  const [announcement, setAnnouncement] = useState({
+    id: '',
+    content: '',
+    type: 'info' as 'info' | 'warning' | 'error' | 'success',
+    is_active: false
+  });
+
   // Stats
   const [stats, setStats] = useState({
     totalClients: 0,
@@ -72,6 +80,7 @@ export default function SuperAdmin() {
     suspendedClients: 0,
     totalLeads: 0,
     pendingPayments: 0,
+    totalViews: 0,
     mrr: 0,
   });
 
@@ -136,6 +145,13 @@ export default function SuperAdmin() {
       const totalLeadsCount = Object.values(leadsCounts).reduce((a: number, b: number) => a + b, 0);
       const pendingPayments = (paymentsData || []).filter(p => p.status === 'pending').length;
 
+      // Load global analytics
+      const { data: analyticsData } = await supabase
+        .from('widget_analytics')
+        .select('event_type');
+
+      const totalViews = (analyticsData || []).filter(a => a.event_type === 'view').length;
+
       setStats({
         totalClients: clientsWithLeads.length,
         activeClients: activeCount,
@@ -143,8 +159,20 @@ export default function SuperAdmin() {
         suspendedClients: suspendedCount,
         totalLeads: totalLeadsCount as number,
         pendingPayments,
+        totalViews,
         mrr: activeCount * 30,
       });
+
+      // Load Announcement
+      const { data: announcementData } = await supabase
+        .from('system_announcements')
+        .select('*')
+        .order('updated_at', { ascending: false })
+        .limit(1);
+
+      if (announcementData?.[0]) {
+        setAnnouncement(announcementData[0] as any);
+      }
 
     } catch (error) {
       console.error('Error loading data:', error);
@@ -290,6 +318,47 @@ export default function SuperAdmin() {
     client.business_name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const saveAnnouncement = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('system_announcements')
+        .upsert({
+          id: announcement.id || undefined,
+          content: announcement.content,
+          type: announcement.type,
+          is_active: announcement.is_active,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: 'Aviso actualizado',
+        description: 'Todos los clientes verán el nuevo mensaje en su dashboard.',
+      });
+      loadData();
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate('/login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      window.location.href = '/login';
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'trial':
@@ -325,7 +394,7 @@ export default function SuperAdmin() {
 
           <div className="flex items-center gap-4">
             <span className="text-sm opacity-80">{user?.email}</span>
-            <Button variant="glass" size="sm" onClick={() => signOut()}>
+            <Button variant="glass" size="sm" onClick={handleSignOut}>
               <LogOut className="w-4 h-4 mr-2" />
               Salir
             </Button>
@@ -368,8 +437,16 @@ export default function SuperAdmin() {
           </Card>
           <Card className="stat-card">
             <CardContent className="pt-4 pb-4">
-              <p className="text-xs text-muted-foreground">Pagos Pend.</p>
-              <p className="text-2xl font-bold text-warning">{stats.pendingPayments}</p>
+              <p className="text-xs text-muted-foreground">Visitas Global</p>
+              <p className="text-2xl font-bold">{stats.totalViews}</p>
+            </CardContent>
+          </Card>
+          <Card className="stat-card">
+            <CardContent className="pt-4 pb-4">
+              <p className="text-xs text-muted-foreground">Conv. Global</p>
+              <p className="text-2xl font-bold text-success">
+                {stats.totalViews > 0 ? Math.round((stats.totalLeads / stats.totalViews) * 100) : 0}%
+              </p>
             </CardContent>
           </Card>
           <Card className="stat-card bg-primary text-primary-foreground">
@@ -393,6 +470,10 @@ export default function SuperAdmin() {
             <TabsTrigger value="analytics" className="gap-2">
               <BarChart3 className="w-4 h-4" />
               Analytics
+            </TabsTrigger>
+            <TabsTrigger value="avisos" className="gap-2">
+              <AlertCircle className="w-4 h-4" />
+              Avisos
             </TabsTrigger>
           </TabsList>
 
@@ -427,6 +508,7 @@ export default function SuperAdmin() {
                     <thead>
                       <tr className="border-b">
                         <th className="text-left py-3 px-4 font-medium">Cliente</th>
+                        <th className="text-left py-3 px-4 font-medium">Registro</th>
                         <th className="text-left py-3 px-4 font-medium">Estado</th>
                         <th className="text-left py-3 px-4 font-medium">Leads</th>
                         <th className="text-left py-3 px-4 font-medium">Trial Expira</th>
@@ -441,6 +523,9 @@ export default function SuperAdmin() {
                               <p className="font-medium">{client.business_name || 'Sin nombre'}</p>
                               <p className="text-sm text-muted-foreground">{client.email}</p>
                             </div>
+                          </td>
+                          <td className="py-3 px-4 text-sm text-muted-foreground">
+                            {new Date(client.created_at).toLocaleDateString('es-PE')}
                           </td>
                           <td className="py-3 px-4">
                             {getStatusBadge(client.status || 'trial')}
@@ -468,6 +553,7 @@ export default function SuperAdmin() {
                                   variant="outline"
                                   onClick={() => updateClientStatus(client.id, 'active')}
                                   disabled={updatingClient === client.id}
+                                  className="text-green-600 hover:text-green-700 hover:bg-green-50 border-green-200"
                                 >
                                   {updatingClient === client.id ? (
                                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -482,6 +568,7 @@ export default function SuperAdmin() {
                                   variant="outline"
                                   onClick={() => updateClientStatus(client.id, 'suspended')}
                                   disabled={updatingClient === client.id}
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
                                 >
                                   <X className="w-4 h-4" />
                                 </Button>
@@ -681,6 +768,89 @@ export default function SuperAdmin() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+          {/* Announcements Tab */}
+          <TabsContent value="avisos">
+            <Card>
+              <CardHeader>
+                <CardTitle>Avisos del Sistema</CardTitle>
+                <CardDescription>Publica mensajes globales que aparecerán en el dashboard de todos los clientes.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="announcement-content">Contenido del Mensaje</Label>
+                    <textarea
+                      id="announcement-content"
+                      className="w-full min-h-[100px] p-4 rounded-xl border bg-background"
+                      placeholder="Ej: Mantenimiento programado para las 10 PM. Toma tus precauciones."
+                      value={announcement.content}
+                      onChange={(e) => setAnnouncement({ ...announcement, content: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <Label>Tipo de Alerta</Label>
+                      <div className="flex flex-wrap gap-2">
+                        {['info', 'warning', 'error', 'success'].map((t) => (
+                          <button
+                            key={t}
+                            onClick={() => setAnnouncement({ ...announcement, type: t as any })}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${announcement.type === t
+                              ? 'bg-primary text-primary-foreground border-primary'
+                              : 'bg-background hover:bg-muted'
+                              }`}
+                          >
+                            {t.charAt(0).toUpperCase() + t.slice(1)}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>Estado</Label>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setAnnouncement({ ...announcement, is_active: !announcement.is_active })}
+                          className={`w-12 h-6 rounded-full transition-colors relative ${announcement.is_active ? 'bg-primary' : 'bg-muted'}`}
+                        >
+                          <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${announcement.is_active ? 'translate-x-6' : ''}`} />
+                        </button>
+                        <span className="text-sm font-medium">{announcement.is_active ? 'Activo (Visible)' : 'Inactivo (Oculto)'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 border border-dashed rounded-xl bg-muted/20">
+                    <p className="text-xs font-medium text-muted-foreground mb-3 underline">Vista previa en el Dashboard:</p>
+                    {announcement.is_active && announcement.content ? (
+                      <div className={`p-4 rounded-lg flex items-center gap-3 border shadow-sm ${announcement.type === 'error' ? 'bg-red-50 border-red-200 text-red-800' :
+                        announcement.type === 'warning' ? 'bg-orange-50 border-orange-200 text-orange-800' :
+                          announcement.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' :
+                            'bg-blue-50 border-blue-200 text-blue-800'
+                        }`}>
+                        <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                        <p className="text-sm font-medium leading-relaxed">{announcement.content}</p>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground italic text-center py-2">No hay aviso activo para mostrar</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex justify-end pt-4 border-t">
+                  <Button
+                    onClick={saveAnnouncement}
+                    disabled={loading || !announcement.content}
+                    className="gap-2"
+                  >
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                    Guardar Cambios y Publicar
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
 

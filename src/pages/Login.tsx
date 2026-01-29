@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/lib/auth';
+import { supabase } from '@/integrations/supabase/client';
 import { MessageCircle, Loader2, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -15,28 +16,94 @@ export default function Login() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  // Check session on mount
+  useEffect(() => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        checkRoleAndRedirect(session.user.id);
+      }
+    });
+  }, []);
 
-    const { error } = await signIn(email, password);
+  const checkRoleAndRedirect = async (userId: string) => {
+    // Create a timeout promise
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('TIMEOUT')), 8000)
+    );
 
-    if (error) {
-      toast({
-        title: 'Error al iniciar sesión',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } else {
-      // Check if superadmin
-      if (email === 'superadmin@leadwidget.pe') {
+    try {
+      // Race the actual check against the timeout
+      const { data: roles, error } = await Promise.race([
+        supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId)
+          .eq('role', 'superadmin')
+          .maybeSingle(),
+        timeoutPromise
+      ]) as any;
+
+      if (error) {
+        console.error("Error checking roles:", error);
+        navigate('/app');
+        return;
+      }
+
+      if (roles) {
         navigate('/superadmin');
       } else {
         navigate('/app');
       }
+    } catch (err: any) {
+      console.error("Critical error or timeout in role check:", err);
+      // Fallback: Si falla el chequeo de roles o hay timeout, asumimos usuario normal
+      navigate('/app');
+    } finally {
+      setLoading(false);
     }
+  };
 
-    setLoading(false);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('TIMEOUT')), 10000)
+    );
+
+    try {
+      const { data, error } = await Promise.race([
+        supabase.auth.signInWithPassword({
+          email,
+          password,
+        }),
+        timeoutPromise
+      ]) as any;
+
+      if (error) {
+        toast({
+          title: 'Error al iniciar sesión',
+          description: error.message,
+          variant: 'destructive',
+        });
+        setLoading(false);
+      } else if (data.user) {
+        // Check roles before redirecting
+        await checkRoleAndRedirect(data.user.id);
+      } else {
+        setLoading(false);
+      }
+    } catch (err: any) {
+      const isTimeout = err.message === 'TIMEOUT';
+      toast({
+        title: isTimeout ? 'Servidor lento' : 'Error inesperado',
+        description: isTimeout
+          ? 'El servicio de Supabase está tardando demasiado. Por favor, intenta de nuevo en unos momentos.'
+          : (err.message || 'Ocurrió un error al intentar ingresar.'),
+        variant: 'destructive',
+      });
+      setLoading(false);
+    }
   };
 
   return (
@@ -49,12 +116,12 @@ export default function Login() {
               <ArrowLeft className="w-4 h-4" />
               Volver al inicio
             </Link>
-            
+
             <div className="flex items-center gap-3 mb-2">
               <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center">
                 <MessageCircle className="w-6 h-6 text-primary-foreground" />
               </div>
-              <span className="font-bold text-2xl">LeadWidget<span className="text-primary">.pe</span></span>
+              <span className="font-bold text-2xl">Lead <span className="text-primary">Widget</span></span>
             </div>
             <h1 className="text-3xl font-bold mt-6">Bienvenido de vuelta</h1>
             <p className="text-muted-foreground mt-2">Ingresa a tu dashboard para gestionar tus leads</p>

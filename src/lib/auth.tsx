@@ -26,23 +26,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log("Auth event:", event, !!session);
         setSession(session);
         setUser(session?.user ?? null);
-        
+
         if (session?.user) {
-          // Check if user is superadmin
-          setTimeout(async () => {
+          try {
             const { data: roles } = await supabase
               .from('user_roles')
               .select('role')
               .eq('user_id', session.user.id);
-            
+
             setIsSuperAdmin(roles?.some(r => r.role === 'superadmin') ?? false);
-          }, 0);
+          } catch (err) {
+            console.error("Error fetching roles:", err);
+            setIsSuperAdmin(false);
+          }
         } else {
           setIsSuperAdmin(false);
         }
-        
+
         setLoading(false);
       }
     );
@@ -59,11 +62,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string, businessName?: string) => {
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          emailRedirectTo: window.location.origin,
+          emailRedirectTo: window.location.origin + "/app",
           data: {
             business_name: businessName,
           },
@@ -72,12 +75,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (error) throw error;
 
-      toast({
-        title: "¡Cuenta creada!",
-        description: "Tu trial de 7 días ha comenzado.",
-      });
+      // If we have a session immediately, it means email confirmation is disabled
+      if (data.session) {
+        setSession(data.session);
+        setUser(data.session.user);
+        toast({
+          title: "¡Bienvenido!",
+          description: "Tu cuenta ha sido creada exitosamente.",
+        });
+      }
 
-      return { error: null };
+      return { error: null, data };
     } catch (error) {
       return { error: error as Error };
     }
