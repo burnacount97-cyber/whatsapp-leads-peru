@@ -58,6 +58,11 @@ export default async function handler(req, res) {
         '¿Tienes alguna duda sobre el servicio? ✨',
         '¡Hola! Estamos en línea para atenderte 🚀'
       ],
+      quickReplies: widgetData.quick_replies || [
+        '¿Cómo funciona?',
+        'Quiero más información',
+        'Ver precios'
+      ],
       exitIntentEnabled: widgetData.trigger_exit_intent, // Added explicit field
       apiUrl: `${baseUrl}/api/chat`,
       trackUrl: `${baseUrl}/api/track`
@@ -167,6 +172,18 @@ export default async function handler(req, res) {
     }
     .lw-btn-whatsapp:hover { background: #128C7E; }
     
+    .lw-quick-replies {
+      display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;
+    }
+    .lw-quick-chip {
+      background: #f1f5f9; border: 1px solid #e2e8f0; color: #475569;
+      padding: 6px 12px; border-radius: 16px; font-size: 11px; cursor: pointer;
+      transition: all 0.2s; font-weight: 500;
+    }
+    .lw-quick-chip:hover {
+      background: \\${config.primaryColor}; color: white; border-color: \\${config.primaryColor};
+    }
+    
     .typing-indicator { display: flex; gap: 4px; padding: 4px 8px; align-items: center; }
     .typing-dot {
       width: 6px; height: 6px; background: \${config.primaryColor}; opacity: 0.6; border-radius: 50%;
@@ -271,6 +288,7 @@ export default async function handler(req, res) {
         
         <!-- Input -->
         <form id="lw-form" class="lw-input-area">
+           <div id="lw-quick-replies" class="lw-quick-replies"></div>
            <div id="lw-hint" style="text-align:center; display:none; animation: lw-bounce-small 2s infinite;">
               <span style="font-size:10px; background:\${config.primaryColor}15; color:\${config.primaryColor}; padding:2px 10px; border-radius:10px; font-weight:600;">¿Tienes alguna duda? ✨</span>
            </div>
@@ -454,6 +472,28 @@ function init() {
   const submitBtn = document.getElementById('lw-submit');
   const teaser = document.getElementById('lw-teaser');
   const badge = document.getElementById('lw-badge');
+  const quickRepliesContainer = document.getElementById('lw-quick-replies');
+
+  // Render Quick Replies
+  function renderQuickReplies() {
+    if (!quickRepliesContainer || messages.length > 2) {
+      if (quickRepliesContainer) quickRepliesContainer.style.display = 'none';
+      return;
+    }
+    quickRepliesContainer.style.display = 'flex';
+    quickRepliesContainer.innerHTML = config.quickReplies.map(text => 
+      \`<button type="button" class="lw-quick-chip" data-text="\${text}">\${text}</button>\`
+    ).join('');
+    
+    // Add click handlers
+    quickRepliesContainer.querySelectorAll('.lw-quick-chip').forEach(chip => {
+      chip.onclick = () => {
+        const text = chip.getAttribute('data-text');
+        sendMessage(text);
+        quickRepliesContainer.style.display = 'none';
+      };
+    });
+  }
 
   let hasBeenClosedOnce = false;
   let hasTrackedOpen = false;
@@ -478,6 +518,7 @@ function init() {
          hasTrackedOpen = true;
       }
       renderMessages();
+      renderQuickReplies();
       input.focus();
       // Hide teaser and badge when chat is active
       if (teaser) teaser.style.display = 'none';

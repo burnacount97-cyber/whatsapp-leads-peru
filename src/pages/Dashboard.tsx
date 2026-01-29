@@ -50,6 +50,7 @@ import {
   ExternalLink,
   Shield,
   X,
+  Smartphone,
 } from 'lucide-react';
 
 interface Lead {
@@ -153,6 +154,31 @@ export default function Dashboard() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [savingAI, setSavingAI] = useState(false);
+
+  // PWA Install Prompt
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [canInstall, setCanInstall] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setCanInstall(true);
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const installApp = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      toast({ title: '¡App instalada!', description: 'Ahora puedes acceder desde tu pantalla de inicio.' });
+    }
+    setDeferredPrompt(null);
+    setCanInstall(false);
+  };
 
   // AI config form state
   const [aiConfig, setAiConfig] = useState({
@@ -675,6 +701,12 @@ export default function Dashboard() {
               <span className="text-sm text-muted-foreground hidden md:inline">
                 {getTrialDaysLeft()} días restantes
               </span>
+            )}
+            {canInstall && (
+              <Button variant="outline" size="sm" onClick={installApp} className="hidden sm:flex border-green-500 text-green-600 hover:bg-green-50">
+                <Smartphone className="w-4 h-4 mr-2" />
+                Instalar App
+              </Button>
             )}
             <Button variant="ghost" size="sm" onClick={handleSignOut}>
               <LogOut className="w-4 h-4 mr-2" />
