@@ -155,12 +155,18 @@ export default async function handler(req, res) {
         console.error('API Chat Error:', error);
 
         // Detailed error for common failures
-        if (error.message?.includes('api_key')) {
-            return res.status(200).json({ response: "Configuración incompleta: La clave de API de OpenAI no es válida o falta." });
+        let userMessage = "Lo siento, tuve un error de conexión con mi cerebro artificial. ¿Puedes intentar de nuevo?";
+
+        if (error.message?.includes('JSON at position')) {
+            userMessage = "Error de configuración: El archivo de cuenta de servicio (service_account) en Vercel no es un JSON válido.";
+        } else if (error.message?.includes('api_key')) {
+            userMessage = "Configuración incompleta: La clave de API de OpenAI no es válida o ha expirado.";
+        } else if (error.message?.includes('Widget not found')) {
+            userMessage = `Error: No pude encontrar la configuración para el widget ID: ${widgetId}.`;
+        } else if (error.message?.includes('quota')) {
+            userMessage = "Aviso: He alcanzado mi límite de uso de OpenAI. Por favor, verifica el crédito de tu cuenta.";
         }
 
-        return res.status(200).json({
-            response: "Lo siento, tuve un error de conexión con mi cerebro artificial. ¿Puedes intentar de nuevo?"
-        });
+        return res.status(200).json({ response: userMessage });
     }
 }
