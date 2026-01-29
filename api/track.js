@@ -20,17 +20,20 @@ export default async function handler(req, res) {
         const timestamp = new Date();
         const dateKey = timestamp.toISOString().split('T')[0]; // YYYY-MM-DD for easy querying
 
-        // Basic rate limiting: check if same IP has tracked in last 5 seconds
-        const recentTrack = await db.collection('analytics')
-            .where('ip', '==', clientIp)
-            .where('widget_id', '==', widgetId)
-            .where('created_at', '>', new Date(Date.now() - 5000).toISOString())
-            .limit(1)
-            .get();
+        // Basic rate limiting/duplicate check (Make it non-blocking to avoid index errors)
+        try {
+            const recentTrack = await db.collection('analytics')
+                .where('ip', '==', clientIp)
+                .where('widget_id', '==', widgetId)
+                .where('created_at', '>', new Date(Date.now() - 5000).toISOString())
+                .limit(1)
+                .get();
 
-        if (!recentTrack.empty && eventType === 'view') {
-            // Skip duplicate view events from same IP within 5 seconds
-            return res.status(200).json({ success: true, cached: true });
+            if (!recentTrack.empty && eventType === 'view') {
+                return res.status(200).json({ success: true, cached: true });
+            }
+        } catch (e) {
+            console.error('Non-critical track check failed:', e.message);
         }
 
         // Save analytics event
