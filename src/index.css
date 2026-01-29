@@ -120,83 +120,120 @@
 
 @layer components {
 
-  /* Iridescent Button Effect - Balanced */
+  /* Iridescent Button Effect - Professional Edition */
   .btn-iridescent {
-    background: linear-gradient(135deg, hsl(var(--primary)), #34d399, hsl(var(--primary)));
+    @apply relative overflow-hidden transition-all duration-500 rounded-xl font-bold;
+    background: linear-gradient(135deg, hsl(var(--primary)), #34d399, #10b981);
+    background-size: 200% 200%;
+    animation: gradient-flow 4s ease infinite;
+    box-shadow: 0 4px 15px -1px hsl(var(--primary) / 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+  }
+
+  .btn-iridescent::after {
+    content: "";
+    @apply absolute inset-0 opacity-0 transition-opacity duration-500;
+    background: linear-gradient(110deg,
+        transparent 25%,
+        rgba(255, 255, 255, 0.3) 50%,
+        transparent 75%);
     background-size: 200% 100%;
-    animation: shimmer 6s ease-in-out infinite;
-    box-shadow: 0 4px 14px hsl(var(--primary) / 0.4);
-    transition: all .5s cubic-bezier(0.4, 0, 0.2, 1);
-    border: none;
-    color: white;
-    position: relative;
-    overflow: hidden;
+    animation: shine 3s infinite;
   }
 
-  .dark .btn-iridescent {
-    color: white;
-    /* Green bg usually needs white text */
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  .btn-iridescent:hover::after {
+    @apply opacity-100;
   }
 
-  /* Hover State: Make it pop but smooth */
   .btn-iridescent:hover {
-    background-size: 150% 100%;
-    box-shadow: 0 6px 20px hsl(var(--primary) / 0.6);
-    transform: translateY(-2px);
+    @apply -translate-y-1;
+    box-shadow: 0 8px 25px -2px hsl(var(--primary) / 0.5);
   }
 
-  /* Shimmer: Pass through then wait */
-  @keyframes shimmer {
-    0% {
-      background-position: 100% 50%;
-    }
-
-    15% {
-      background-position: 0% 50%;
-    }
-
-    /* Fast pass */
-    100% {
-      background-position: 0% 50%;
-    }
-
-    /* Long wait */
+  .glass-premium {
+    @apply backdrop-blur-md border shadow-sm;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    border-color: rgba(255, 255, 255, 0.1);
   }
 
-  /* Utility Classes for Landing */
+  .dark .glass-premium {
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.2));
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+
+  @layer utilities {
+    @keyframes gradient-flow {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    @keyframes shine {
+      0% {
+        background-position: -200% 0;
+      }
+
+      100% {
+        background-position: 200% 0;
+      }
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    @keyframes pulse-subtle {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.8;
+        transform: scale(0.98);
+      }
+    }
+
+    .animate-float {
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .animate-pulse-subtle {
+      animation: pulse-subtle 4s ease-in-out infinite;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  }
+
+  /* Base custom styles */
   .hero-text-gradient {
-    background: linear-gradient(135deg, hsl(161 100% 38%) 0%, hsl(210 100% 36%) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-emerald-500 to-primary;
+    background-size: 200% auto;
+    animation: gradient-flow 5s linear infinite;
   }
-
-  .glass {
-    background: hsl(0 0% 100% / 0.8);
-    backdrop-filter: blur(12px);
-  }
-
-  .glass-dark {
-    background: hsl(220 20% 10% / 0.8);
-    backdrop-filter: blur(12px);
-  }
-}
-
-@layer utilities {
-  .text-yape {
-    color: hsl(161 100% 38%);
-  }
-
-  .text-bcp {
-    color: hsl(210 100% 36%);
-  }
-
-  .bg-yape {
-    background-color: hsl(161 100% 38%);
-  }
-
-  .bg-bcp {
-    background-color: hsl(210 100% 36%);
-  }
-}

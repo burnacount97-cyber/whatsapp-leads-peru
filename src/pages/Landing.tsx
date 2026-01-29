@@ -21,7 +21,10 @@ import {
   Copy,
   ShieldCheck,
   ChevronRight,
-  Play
+  Play,
+  Bot,
+  Send,
+  Sparkles
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -64,7 +67,12 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300 selection:bg-primary/20">
+
+      {/* Background Mesh/Grid Effect */}
+      <div className="fixed inset-0 z-0 pointer-events-none opacity-[0.03] dark:opacity-[0.05]"
+        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath d='M36 34v2H20v-2h16zm0-8v2H20v-2h16zm-16-8v2h16v-2H20zM0 0h60v60H0V0zm1 1h58v58H1V1z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }}>
+      </div>
 
       {/* --- SOCIAL PROOF TOAST --- */}
       <SocialProofToast />
@@ -142,7 +150,7 @@ export default function Landing() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                 </span>
-                Nuevo Sistema 2026
+                Sistema IA 2026 • <span>124 usuarios online hoy</span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] text-balance">
@@ -300,17 +308,17 @@ export default function Landing() {
             <p className="text-base sm:text-lg text-muted-foreground text-pretty px-4">Más que un botón de WhatsApp, es un sistema completo de captura y cualificación.</p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 relative z-10">
             {[
-              { icon: Zap, t: "Instalación Flash", d: "Copia y pega una línea de código. Funciona en WordPress, Shopify, Wix y código propio." },
-              { icon: Smartphone, t: "Mobile First", d: "Diseñado para sentirse nativo en celulares, donde ocurre el 80% de las ventas." },
-              { icon: BarChart3, t: "Analytics Pro", d: "Mide cuántas personas abren el chat y cuántas realmente te hablan." },
-              { icon: Users, t: "Multi-Agente", d: "La IA responde por ti 24/7, escalando cientos de conversaciones simultáneas." },
-              { icon: Globe, t: "100% Customizable", d: "Adapta los colores, textos y logo para que coincida perfectamente con tu marca." },
-              { icon: ShieldCheck, t: "Anti-Spam", d: "Filtra curiosos. Solo te llegarán notificaciones de clientes reales." },
+              { icon: Zap, t: "Instalación Flash", d: "Copia y pega una línea de código. Funciona en WordPress, Shopify, Wix y plataformas propias.", color: "blue" },
+              { icon: Smartphone, t: "Mobile First", d: "Diseñado para sentirse nativo en celulares, donde ocurre el 80% de las ventas en Latinoamérica.", color: "emerald" },
+              { icon: BarChart3, t: "Analytics Pro", d: "Mide cuántas personas abren el chat y cuántas realmente te hablan para optimizar tu inversión.", color: "purple" },
+              { icon: Users, t: "Multi-Agente", d: "La IA responde por ti 24/7, escalando cientos de conversaciones simultáneas sin despeinarse.", color: "orange" },
+              { icon: Globe, t: "100% Personalizable", d: "Adapta colores, textos y personalidad de la IA para que coincida perfectamente con tu marca.", color: "pink" },
+              { icon: ShieldCheck, t: "Filtro de Calidad", d: "Filtra curiosos automáticamente. Solo te llegarán notificaciones de clientes con intención real.", color: "cyan" },
             ].map((f, i) => (
-              <div key={i} className="group p-6 sm:p-8 rounded-3xl bg-card border border-border/50 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-primary/5 text-primary flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300">
+              <div key={i} className="group p-6 sm:p-8 rounded-3xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 hover:shadow-[0_0_30px_-10px_rgba(0,193,133,0.2)] transition-all duration-500">
+                <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500`}>
                   <f.icon className="w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
                 <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 group-hover:text-primary transition-colors">{f.t}</h3>
@@ -364,11 +372,47 @@ export default function Landing() {
                 ))}
               </ul>
             </div>
-            <div className="flex-1 bg-muted/50 rounded-2xl p-6 w-full flex items-center justify-center min-h-[250px] sm:min-h-[300px]">
-              <div className="text-center opacity-60">
-                <Smartphone className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 text-muted-foreground" />
-                <p className="text-sm sm:text-base">Vista previa del template {activeTemplate}</p>
-                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">(Interactúa con el demo real abajo)</p>
+            <div className="flex-1 bg-slate-950 rounded-2xl p-4 sm:p-6 w-full flex flex-col min-h-[300px] border border-white/10 shadow-2xl overflow-hidden relative group">
+              {/* Header Simulation */}
+              <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                    <Bot className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-[10px] font-bold text-white">IA Asistente</p>
+                    <p className="text-[8px] text-primary">En línea</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Messages Simulation */}
+              <div className="space-y-3 mb-4 flex-1">
+                <div className="bg-white/5 p-3 rounded-2xl rounded-bl-none max-w-[80%] text-left">
+                  <p className="text-[11px] text-slate-300">
+                    {activeTemplate === 'inmobiliarias' && "👋 ¡Hola! ¿Buscas comprar o alquilar? Tengo opciones en Miraflores y San Isidro."}
+                    {activeTemplate === 'clínicas' && "👋 Hola, soy el asistente médico. ¿Qué especialidad necesitas consultar hoy?"}
+                    {activeTemplate === 'talleres' && "👋 ¡Hola! ¿Qué problema tiene tu vehículo? Podemos agendar una revisión."}
+                    {activeTemplate === 'delivery' && "👋 ¡Hola! ¿A qué dirección enviamos tu pedido hoy?"}
+                    {activeTemplate === 'general' && "👋 ¡Hola! ¿En qué podemos ayudarte el día de hoy?"}
+                  </p>
+                </div>
+                <div className="bg-primary/20 p-3 rounded-2xl rounded-br-none max-w-[80%] ml-auto text-right border border-primary/20">
+                  <p className="text-[11px] text-primary-foreground font-medium italic">El cliente responde...</p>
+                </div>
+                <div className="bg-white/5 p-3 rounded-2xl rounded-bl-none max-w-[80%] text-left animate-pulse">
+                  <p className="text-[11px] text-slate-400">Escribiendo...</p>
+                </div>
+              </div>
+
+              {/* Input Area Simulation */}
+              <div className="mt-auto flex gap-2">
+                <div className="h-8 flex-1 bg-white/5 rounded-full border border-white/10 px-3 flex items-center">
+                  <p className="text-[10px] text-slate-500">Escribe algo...</p>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                  <Send className="w-3.5 h-3.5 text-white" />
+                </div>
               </div>
             </div>
           </div>
@@ -519,15 +563,56 @@ export default function Landing() {
       </section>
 
       {/* --- FOOTER --- */}
-      <footer className="py-8 sm:py-12 border-t bg-muted/10">
-        <div className="container mx-auto text-center text-muted-foreground">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
-              <MessageCircle className="w-4 h-4" />
+      <footer className="py-16 border-t bg-muted/10 relative overflow-hidden px-4">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-12">
+            <div className="col-span-2 md:col-span-1">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20">
+                  <MessageCircle className="w-6 h-6" />
+                </div>
+                <span className="font-black text-xl tracking-tight">Lead Widget</span>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                El widget inteligente que revoluciona la captura de leads en Perú y Latinoamérica.
+                Convierte cada visita en una oportunidad real.
+              </p>
             </div>
-            <span className="font-bold text-foreground">Lead Widget</span>
+            <div>
+              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-foreground">Producto</h4>
+              <ul className="space-y-4 text-sm text-muted-foreground">
+                <li className="hover:text-primary transition-colors cursor-pointer">Características</li>
+                <li className="hover:text-primary transition-colors cursor-pointer">Plantillas</li>
+                <li className="hover:text-primary transition-colors cursor-pointer">Integraciones</li>
+                <li className="hover:text-primary transition-colors cursor-pointer">Precios</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-foreground">Compañía</h4>
+              <ul className="space-y-4 text-sm text-muted-foreground">
+                <li className="hover:text-primary transition-colors cursor-pointer">Sobre Nosotros</li>
+                <li className="hover:text-primary transition-colors cursor-pointer">Casos de Éxito</li>
+                <li className="hover:text-primary transition-colors cursor-pointer">Blog</li>
+                <li className="hover:text-primary transition-colors cursor-pointer">Soporte</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-foreground">Legal</h4>
+              <ul className="space-y-4 text-sm text-muted-foreground">
+                <li className="hover:text-primary transition-colors cursor-pointer">Privacidad</li>
+                <li className="hover:text-primary transition-colors cursor-pointer">Términos de servicio</li>
+                <li className="hover:text-primary transition-colors cursor-pointer">Libro de reclamaciones</li>
+              </ul>
+            </div>
           </div>
-          <p>&copy; 2026 Lead Widget. Todos los derechos reservados.</p>
+          <div className="pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
+            <p>&copy; 2026 Lead Widget. Todos los derechos reservados. Hecho con ❤️ en Lima, Perú.</p>
+            <div className="flex gap-6">
+              <span className="hover:text-primary transition-colors cursor-pointer">Instagram</span>
+              <span className="hover:text-primary transition-colors cursor-pointer">LinkedIn</span>
+              <span className="hover:text-primary transition-colors cursor-pointer">WhatsApp</span>
+            </div>
+          </div>
         </div>
       </footer>
 
@@ -535,17 +620,45 @@ export default function Landing() {
 
       {/* Exit Popup */}
       {showExitPopup && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-card w-full max-w-lg p-8 rounded-3xl border shadow-2xl relative animate-in zoom-in-95">
-            <button onClick={() => setShowExitPopup(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"><CloseIcon /></button>
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary">
-                <Zap className="w-8 h-8" />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-md animate-in fade-in duration-500">
+          <div className="bg-card w-full max-w-lg p-1 sm:p-2 rounded-[2.5rem] border shadow-2xl relative animate-in zoom-in-95 duration-300">
+            <div className="bg-background rounded-[2rem] p-8 md:p-12 text-center space-y-6 relative overflow-hidden">
+              {/* Decorative background circle */}
+              <div className="absolute -top-12 -right-12 w-32 h-32 bg-primary/10 rounded-full blur-2xl" />
+
+              <button
+                onClick={() => setShowExitPopup(false)}
+                className="absolute top-6 right-6 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <CloseIcon className="w-5 h-5" />
+              </button>
+
+              <div className="w-16 h-16 bg-gradient-to-tr from-primary to-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-white shadow-xl shadow-primary/20 rotate-6 transform transition-transform group-hover:rotate-0">
+                <Sparkles className="w-8 h-8" />
               </div>
-              <h3 className="text-2xl font-bold">¡Espera un segundo!</h3>
-              <p className="text-muted-foreground">¿Te vas sin probar cómo funciona? La demo es gratis y toma 1 minuto.</p>
-              <Button onClick={handleOpenDemoFromPopup} className="w-full font-bold btn-iridescent text-white" size="lg">Ver Demo Rápida</Button>
-              <button onClick={() => setShowExitPopup(false)} className="text-sm text-muted-foreground underline">No gracias, prefiero perder leads</button>
+
+              <div className="space-y-2">
+                <h3 className="text-3xl font-black tracking-tight">¡Vaya, no te vayas!</h3>
+                <p className="text-muted-foreground text-lg text-balance">
+                  Estás a un click de ver cómo la IA puede <span className="text-primary font-bold">duplicar tus ventas</span>. Prueba la demo sin compromiso.
+                </p>
+              </div>
+
+              <div className="pt-2">
+                <Button
+                  onClick={handleOpenDemoFromPopup}
+                  className="w-full font-bold h-14 text-lg btn-iridescent text-white shadow-xl shadow-primary/30 rounded-xl"
+                  size="lg"
+                >
+                  Probar Demo Gratis Ahora
+                </Button>
+                <button
+                  onClick={() => setShowExitPopup(false)}
+                  className="mt-4 text-sm text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
+                >
+                  No, prefiero seguir perdiendo clientes
+                </button>
+              </div>
             </div>
           </div>
         </div>

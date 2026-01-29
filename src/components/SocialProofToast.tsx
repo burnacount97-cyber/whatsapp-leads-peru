@@ -41,32 +41,34 @@ export function SocialProofToast() {
     return (
         <div
             className={cn(
-                "fixed bottom-4 left-4 z-50 transition-all duration-500 transform",
-                isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
+                "fixed bottom-4 left-4 z-[60] transition-all duration-700 transform",
+                isVisible ? "translate-x-0 opacity-100 scale-100" : "-translate-x-12 opacity-0 scale-90"
             )}
         >
-            <div className="bg-slate-900/90 backdrop-blur-md border border-slate-700/50 text-slate-100 p-3 rounded-2xl shadow-2xl flex items-center gap-4 min-w-[300px] max-w-sm">
+            <div className="bg-white/80 dark:bg-slate-950/80 backdrop-blur-lg border border-primary/20 text-slate-900 dark:text-slate-100 pr-6 p-3 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] flex items-center gap-4 min-w-[280px] max-w-sm">
 
                 {/* Icon Badge */}
                 <div className="relative">
-                    <div className="w-12 h-12 rounded-full bg-indigo-500/10 flex items-center justify-center">
-                        <ShieldCheck className="w-6 h-6 text-indigo-400" />
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                        <ShieldCheck className="w-6 h-6 text-primary" />
                     </div>
-                    <div className="absolute -bottom-1 -right-1 bg-emerald-500 rounded-full p-0.5 border-2 border-slate-900">
-                        <Check className="w-3 h-3 text-white stroke-[3]" />
+                    <div className="absolute -top-1 -left-1 flex h-3 w-3">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
                     </div>
                 </div>
 
                 {/* Content */}
-                <div>
-                    <p className="text-sm font-medium">
-                        <span className="font-bold text-white">{data.name}</span> <span className="text-slate-400">de {data.city}</span>
+                <div className="flex-1">
+                    <div className="flex items-center justify-between mb-0.5">
+                        <p className="text-[10px] uppercase tracking-widest text-primary font-black">Actividad en vivo</p>
+                        <p className="text-[9px] text-muted-foreground font-medium">{data.time}</p>
+                    </div>
+                    <p className="text-sm font-medium leading-tight">
+                        <span className="font-bold text-foreground">{data.name}</span> <span className="opacity-60 text-xs">de {data.city}</span>
                     </p>
-                    <p className="text-sm font-semibold text-emerald-300">
-                        {data.action}
-                    </p>
-                    <p className="text-[10px] uppercase tracking-wider text-slate-500 font-bold mt-1">
-                        Verificado • {data.time}
+                    <p className="text-sm font-extrabold text-foreground/80 mt-1 flex items-center gap-1">
+                        {data.action} <Check className="w-3 h-3 text-primary stroke-[4]" />
                     </p>
                 </div>
             </div>
