@@ -51,6 +51,7 @@ import {
   Shield,
   X,
   Smartphone,
+  EyeOff,
 } from 'lucide-react';
 
 interface Lead {
@@ -240,6 +241,8 @@ export default function Dashboard() {
     // Quick Replies
     quick_replies: '¿Cómo funciona?\nQuiero más información\nVer precios',
   });
+
+  const [showApiKey, setShowApiKey] = useState(false);
 
 
 
@@ -1096,12 +1099,22 @@ export default function Dashboard() {
                 {/* API Key */}
                 <div className="space-y-2">
                   <Label>API Key</Label>
-                  <Input
-                    type="password"
-                    value={aiConfig.ai_api_key}
-                    onChange={(e) => setAiConfig({ ...aiConfig, ai_api_key: e.target.value })}
-                    placeholder="sk-..."
-                  />
+                  <div className="relative">
+                    <Input
+                      type={showApiKey ? "text" : "password"}
+                      value={aiConfig.ai_api_key}
+                      onChange={(e) => setAiConfig({ ...aiConfig, ai_api_key: e.target.value })}
+                      placeholder="sk-..."
+                      className="pr-12"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowApiKey(!showApiKey)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
+                    >
+                      {showApiKey ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
                   <p className="text-xs text-muted-foreground">
                     {aiConfig.ai_provider === 'openai' && 'Obtén tu API key en platform.openai.com'}
                     {aiConfig.ai_provider === 'anthropic' && 'Obtén tu API key en console.anthropic.com'}
