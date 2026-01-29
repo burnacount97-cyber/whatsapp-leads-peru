@@ -20,6 +20,21 @@ export default async function handler(req, res) {
         const timestamp = new Date();
         const dateKey = timestamp.toISOString().split('T')[0]; // YYYY-MM-DD for easy querying
 
+        // SECURITY: Check if IP is blocked (silent fail for tracking)
+        try {
+            const blockedQuery = await db.collection('blocked_ips')
+                .where('ip_address', '==', clientIp)
+                .where('widget_id', '==', widgetId)
+                .limit(1)
+                .get();
+
+            if (!blockedQuery.empty) {
+                return res.status(200).json({ success: true, blocked: true });
+            }
+        } catch (blockCheckError) {
+            console.error('Block check error in tracking:', blockCheckError.message);
+        }
+
         // Basic rate limiting/duplicate check (Make it non-blocking to avoid index errors)
         try {
             const recentTrack = await db.collection('analytics')

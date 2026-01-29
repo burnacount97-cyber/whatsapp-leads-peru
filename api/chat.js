@@ -23,6 +23,25 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Message and widgetId are required' });
     }
 
+    // SECURITY: Check if IP is blocked
+    try {
+        const blockedQuery = await db.collection('blocked_ips')
+            .where('ip_address', '==', clientIp)
+            .where('widget_id', '==', widgetId)
+            .limit(1)
+            .get();
+
+        if (!blockedQuery.empty) {
+            return res.status(403).json({
+                response: "Tu acceso a este chat ha sido restringido por incumplir las normas de uso.",
+                blocked: true
+            });
+        }
+    } catch (blockCheckError) {
+        console.error('Block check error:', blockCheckError.message);
+        // Non-blocking: continue if check fails
+    }
+
     try {
         // RATE LIMITING: Check message count from this IP (Make it non-blocking to avoid index errors)
         try {
@@ -138,19 +157,18 @@ export default async function handler(req, res) {
             try {
                 const blockMatch = aiResponse.match(/\{"action":\s*"block_user"[^}]*\}/);
                 if (blockMatch) {
-                    // For client widgets: Permanent IP block
-                    if (widgetId !== 'demo-landing' && dbWidgetConfig) {
-                        await db.collection('blocked_ips').add({
-                            widget_id: dbWidgetConfig.id,
-                            ip_address: clientIp,
-                            reason: 'AI detected abuse',
-                            created_at: new Date().toISOString()
-                        });
-                    }
+                    // Permanent IP block for ALL widgets (including demo)
+                    const targetWidgetId = widgetId === 'demo-landing' ? 'demo-landing' : (dbWidgetConfig?.id || widgetId);
 
-                    // For ALL widgets (including demo): Reject current conversation
+                    await db.collection('blocked_ips').add({
+                        widget_id: targetWidgetId,
+                        ip_address: clientIp,
+                        reason: 'AI detected abuse',
+                        created_at: new Date().toISOString()
+                    });
+
                     return res.status(200).json({
-                        response: "Esta conversación ha sido finalizada por incumplir las normas de uso. Por favor, usa el chat de forma adecuada.",
+                        response: "Esta conversación ha sido finalizada por incumplir las normas de uso. Tu acceso ha sido restringido.",
                         blocked: true
                     });
                 }
