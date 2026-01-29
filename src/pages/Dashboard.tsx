@@ -186,6 +186,8 @@ export default function Dashboard() {
     exit_intent_description: 'Prueba Lead Widget gratis por 3 días y aumenta tus ventas.',
     exit_intent_cta: 'Probar Demo Ahora',
     teaser_messages: '¿Cómo podemos ayudarte? 👋\n¿Tienes alguna duda sobre el servicio? ✨\n¡Hola! Estamos en línea para atenderte 🚀',
+    // Quick Replies
+    quick_replies: '¿Cómo funciona?\nQuiero más información\nVer precios',
   });
 
   const [announcement, setAnnouncement] = useState<{
@@ -283,6 +285,11 @@ export default function Dashboard() {
             '¿Tienes alguna duda sobre el servicio? ✨',
             '¡Hola! Estamos en línea para atenderte 🚀'
           ],
+          quick_replies: [
+            '¿Cómo funciona?',
+            'Quiero más información',
+            'Ver precios'
+          ],
           created_at: new Date().toISOString()
         };
         await setDoc(newWidgetRef, defaultConfig);
@@ -317,6 +324,9 @@ export default function Dashboard() {
               '¿Tienes alguna duda sobre el servicio? ✨',
               '¡Hola! Estamos en línea para atenderte 🚀'
             ]).join('\n'),
+          quick_replies: Array.isArray(configData.quick_replies)
+            ? configData.quick_replies.join('\n')
+            : (configData.quick_replies || '¿Cómo funciona?\nQuiero más información\nVer precios'),
         });
       }
 
@@ -404,6 +414,9 @@ export default function Dashboard() {
           : (typeof formConfig.teaser_messages === 'string'
             ? formConfig.teaser_messages.split('\n').filter((m: string) => m.trim() !== '')
             : formConfig.teaser_messages),
+        quick_replies: typeof formConfig.quick_replies === 'string'
+          ? formConfig.quick_replies.split('\n').filter((m: string) => m.trim() !== '')
+          : formConfig.quick_replies,
       });
 
       // Update business name in profile
@@ -948,6 +961,22 @@ export default function Dashboard() {
                           placeholder="Escribe un mensaje por línea..."
                         />
                         <p className="text-[10px] text-primary italic">💡 Pon un mensaje atractivo por cada línea.</p>
+                      </div>
+
+                      <div className="space-y-4 p-4 bg-muted/50 rounded-xl border">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <Label className="cursor-pointer">Atajos Rápidos (Quick Replies)</Label>
+                            <p className="text-[10px] text-muted-foreground mt-1">Botones de respuesta rápida que aparecen al inicio del chat.</p>
+                          </div>
+                        </div>
+                        <textarea
+                          value={formConfig.quick_replies}
+                          onChange={(e) => setFormConfig({ ...formConfig, quick_replies: e.target.value })}
+                          className="w-full p-3 text-xs border rounded-md bg-background min-h-[80px]"
+                          placeholder="Escribe un atajo por línea..."
+                        />
+                        <p className="text-[10px] text-primary italic">💡 Cada línea será un botón que el usuario puede pulsar para enviar automáticamente.</p>
                       </div>
                     </div>
                   </CardContent>
