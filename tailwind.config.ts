@@ -108,8 +108,9 @@ export default {
           "50%": { transform: "translateY(-20px)" },
         },
         "shine": {
-          "from": { backgroundPosition: "0 0" },
-          "to": { backgroundPosition: "-200% 0" },
+          "0%": { backgroundPosition: "200% 0" },
+          "15%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "-200% 0" },
         },
       },
       animation: {
@@ -121,7 +122,7 @@ export default {
         "bounce-subtle": "bounce-subtle 2s ease-in-out infinite",
         "float": "float 6s ease-in-out infinite",
         "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
-        "shine": "shine 8s linear infinite",
+        "shine": "shine 8s ease-in-out infinite",
       },
       boxShadow: {
         "glow": "0 0 40px hsl(161 100% 38% / 0.3)",
