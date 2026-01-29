@@ -140,11 +140,7 @@ export default function Dashboard() {
   const { toast } = useToast();
 
   // Redirect SuperAdmin to their panel if they land here
-  useEffect(() => {
-    if (!authLoading && isSuperAdmin) {
-      navigate('/superadmin');
-    }
-  }, [isSuperAdmin, authLoading, navigate]);
+
 
   const [profile, setProfile] = useState<Profile | null>(null);
   const [widgetConfig, setWidgetConfig] = useState<WidgetConfig | null>(null);
