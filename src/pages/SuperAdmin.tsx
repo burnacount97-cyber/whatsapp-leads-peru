@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { db } from '@/lib/firebase';
-import { collection, query, orderBy, getDocs, doc, updateDoc, setDoc, where, limit, onSnapshot, deleteDoc } from 'firebase/firestore';
+import { collection, query, orderBy, getDocs, getDoc, doc, updateDoc, setDoc, where, limit, onSnapshot, deleteDoc } from 'firebase/firestore';
 import { useAuth } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +25,7 @@ import {
   AlertCircle,
   Shield,
   ShieldCheck,
+  Settings,
   Plus,
   Pencil,
   Copy,
@@ -86,6 +87,8 @@ export default function SuperAdmin() {
   const [editingClient, setEditingClient] = useState<Profile | null>(null);
   const [editForm, setEditForm] = useState({ business_name: '', phone: '', email: '' });
   const [blockedDemoIps, setBlockedDemoIps] = useState<any[]>([]);
+  const [demoWidgetOwnerId, setDemoWidgetOwnerId] = useState('');
+  const [savingConfig, setSavingConfig] = useState(false);
 
 
   // Stats
@@ -174,6 +177,15 @@ export default function SuperAdmin() {
         setBlockedDemoIps(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
       }
     );
+
+
+
+    // Fetch System Config (Demo Widget ID)
+    getDoc(doc(db, 'system_settings', 'demo')).then(docSnap => {
+      if (docSnap.exists()) {
+        setDemoWidgetOwnerId(docSnap.data().owner_id || '');
+      }
+    });
 
     setLoading(false);
 
@@ -309,6 +321,22 @@ export default function SuperAdmin() {
     setIsCreateOpen(false);
   };
 
+  const handleSaveSystemConfig = async () => {
+    setSavingConfig(true);
+    try {
+      await setDoc(doc(db, 'system_settings', 'demo'), {
+        owner_id: demoWidgetOwnerId,
+        updated_at: new Date().toISOString(),
+        updated_by: user?.uid
+      }, { merge: true });
+      toast({ title: 'Configuración guardada', description: 'El widget de la landing ahora usará este ID.' });
+    } catch (error: any) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } finally {
+      setSavingConfig(false);
+    }
+  };
+
   const filteredClients = clients.filter(client =>
     client.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
     client.business_name?.toLowerCase().includes(searchQuery.toLowerCase())
@@ -434,6 +462,10 @@ export default function SuperAdmin() {
             <TabsTrigger value="security" className="gap-2">
               <ShieldCheck className="w-4 h-4" />
               Seguridad
+            </TabsTrigger>
+            <TabsTrigger value="config" className="gap-2">
+              <Settings className="w-4 h-4" />
+              Configuración
             </TabsTrigger>
 
           </TabsList>
@@ -791,7 +823,7 @@ export default function SuperAdmin() {
                 <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl flex gap-3">
                   <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
                   <p className="text-sm text-amber-800 dark:text-amber-200">
-                    Estas IPs fueron bloqueadas automáticamente por intentar manipular el chat demo de tu landing page. 
+                    Estas IPs fueron bloqueadas automáticamente por intentar manipular el chat demo de tu landing page.
                     Si crees que algún bloqueo fue un error, puedes rehabilitar manualmente.
                   </p>
                 </div>
