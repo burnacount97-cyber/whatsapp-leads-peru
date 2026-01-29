@@ -1,18 +1,58 @@
 (function () {
-    'use strict';
+  'use strict';
 
-    // Widget configuration - will be replaced with actual config from server
-    const config = {
-        primaryColor: '#00C185',
-        businessName: 'LeadWidget',
-        welcomeMessage: '¡Hola! ¿En qué podemos ayudarte?',
-        nicheQuestion: '¿En qué distrito te encuentras?',
-        whatsappDestination: '+51987654321',
-        template: 'general'
-    };
+  // Widget configuration - will be replaced with actual config from server
+  // UPDATE THESE VALUES WITH YOUR FIREBASE CONFIG AND CLIENT ID
+  const config = {
+    primaryColor: '#00C185',
+    businessName: 'LeadWidget',
+    welcomeMessage: '¡Hola! ¿En qué podemos ayudarte?',
+    nicheQuestion: '¿En qué distrito te encuentras?',
+    whatsappDestination: '+51987654321',
+    template: 'general',
+    // Backend Config for Lead Capture
+    projectId: 'whatsapp-leads-peru', // From .env
+    apiKey: 'AIzaSyDoUHZtRvgEwhEUhZj6x4xEZvVmxliMCJo', // From .env
+    clientId: 'demo_client_id' // Needs to be replaced with the specific user's ID
+  };
 
-    // Create widget HTML
-    const widgetHTML = `
+  // Helper: Save to Firestore
+  async function saveLeadToFirestore(name, phone, interest) {
+    try {
+      const url = `https://firestore.googleapis.com/v1/projects/${config.projectId}/databases/(default)/documents/leads?key=${config.apiKey}`;
+
+      const payload = {
+        fields: {
+          client_id: { stringValue: config.clientId },
+          name: { stringValue: name },
+          phone: { stringValue: phone },
+          message: { stringValue: interest },
+          source: { stringValue: 'website_widget' },
+          status: { stringValue: 'new' },
+          created_at: { timestampValue: new Date().toISOString() }
+        }
+      };
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        console.warn('LeadWidget: Failed to save lead', await response.text());
+      } else {
+        console.log('LeadWidget: Lead saved successfully');
+      }
+    } catch (error) {
+      console.error('LeadWidget: Error saving lead', error);
+    }
+  }
+
+  // Create widget HTML
+  const widgetHTML = `
     <div id="leadwidget-container" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
       <!-- Widget Button -->
       <button id="leadwidget-button" style="
@@ -241,98 +281,101 @@
     </style>
   `;
 
-    // Helper function to adjust color brightness
-    function adjustColor(color, amount) {
-        const num = parseInt(color.replace('#', ''), 16);
-        const r = Math.max(0, Math.min(255, (num >> 16) + amount));
-        const g = Math.max(0, Math.min(255, ((num >> 8) & 0x00FF) + amount));
-        const b = Math.max(0, Math.min(255, (num & 0x0000FF) + amount));
-        return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
-    }
+  // Helper function to adjust color brightness
+  function adjustColor(color, amount) {
+    const num = parseInt(color.replace('#', ''), 16);
+    const r = Math.max(0, Math.min(255, (num >> 16) + amount));
+    const g = Math.max(0, Math.min(255, ((num >> 8) & 0x00FF) + amount));
+    const b = Math.max(0, Math.min(255, (num & 0x0000FF) + amount));
+    return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+  }
 
-    // Initialize widget
-    function initWidget() {
-        // Insert widget HTML
-        const container = document.createElement('div');
-        container.innerHTML = widgetHTML;
-        document.body.appendChild(container);
+  // Initialize widget
+  function initWidget() {
+    // Insert widget HTML
+    const container = document.createElement('div');
+    container.innerHTML = widgetHTML;
+    document.body.appendChild(container);
 
-        // Get elements
-        const button = document.getElementById('leadwidget-button');
-        const panel = document.getElementById('leadwidget-panel');
-        const closeBtn = document.getElementById('leadwidget-close');
-        const btnNext1 = document.getElementById('btn-next-1');
-        const btnSend = document.getElementById('btn-send');
+    // Get elements
+    const button = document.getElementById('leadwidget-button');
+    const panel = document.getElementById('leadwidget-panel');
+    const closeBtn = document.getElementById('leadwidget-close');
+    const btnNext1 = document.getElementById('btn-next-1');
+    const btnSend = document.getElementById('btn-send');
 
-        // Toggle panel
-        button.addEventListener('click', () => {
-            const isVisible = panel.style.display === 'flex';
-            panel.style.display = isVisible ? 'none' : 'flex';
-        });
+    // Toggle panel
+    button.addEventListener('click', () => {
+      const isVisible = panel.style.display === 'flex';
+      panel.style.display = isVisible ? 'none' : 'flex';
+    });
 
-        closeBtn.addEventListener('click', () => {
-            panel.style.display = 'none';
-        });
+    closeBtn.addEventListener('click', () => {
+      panel.style.display = 'none';
+    });
 
-        // Step 1 -> Step 2
-        btnNext1.addEventListener('click', () => {
-            const name = document.getElementById('lead-name').value.trim();
-            const phone = document.getElementById('lead-phone').value.trim();
+    // Step 1 -> Step 2
+    btnNext1.addEventListener('click', () => {
+      const name = document.getElementById('lead-name').value.trim();
+      const phone = document.getElementById('lead-phone').value.trim();
 
-            if (!name || !phone) {
-                alert('Por favor completa todos los campos');
-                return;
-            }
+      if (!name || !phone) {
+        alert('Por favor completa todos los campos');
+        return;
+      }
 
-            document.getElementById('step-welcome').style.display = 'none';
-            document.getElementById('step-interest').style.display = 'block';
-        });
+      document.getElementById('step-welcome').style.display = 'none';
+      document.getElementById('step-interest').style.display = 'block';
+    });
 
-        // Step 2 -> WhatsApp
-        btnSend.addEventListener('click', () => {
-            const name = document.getElementById('lead-name').value.trim();
-            const phone = document.getElementById('lead-phone').value.trim();
-            const interest = document.getElementById('lead-interest').value.trim();
+    // Step 2 -> WhatsApp & Save
+    btnSend.addEventListener('click', async () => {
+      const name = document.getElementById('lead-name').value.trim();
+      const phone = document.getElementById('lead-phone').value.trim();
+      const interest = document.getElementById('lead-interest').value.trim();
 
-            if (!interest) {
-                alert('Por favor completa tu respuesta');
-                return;
-            }
+      if (!interest) {
+        alert('Por favor completa tu respuesta');
+        return;
+      }
 
-            // Show success
-            document.getElementById('step-interest').style.display = 'none';
-            document.getElementById('step-success').style.display = 'block';
+      // Show success immediately for UX
+      document.getElementById('step-interest').style.display = 'none';
+      document.getElementById('step-success').style.display = 'block';
 
-            // Build WhatsApp message
-            const message = `Hola! Soy ${name}%0A%0ATeléfono: ${phone}%0A${config.nicheQuestion} ${interest}`;
-            const whatsappUrl = `https://wa.me/${config.whatsappDestination.replace(/\D/g, '')}?text=${message}`;
+      // Save to Firestore in background
+      saveLeadToFirestore(name, phone, interest);
 
-            // Redirect to WhatsApp after 1.5 seconds
-            setTimeout(() => {
-                window.open(whatsappUrl, '_blank');
-                panel.style.display = 'none';
+      // Build WhatsApp message
+      const message = `Hola! Soy ${name}%0A%0ATeléfono: ${phone}%0A${config.nicheQuestion} ${interest}`;
+      const whatsappUrl = `https://wa.me/${config.whatsappDestination.replace(/\D/g, '')}?text=${message}`;
 
-                // Reset form
-                setTimeout(() => {
-                    document.getElementById('lead-name').value = '';
-                    document.getElementById('lead-phone').value = '';
-                    document.getElementById('lead-interest').value = '';
-                    document.getElementById('step-success').style.display = 'none';
-                    document.getElementById('step-welcome').style.display = 'block';
-                }, 2000);
-            }, 1500);
-        });
+      // Redirect to WhatsApp after delay
+      setTimeout(() => {
+        window.open(whatsappUrl, '_blank');
+        panel.style.display = 'none';
 
-        // Auto-show after delay (optional)
+        // Reset form
         setTimeout(() => {
-            panel.style.display = 'flex';
-        }, 5000);
-    }
+          document.getElementById('lead-name').value = '';
+          document.getElementById('lead-phone').value = '';
+          document.getElementById('lead-interest').value = '';
+          document.getElementById('step-success').style.display = 'none';
+          document.getElementById('step-welcome').style.display = 'block';
+        }, 2000);
+      }, 1500);
+    });
 
-    // Wait for DOM to be ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initWidget);
-    } else {
-        initWidget();
-    }
+    // Auto-show after delay (optional)
+    setTimeout(() => {
+      panel.style.display = 'flex';
+    }, 5000);
+  }
+
+  // Wait for DOM to be ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initWidget);
+  } else {
+    initWidget();
+  }
 })();
