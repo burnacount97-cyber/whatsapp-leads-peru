@@ -41,8 +41,12 @@ export function SocialProofToast() {
     return (
         <div
             className={cn(
-                "fixed bottom-4 left-4 z-[60] transition-all duration-700 transform",
-                isVisible ? "translate-x-0 opacity-100 scale-100" : "-translate-x-12 opacity-0 scale-90"
+                "fixed left-4 right-4 sm:right-auto sm:w-auto z-[60] transition-all duration-700 transform",
+                // Mobile: Top (below header), Desktop: Bottom
+                "top-20 sm:top-auto sm:bottom-4",
+                isVisible
+                    ? "translate-y-0 opacity-100 scale-100"
+                    : "sm:-translate-x-12 -translate-y-12 sm:translate-y-0 opacity-0 scale-90"
             )}
         >
             <div className="bg-white/80 dark:bg-slate-950/80 backdrop-blur-lg border border-primary/20 text-slate-900 dark:text-slate-100 pr-6 p-3 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] flex items-center gap-4 min-w-[280px] max-w-sm">
