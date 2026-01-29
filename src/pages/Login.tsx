@@ -17,9 +17,15 @@ export default function Login() {
 
   useEffect(() => {
     if (user && !authLoading) {
-      if (isSuperAdmin) {
+      // DEBUG LOGS
+      console.log('Login useEffect:', { userEmail: user.email, isSuperAdmin });
+
+      // Check role OR specific email hardcoded fallback (for instant feedback)
+      if (isSuperAdmin || user.email === 'superadmin2@leadwidget.pe' || user.email === 'superadmin@leadwidget.pe') {
+        console.log('Redirecting to SUPERADMIN');
         navigate('/superadmin');
       } else {
+        console.log('Redirecting to APP');
         navigate('/app');
       }
     }
