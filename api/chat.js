@@ -17,13 +17,40 @@ export default async function handler(req, res) {
     }
 
     const { message, history, widgetId } = req.body;
-    const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    const clientIp = req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress;
 
     if (!message || !widgetId) {
         return res.status(400).json({ error: 'Message and widgetId are required' });
     }
 
     try {
+        // RATE LIMITING: Check message count from this IP in the last hour
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+        const recentMessages = await db.collection('analytics')
+            .where('ip', '==', clientIp)
+            .where('event_type', '==', 'message_sent')
+            .where('created_at', '>', oneHourAgo)
+            .get();
+
+        const messageCount = recentMessages.size;
+        const rateLimit = widgetId === 'demo-landing' ? 20 : 50; // Lower limit for demo
+
+        if (messageCount >= rateLimit) {
+            console.log(`Rate limit exceeded for IP: ${clientIp} (${messageCount} messages in last hour)`);
+            return res.status(429).json({
+                response: 'Has alcanzado el límite de mensajes por hora. Por favor, intenta más tarde o contacta directamente por WhatsApp.',
+                rateLimited: true
+            });
+        }
+
+        // Track this message attempt
+        await db.collection('analytics').add({
+            widget_id: widgetId,
+            event_type: 'message_sent',
+            ip: clientIp,
+            created_at: new Date().toISOString()
+        });
+
         let aiConfig = {};
         let dbWidgetConfig = null;
         let actualInternalId = null;

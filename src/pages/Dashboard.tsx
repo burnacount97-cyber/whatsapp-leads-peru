@@ -402,15 +402,16 @@ export default function Dashboard() {
       // Load analytics and blocked IPs if widget exists
       if (configData) {
         // Analytics - Views
-        const qViews = query(collection(db, 'widget_analytics'),
+        // Analytics - Views
+        const qViews = query(collection(db, 'analytics'),
           where('widget_id', '==', configData.id),
           where('event_type', '==', 'view'));
         const viewsSnap = await getDocs(qViews);
 
         // Analytics - Interactions
-        const qInteractions = query(collection(db, 'widget_analytics'),
+        const qInteractions = query(collection(db, 'analytics'),
           where('widget_id', '==', configData.id),
-          where('event_type', '==', 'chat_open'));
+          where('event_type', 'in', ['chat_open', 'message_sent']));
         const interactionsSnap = await getDocs(qInteractions);
 
         setAnalytics({
@@ -1457,53 +1458,86 @@ export default function Dashboard() {
 
           {/* Billing Tab */}
           <TabsContent value="billing" className="space-y-6">
-            <div className="grid lg:grid-cols-2 gap-8">
-              <Card>
+            <div className="grid lg:grid-cols-3 gap-8">
+              {/* Plan Status */}
+              <Card className="lg:col-span-1">
                 <CardHeader>
-                  <CardTitle>Estado de tu plan</CardTitle>
+                  <CardTitle>Mi Plan</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between p-4 bg-muted rounded-xl">
-                    <div>
-                      <p className="font-semibold">Plan Mensual</p>
-                      <p className="text-2xl font-bold">S/30<span className="text-sm font-normal text-muted-foreground">/mes</span></p>
-                    </div>
-                    {getStatusBadge(profile?.subscription_status || 'trial')}
-                  </div>
-
-                  {profile?.subscription_status === 'trial' && (
-                    <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
-                      <div className="flex items-center gap-2 text-amber-600 mb-2 font-semibold">
-                        <Clock className="w-5 h-5" />
-                        Trial activo
+                  <div className="p-6 bg-slate-50 border rounded-2xl">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">Plan Actual</p>
+                        <p className="text-2xl font-black text-primary capitalize">{profile?.plan_type || 'Trial'}</p>
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        Te quedan {getTrialDaysLeft()} días de prueba. Paga para mantener tu widget activo.
-                      </p>
+                      {getStatusBadge(profile?.subscription_status || 'trial')}
                     </div>
-                  )}
+
+                    <div className="space-y-3 py-4 border-t border-slate-200 mt-4">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Precio:</span>
+                        <span className="font-bold text-slate-900">S/ 30.00 / mes</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Siguiente Pago:</span>
+                        <span className="font-bold text-slate-900">{getTrialEndDateString()}</span>
+                      </div>
+                    </div>
+
+                    {profile?.subscription_status === 'trial' && (
+                      <div className="mt-4 p-4 bg-amber-50 border border-amber-100 rounded-xl">
+                        <p className="text-xs text-amber-800 font-medium leading-relaxed">
+                          ⚠️ Te quedan {getTrialDaysLeft()} días de prueba. Paga S/ 30 hoy para mantener tu bot activo ilimitadamente.
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
 
-              <Card>
+              {/* Payment Info */}
+              <Card className="lg:col-span-2">
                 <CardHeader>
-                  <CardTitle>Renovar Suscripción</CardTitle>
-                  <CardDescription>Paga con Yape o Plin y sube tu captura</CardDescription>
+                  <CardTitle>Renovar o Activar Plan</CardTitle>
+                  <CardDescription>Usa cualquiera de estos métodos y sube tu captura para activación inmediata</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-[#00C185]/10 rounded-xl text-center border border-[#00C185]/20">
-                      <div className="w-10 h-10 bg-[#00C185] rounded-lg flex items-center justify-center mx-auto mb-2 text-white font-bold text-xs">YAPE</div>
-                      <p className="text-sm font-bold">902 105 668</p>
-                      <p className="text-[10px] text-muted-foreground uppercase">Ken Ryzen</p>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="p-4 bg-sky-50 border border-sky-100 rounded-xl">
+                      <h4 className="font-bold flex items-center gap-2 mb-3">
+                        <div className="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center text-white text-[10px]">BCP</div>
+                        Transferencia BCP
+                      </h4>
+                      <div className="space-y-1 text-xs">
+                        <div className="flex justify-between"><span>Soles:</span> <span className="font-medium">193-XXXXXXXX-X-XX</span></div>
+                        <div className="flex justify-between"><span>CCI:</span> <span className="font-medium">002-193-XXXXXXXX-X-XX</span></div>
+                      </div>
                     </div>
-                    <div className="p-4 bg-[#7B2CBF]/10 rounded-xl text-center border border-[#7B2CBF]/20">
-                      <div className="w-10 h-10 bg-[#7B2CBF] rounded-lg flex items-center justify-center mx-auto mb-2 text-white font-bold text-xs">PLIN</div>
-                      <p className="text-sm font-bold">902 105 668</p>
-                      <p className="text-[10px] text-muted-foreground uppercase">Ken Ryzen</p>
+
+                    <div className="p-4 bg-purple-50 border border-purple-100 rounded-xl">
+                      <h4 className="font-bold flex items-center gap-2 mb-3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-fuchsia-500 rounded-lg flex items-center justify-center text-white text-[10px]">Y/P</div>
+                        Yape o Plin
+                      </h4>
+                      <div className="space-y-1 text-xs">
+                        <div className="flex justify-between"><span>Número:</span> <span className="font-medium text-lg">902 105 668</span></div>
+                        <div className="flex justify-between"><span>Titular:</span> <span className="font-medium">Ken Ryzen</span></div>
+                      </div>
                     </div>
                   </div>
-                  <div className="space-y-3">
+
+                  <div className="p-8 border-2 border-dashed rounded-2xl bg-slate-50 text-center space-y-4">
+                    <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mx-auto mb-2 border border-slate-100">
+                      <Upload className="w-8 h-8 text-primary/40" />
+                    </div>
+                    <div>
+                      <p className="font-bold mb-1">Subir Comprobante</p>
+                      <p className="text-sm text-muted-foreground max-w-sm mx-auto">
+                        Selecciona una foto o captura de pantalla de tu transferencia para que nuestro equipo valide el pago.
+                      </p>
+                    </div>
+
                     <input
                       type="file"
                       ref={fileInputRef}
@@ -1511,19 +1545,72 @@ export default function Dashboard() {
                       accept="image/*"
                       onChange={handleUploadProof}
                     />
+
                     <Button
-                      variant="outline"
-                      className="w-full h-12 border-dashed gap-2"
+                      className="gap-2 h-12 px-8 font-bold text-lg"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={uploading}
                     >
-                      {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                      Sube tu comprobante de pago
+                      {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-5 h-5" />}
+                      Seleccionar Archivo
                     </Button>
                   </div>
                 </CardContent>
               </Card>
             </div>
+
+            {/* Payment History */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Historial de Pagos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {payments.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-2xl">
+                    <CreditCard className="w-12 h-12 mx-auto mb-4 opacity-10" />
+                    <p>No tienes pagos registrados aún</p>
+                    <p className="text-sm mt-1">Tus suscripciones aparecerán aquí después de subir el primer comprobante.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b text-xs uppercase tracking-wider text-muted-foreground">
+                          <th className="text-left py-4 px-6 font-bold">Concepto</th>
+                          <th className="text-left py-4 px-6 font-bold">Monto</th>
+                          <th className="text-left py-4 px-6 font-bold">Fecha</th>
+                          <th className="text-left py-4 px-6 font-bold">Método</th>
+                          <th className="text-right py-4 px-6 font-bold">Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-sm">
+                        {payments.map((p) => (
+                          <tr key={p.id} className="border-b group hover:bg-slate-50/50 transition-colors">
+                            <td className="py-4 px-6">
+                              <div className="font-bold text-slate-900">{p.description || 'Suscripción Lead Widget'}</div>
+                              <div className="text-[10px] text-muted-foreground font-mono">ID: {p.id.substring(0, 8)}</div>
+                            </td>
+                            <td className="py-4 px-6 font-bold text-slate-700">S/ {Number(p.amount).toFixed(2)}</td>
+                            <td className="py-4 px-6 text-muted-foreground">{new Date(p.created_at).toLocaleDateString('es-PE')}</td>
+                            <td className="py-4 px-6">
+                              <span className="text-xs font-medium px-2 py-1 bg-slate-100 rounded text-slate-600 uppercase tracking-tighter">{p.payment_method || 'Varios'}</span>
+                            </td>
+                            <td className="py-4 px-6 text-right">
+                              <span className={`px-3 py-1 rounded-full text-xs font-bold ${p.status === 'completed' || p.status === 'active'
+                                  ? 'bg-green-100 text-green-700 border border-green-200'
+                                  : 'bg-amber-100 text-amber-700 border border-amber-200'
+                                }`}>
+                                {p.status === 'completed' || p.status === 'active' ? '✓ Pagado' : '⏳ Pendiente'}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>

@@ -1,0 +1,94 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is super admin
+    function isSuperAdmin() {
+      return request.auth != null && 
+             request.auth.token.email == 'admin@leadwidget.com';
+    }
+    
+    // Helper function to check if user owns the resource
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+    
+    // ============================================
+    // PROFILES - Users can only read/write their own profile
+    // SuperAdmin can read all profiles
+    // ============================================
+    match /profiles/{userId} {
+      allow read: if isOwner(userId) || isSuperAdmin();
+      allow create: if isOwner(userId) || isSuperAdmin();
+      allow update: if isOwner(userId) || isSuperAdmin();
+      allow delete: if isSuperAdmin();
+    }
+    
+    // ============================================
+    // WIDGET CONFIGS - Public read (for embedded widget)
+    // Only owner can modify
+    // ============================================
+    match /widget_configs/{configId} {
+      allow read: if true; // Public - needed for embedded widget to load config
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && 
+                       (resource.data.user_id == request.auth.uid || isSuperAdmin());
+      allow delete: if request.auth != null && 
+                       (resource.data.user_id == request.auth.uid || isSuperAdmin());
+    }
+    
+    // ============================================
+    // LEADS - Only owner can read their leads
+    // Anyone can create (widget creates leads)
+    // ============================================
+    match /leads/{leadId} {
+      allow read: if request.auth != null && 
+                     (resource.data.client_id == request.auth.uid || isSuperAdmin());
+      allow create: if true; // Widget needs to create leads without auth
+      allow update: if request.auth != null && 
+                       (resource.data.client_id == request.auth.uid || isSuperAdmin());
+      allow delete: if request.auth != null && 
+                       (resource.data.client_id == request.auth.uid || isSuperAdmin());
+    }
+    
+    // ============================================
+    // BLOCKED IPS - Read for verification, create for blocking
+    // ============================================
+    match /blocked_ips/{ipId} {
+      allow read: if true; // API needs to check if IP is blocked
+      allow create: if true; // API needs to block IPs
+      allow delete: if request.auth != null && 
+                       (resource.data.widget_id == request.auth.uid || isSuperAdmin());
+    }
+    
+    // ============================================
+    // ANALYTICS - Owner can read, widget can create
+    // ============================================
+    match /analytics/{analyticsId} {
+      allow read: if request.auth != null;
+      allow create: if true; // Widget tracking needs to create events
+      allow update: if false;
+      allow delete: if isSuperAdmin();
+    }
+    
+    // ============================================
+    // SYSTEM ANNOUNCEMENTS - All authenticated users can read
+    // Only SuperAdmin can write
+    // ============================================
+    match /system_announcements/{announcementId} {
+      allow read: if request.auth != null;
+      allow write: if isSuperAdmin();
+    }
+    
+    // ============================================
+    // PAYMENTS (for future use)
+    // ============================================
+    match /payments/{paymentId} {
+      allow read: if request.auth != null && 
+                     (resource.data.user_id == request.auth.uid || isSuperAdmin());
+      allow create: if request.auth != null;
+      allow update: if isSuperAdmin();
+      allow delete: if isSuperAdmin();
+    }
+  }
+}

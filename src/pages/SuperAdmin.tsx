@@ -163,7 +163,7 @@ export default function SuperAdmin() {
     });
 
     // Real-time Analytics
-    const unsubAnalytics = onSnapshot(collection(db, 'widget_analytics'), (snapshot) => {
+    const unsubAnalytics = onSnapshot(collection(db, 'analytics'), (snapshot) => {
       const totalViews = snapshot.docs.filter(d => d.data().event_type === 'view').length;
       setStats(prev => ({ ...prev, totalViews }));
     });

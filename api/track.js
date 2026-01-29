@@ -13,10 +13,35 @@ export default async function handler(req, res) {
     if (!widgetId) return res.status(400).json({ error: 'widgetId is required' });
 
     try {
-        await db.collection('widget_analytics').add({
+        // Get client info
+        const clientIp = req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress;
+        const userAgent = req.headers['user-agent'] || 'Unknown';
+        const referer = req.headers['referer'] || req.headers['referrer'] || 'Direct';
+        const timestamp = new Date();
+        const dateKey = timestamp.toISOString().split('T')[0]; // YYYY-MM-DD for easy querying
+
+        // Basic rate limiting: check if same IP has tracked in last 5 seconds
+        const recentTrack = await db.collection('analytics')
+            .where('ip', '==', clientIp)
+            .where('widget_id', '==', widgetId)
+            .where('created_at', '>', new Date(Date.now() - 5000).toISOString())
+            .limit(1)
+            .get();
+
+        if (!recentTrack.empty && eventType === 'view') {
+            // Skip duplicate view events from same IP within 5 seconds
+            return res.status(200).json({ success: true, cached: true });
+        }
+
+        // Save analytics event
+        await db.collection('analytics').add({
             widget_id: widgetId,
-            event_type: eventType || 'view',
-            created_at: new Date().toISOString()
+            event_type: eventType || 'view', // 'view', 'chat_open', 'lead_captured', 'message_sent'
+            ip: clientIp,
+            user_agent: userAgent,
+            referer: referer,
+            date: dateKey, // For easy daily aggregation
+            created_at: timestamp.toISOString()
         });
 
         return res.status(200).json({ success: true });
