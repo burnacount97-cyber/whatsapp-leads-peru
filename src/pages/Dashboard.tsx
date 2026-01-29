@@ -1127,7 +1127,7 @@ export default function Dashboard() {
                   <CardHeader>
                     <CardTitle className="text-base flex items-center gap-2">
                       <ShieldCheck className="w-5 h-5 text-blue-600" />
-                      ¿Cómo obtener tu API Key de OpenAI? (Gratis + Paso a Paso)
+                      ¿Cómo obtener tu API Key de OpenAI? (Paso a Paso - 3 minutos)
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
