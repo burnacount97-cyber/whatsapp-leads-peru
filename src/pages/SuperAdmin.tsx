@@ -544,9 +544,12 @@ export default function SuperAdmin() {
                             <span className="font-semibold">{client.leads_count}</span>
                           </td>
                           <td className="py-3 px-4 text-sm text-muted-foreground">
-                            {client.trial_ends_at
-                              ? new Date(client.trial_ends_at).toLocaleDateString('es-PE')
-                              : '-'}
+                            {(() => {
+                              const created = new Date(client.created_at);
+                              const trialEnd = new Date(created);
+                              trialEnd.setDate(created.getDate() + 3);
+                              return trialEnd.toLocaleDateString('es-PE');
+                            })()}
                           </td>
                           <td className="py-3 px-4">
                             <div className="flex gap-2">
