@@ -33,6 +33,7 @@ const nicheTemplates = [
   { name: 'Clínicas', emoji: '🏥', desc: 'Especialidad y urgencia' },
   { name: 'Talleres', emoji: '🔧', desc: 'Tipo de vehículo y problema' },
   { name: 'Delivery', emoji: '🛵', desc: 'Dirección de entrega' },
+  { name: 'Ecommerce', emoji: '🛍️', desc: 'Dudas de stock y cupones' },
   { name: 'General', emoji: '💼', desc: 'Personalizable para cualquier negocio' },
 ];
 
@@ -410,6 +411,7 @@ export default function Landing() {
                     {activeTemplate === 'clínicas' && "👋 Hola, soy el asistente médico. ¿Qué especialidad necesitas consultar hoy?"}
                     {activeTemplate === 'talleres' && "👋 ¡Hola! ¿Qué problema tiene tu vehículo? Podemos agendar una revisión."}
                     {activeTemplate === 'delivery' && "👋 ¡Hola! ¿A qué dirección enviamos tu pedido hoy?"}
+                    {activeTemplate === 'ecommerce' && "👋 ¡Hola! ¿Tienes dudas con algún producto o con tu cupón de descuento?"}
                     {activeTemplate === 'general' && "👋 ¡Hola! ¿En qué podemos ayudarte el día de hoy?"}
                   </p>
                 </div>
