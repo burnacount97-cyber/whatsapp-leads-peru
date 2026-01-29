@@ -117,6 +117,7 @@ export default async function handler(req, res) {
             model: aiConfig.ai_model || 'gpt-4o-mini',
             messages: messages,
             temperature: aiConfig.ai_temperature || 0.7,
+            max_tokens: aiConfig.ai_max_tokens || 500,
         });
 
         const aiResponse = completion.choices[0].message.content;
