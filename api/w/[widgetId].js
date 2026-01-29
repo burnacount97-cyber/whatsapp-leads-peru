@@ -1,4 +1,4 @@
-import { getSupabaseClient } from '../_supabase.js';
+import { db } from '../_firebase.js';
 
 export default async function handler(req, res) {
   const { widgetId } = req.query;
@@ -8,27 +8,29 @@ export default async function handler(req, res) {
   }
 
   try {
-    const supabase = getSupabaseClient();
+    // 1. Fetch Widget Config
+    // First try by document ID (if widgetId matches a doc ID format)
+    let widgetDoc = await db.collection('widget_configs').doc(widgetId).get();
+    let widgetData = widgetDoc.exists ? { id: widgetDoc.id, ...widgetDoc.data() } : null;
 
-    const { data: widgetConfig, error } = await supabase
-      .from('widget_configs')
-      .select(`
-        *,
-        profiles:user_id (
-          business_name,
-          whatsapp_number,
-          status
-        )
-      `)
-      .eq('widget_id', widgetId)
-      .single();
+    // Fallback to custom widget_id field if not found by doc id
+    if (!widgetData) {
+      const q = await db.collection('widget_configs').where('widget_id', '==', widgetId).limit(1).get();
+      if (!q.empty) {
+        widgetData = { id: q.docs[0].id, ...q.docs[0].data() };
+      }
+    }
 
-    if (error || !widgetConfig) {
+    if (!widgetData) {
       return res.status(404).send('// Widget not found');
     }
 
+    // 2. Fetch Profile to get business info
+    const profileDoc = await db.collection('profiles').doc(widgetData.user_id).get();
+    const profileData = profileDoc.exists ? profileDoc.data() : {};
+
     // Check if account is suspended
-    if (widgetConfig.profiles?.status === 'suspended') {
+    if (profileData.subscription_status === 'suspended') {
       res.setHeader('Content-Type', 'application/javascript');
       res.setHeader('Access-Control-Allow-Origin', '*');
       return res.status(200).send('console.warn("LeadWidget: Service suspended for this account.");');
@@ -40,22 +42,23 @@ export default async function handler(req, res) {
     const baseUrl = `${protocol}://${host}`;
 
     const config = {
-      primaryColor: widgetConfig.primary_color || '#00C185',
-      businessName: widgetConfig.profiles?.business_name || 'Lead Widget',
-      welcomeMessage: widgetConfig.welcome_message || '¡Hola! soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
-      whatsappDestination: widgetConfig.whatsapp_destination || widgetConfig.profiles?.whatsapp_number || '',
-      widgetId: widgetConfig.id,
-      triggerDelay: widgetConfig.trigger_delay || 5, // Default faster for testing
-      chatPlaceholder: widgetConfig.chat_placeholder || 'Escribe tu mensaje...',
-      vibrationIntensity: widgetConfig.vibration_intensity || 'soft',
-      exitIntentTitle: widgetConfig.exit_intent_title || '¡Espera!',
-      exitIntentDescription: widgetConfig.exit_intent_description || 'Prueba Lead Widget gratis por 3 días y aumenta tus ventas.',
-      exitIntentCTA: widgetConfig.exit_intent_cta || 'Probar Demo Ahora',
-      teaserMessages: widgetConfig.teaser_messages || [
+      primaryColor: widgetData.primary_color || '#00C185',
+      businessName: profileData.business_name || 'Lead Widget',
+      welcomeMessage: widgetData.welcome_message || '¡Hola! soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
+      whatsappDestination: widgetData.whatsapp_destination || profileData.whatsapp_number || '',
+      widgetId: widgetData.id,
+      triggerDelay: widgetData.trigger_delay || 5,
+      chatPlaceholder: widgetData.chat_placeholder || 'Escribe tu mensaje...',
+      vibrationIntensity: widgetData.vibration_intensity || 'soft',
+      exitIntentTitle: widgetData.exit_intent_title || '¡Espera!',
+      exitIntentDescription: widgetData.exit_intent_description || 'Prueba Lead Widget gratis por 3 días y aumenta tus ventas.',
+      exitIntentCTA: widgetData.exit_intent_cta || 'Probar Demo Ahora',
+      teaserMessages: widgetData.teaser_messages || [
         '¿Cómo podemos ayudarte? 👋',
         '¿Tienes alguna duda sobre el servicio? ✨',
         '¡Hola! Estamos en línea para atenderte 🚀'
       ],
+      exitIntentEnabled: widgetData.trigger_exit_intent, // Added explicit field
       apiUrl: `${baseUrl}/api/chat`,
       trackUrl: `${baseUrl}/api/track`
     };

@@ -1,4 +1,4 @@
-import { getSupabaseClient } from './_supabase.js';
+import { db } from './_firebase.js';
 
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -13,11 +13,10 @@ export default async function handler(req, res) {
     if (!widgetId) return res.status(400).json({ error: 'widgetId is required' });
 
     try {
-        const supabase = getSupabaseClient();
-
-        await supabase.from('widget_analytics').insert({
+        await db.collection('widget_analytics').add({
             widget_id: widgetId,
-            event_type: eventType || 'view'
+            event_type: eventType || 'view',
+            created_at: new Date().toISOString()
         });
 
         return res.status(200).json({ success: true });

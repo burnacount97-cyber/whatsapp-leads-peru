@@ -4,81 +4,33 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/lib/auth';
-import { supabase } from '@/integrations/supabase/client';
 import { MessageCircle, Loader2, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const [localLoading, setLocalLoading] = useState(false);
+  const { signIn, user, isSuperAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Check session on mount
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        checkRoleAndRedirect(session.user.id);
-      }
-    });
-  }, []);
-
-  const checkRoleAndRedirect = async (userId: string) => {
-    // Create a timeout promise
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('TIMEOUT')), 8000)
-    );
-
-    try {
-      // Race the actual check against the timeout
-      const { data: roles, error } = await Promise.race([
-        supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', userId)
-          .eq('role', 'superadmin')
-          .maybeSingle(),
-        timeoutPromise
-      ]) as any;
-
-      if (error) {
-        console.error("Error checking roles:", error);
-        navigate('/app');
-        return;
-      }
-
-      if (roles) {
+    if (user && !authLoading) {
+      if (isSuperAdmin) {
         navigate('/superadmin');
       } else {
         navigate('/app');
       }
-    } catch (err: any) {
-      console.error("Critical error or timeout in role check:", err);
-      // Fallback: Si falla el chequeo de roles o hay timeout, asumimos usuario normal
-      navigate('/app');
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [user, isSuperAdmin, authLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('TIMEOUT')), 10000)
-    );
+    setLocalLoading(true);
 
     try {
-      const { data, error } = await Promise.race([
-        supabase.auth.signInWithPassword({
-          email,
-          password,
-        }),
-        timeoutPromise
-      ]) as any;
+      const { error } = await signIn(email, password);
 
       if (error) {
         toast({
@@ -86,23 +38,16 @@ export default function Login() {
           description: error.message,
           variant: 'destructive',
         });
-        setLoading(false);
-      } else if (data.user) {
-        // Check roles before redirecting
-        await checkRoleAndRedirect(data.user.id);
-      } else {
-        setLoading(false);
+        setLocalLoading(false);
       }
+      // Redirect handled by useEffect
     } catch (err: any) {
-      const isTimeout = err.message === 'TIMEOUT';
       toast({
-        title: isTimeout ? 'Servidor lento' : 'Error inesperado',
-        description: isTimeout
-          ? 'El servicio de Supabase está tardando demasiado. Por favor, intenta de nuevo en unos momentos.'
-          : (err.message || 'Ocurrió un error al intentar ingresar.'),
+        title: 'Error inesperado',
+        description: err.message,
         variant: 'destructive',
       });
-      setLoading(false);
+      setLocalLoading(false);
     }
   };
 
@@ -159,9 +104,9 @@ export default function Login() {
               variant="hero"
               size="lg"
               className="w-full"
-              disabled={loading}
+              disabled={localLoading || authLoading}
             >
-              {loading ? (
+              {localLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
                 'Iniciar Sesión'

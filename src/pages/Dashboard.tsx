@@ -1,7 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/lib/auth';
-import { supabase } from '@/integrations/supabase/client';
+import { db, storage } from '@/lib/firebase';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  orderBy,
+  addDoc
+} from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -36,12 +50,51 @@ import {
   Shield,
   X,
 } from 'lucide-react';
-import type { Tables } from '@/integrations/supabase/types';
 
-type Lead = Tables<'leads'>;
-type WidgetConfig = Tables<'widget_configs'>;
-type Profile = Tables<'profiles'>;
-type Payment = Tables<'payments'>;
+interface Lead {
+  id: string;
+  client_id: string;
+  widget_id: string;
+  name: string;
+  phone: string;
+  interest: string;
+  created_at: string;
+  status: string;
+}
+
+interface WidgetConfig {
+  id: string;
+  user_id: string;
+  widget_id: string;
+  business_name: string;
+  phone_number: string;
+  welcome_message: string;
+  position: 'right' | 'left';
+  theme_color: string;
+  template: string;
+  niche_question: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+interface Profile {
+  id: string;
+  email: string;
+  business_name: string;
+  subscription_status: string;
+  status?: string; // Used in UI
+  trial_ends_at?: string;
+  plan_type?: string;
+  ai_enabled: boolean;
+  ai_api_key?: string;
+  ai_provider?: string;
+  ai_model?: string;
+  ai_temperature?: number;
+  ai_system_prompt?: string;
+  ai_max_tokens?: number;
+}
+
+type Payment = any;
 
 const templates = [
   {
@@ -147,45 +200,37 @@ export default function Dashboard() {
     if (!user) return;
 
     try {
-      // Load profile
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .maybeSingle();
+      const userId = user.uid;
 
+      // Load profile
+      const profileSnap = await getDoc(doc(db, 'profiles', userId));
+      const profileData = profileSnap.exists() ? { id: profileSnap.id, ...profileSnap.data() } as Profile : null;
       setProfile(profileData);
 
       // Load AI config from profile
       if (profileData) {
         setAiConfig({
-          ai_enabled: true, // Always true now
+          ai_enabled: true,
           ai_provider: profileData.ai_provider || 'openai',
           ai_api_key: profileData.ai_api_key || '',
           ai_model: profileData.ai_model || 'gpt-4o-mini',
           ai_temperature: profileData.ai_temperature || 0.7,
-          ai_max_tokens: profileData.ai_max_tokens || 500,
+          ai_max_tokens: 500, // Fixed value or add to interface if needed
           ai_system_prompt: profileData.ai_system_prompt || 'Eres un asistente virtual amable y profesional que ayuda a capturar leads para un negocio. Tu objetivo es obtener información del cliente de manera natural y amigable.',
         });
       }
 
       // Load widget config
-      const { data: configData } = await supabase
-        .from('widget_configs')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      const qConfig = query(collection(db, 'widget_configs'), where('user_id', '==', userId));
+      const configSnap = await getDocs(qConfig);
+      const configData = configSnap.empty ? null : { id: configSnap.docs[0].id, ...configSnap.docs[0].data() } as any;
 
       // Load Announcement
-      const { data: announcementData } = await supabase
-        .from('system_announcements')
-        .select('*')
-        .eq('is_active', true)
-        .order('updated_at', { ascending: false })
-        .limit(1);
+      const qAnnounce = query(collection(db, 'system_announcements'), where('is_active', '==', true), orderBy('updated_at', 'desc'));
+      const announceSnap = await getDocs(qAnnounce);
 
-      if (announcementData?.[0]) {
-        setAnnouncement(announcementData[0] as any);
+      if (!announceSnap.empty) {
+        setAnnouncement({ id: announceSnap.docs[0].id, ...announceSnap.docs[0].data() } as any);
       }
 
       if (configData) {
@@ -193,7 +238,7 @@ export default function Dashboard() {
         setFormConfig({
           template: configData.template || 'general',
           primary_color: configData.primary_color || '#00C185',
-          business_name: profile?.business_name || 'Lead Widget',
+          business_name: profileData?.business_name || 'Lead Widget',
           welcome_message: configData.welcome_message || '¡Hola! ¿En qué podemos ayudarte?',
           whatsapp_destination: configData.whatsapp_destination || '',
           niche_question: configData.niche_question || '¿En qué distrito te encuentras?',
@@ -207,64 +252,64 @@ export default function Dashboard() {
           exit_intent_title: configData.exit_intent_title || '¡Espera!',
           exit_intent_description: configData.exit_intent_description || 'Prueba Lead Widget gratis por 3 días y aumenta tus ventas.',
           exit_intent_cta: configData.exit_intent_cta || 'Probar Demo Ahora',
-          teaser_messages: (configData.teaser_messages || [
-            '¿Cómo podemos ayudarte? 👋',
-            '¿Tienes alguna duda sobre el servicio? ✨',
-            '¡Hola! Estamos en línea para atenderte 🚀'
-          ]).join('\n'),
+          teaser_messages: Array.isArray(configData.teaser_messages)
+            ? configData.teaser_messages.join('\n')
+            : (configData.teaser_messages || [
+              '¿Cómo podemos ayudarte? 👋',
+              '¿Tienes alguna duda sobre el servicio? ✨',
+              '¡Hola! Estamos en línea para atenderte 🚀'
+            ]).join('\n'),
         });
       }
 
       // Load leads
-      const { data: leadsData } = await supabase
-        .from('leads')
-        .select('*')
-        .eq('client_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(100);
+      const qLeads = query(collection(db, 'leads'), where('client_id', '==', userId), orderBy('created_at', 'desc'));
+      const leadsSnap = await getDocs(qLeads);
+      const leadsData = leadsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Lead[];
 
-      setLeads(leadsData || []);
-
+      setLeads(leadsData);
       // Load payments
-      const { data: paymentsData } = await supabase
-        .from('payments')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+      const qPayments = query(collection(db, 'payments'), where('user_id', '==', userId), orderBy('created_at', 'desc'));
+      const paymentSnap = await getDocs(qPayments);
+      const paymentsData = paymentSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Payment[];
+      setPayments(paymentsData);
 
-      setPayments(paymentsData || []);
-
-      // Load analytics if widget exists
+      // Load analytics and blocked IPs if widget exists
       if (configData) {
-        const { data: viewsData } = await supabase
-          .from('widget_analytics')
-          .select('id', { count: 'exact' })
-          .eq('widget_id', configData.id)
-          .eq('event_type', 'view');
+        // Analytics - Views
+        const qViews = query(collection(db, 'widget_analytics'),
+          where('widget_id', '==', configData.id),
+          where('event_type', '==', 'view'));
+        const viewsSnap = await getDocs(qViews);
 
-        const { data: interactionsData } = await supabase
-          .from('widget_analytics')
-          .select('id', { count: 'exact' })
-          .eq('widget_id', configData.id)
-          .eq('event_type', 'chat_open');
+        // Analytics - Interactions
+        const qInteractions = query(collection(db, 'widget_analytics'),
+          where('widget_id', '==', configData.id),
+          where('event_type', '==', 'chat_open'));
+        const interactionsSnap = await getDocs(qInteractions);
 
         setAnalytics({
-          views: viewsData?.length || 0,
-          interactions: interactionsData?.length || 0
+          views: viewsSnap.size,
+          interactions: interactionsSnap.size
         });
 
         // Load blocked IPs
-        const { data: blockedData } = await supabase
-          .from('blocked_ips')
-          .select('*')
-          .eq('widget_id', configData.id)
-          .order('created_at', { ascending: false });
+        const qBlocked = query(collection(db, 'blocked_ips'),
+          where('widget_id', '==', configData.id),
+          orderBy('created_at', 'desc'));
+        const blockedSnap = await getDocs(qBlocked);
+        const blockedData = blockedSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        setBlockedIps(blockedData || []);
+        setBlockedIps(blockedData);
       }
 
     } catch (error) {
       console.error('Error loading data:', error);
+      toast({
+        title: 'Error al cargar datos',
+        description: 'No se pudo cargar la información del dashboard',
+        variant: 'destructive',
+      });
     } finally {
       setLoading(false);
     }
@@ -275,36 +320,32 @@ export default function Dashboard() {
 
     setSaving(true);
     try {
-      const { error: configError } = await supabase
-        .from('widget_configs')
-        .update({
-          template: formConfig.template,
-          primary_color: formConfig.primary_color,
-          welcome_message: formConfig.welcome_message,
-          whatsapp_destination: formConfig.whatsapp_destination,
-          niche_question: formConfig.niche_question,
-          trigger_delay: formConfig.trigger_delay,
-          chat_placeholder: formConfig.chat_placeholder,
-          vibration_intensity: formConfig.vibration_intensity,
-          trigger_exit_intent: formConfig.exit_intent_enabled,
-          exit_intent_title: formConfig.exit_intent_title,
-          exit_intent_description: formConfig.exit_intent_description,
-          exit_intent_cta: formConfig.exit_intent_cta,
-          teaser_messages: formConfig.teaser_messages.split('\n').filter(m => m.trim() !== ''),
-        })
-        .eq('id', widgetConfig.id);
-
-      if (configError) throw configError;
+      // Update widget config
+      const widgetRef = doc(db, 'widget_configs', widgetConfig.id);
+      await updateDoc(widgetRef, {
+        template: formConfig.template,
+        primary_color: formConfig.primary_color,
+        welcome_message: formConfig.welcome_message,
+        whatsapp_destination: formConfig.whatsapp_destination,
+        niche_question: formConfig.niche_question,
+        trigger_delay: formConfig.trigger_delay,
+        chat_placeholder: formConfig.chat_placeholder,
+        vibration_intensity: formConfig.vibration_intensity,
+        trigger_exit_intent: formConfig.exit_intent_enabled,
+        exit_intent_title: formConfig.exit_intent_title,
+        exit_intent_description: formConfig.exit_intent_description,
+        exit_intent_cta: formConfig.exit_intent_cta,
+        teaser_messages: Array.isArray(formConfig.teaser_messages)
+          ? formConfig.teaser_messages
+          : (typeof formConfig.teaser_messages === 'string'
+            ? formConfig.teaser_messages.split('\n').filter((m: string) => m.trim() !== '')
+            : formConfig.teaser_messages),
+      });
 
       // Update business name in profile
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          business_name: formConfig.business_name
-        })
-        .eq('id', user.id);
-
-      if (profileError) throw profileError;
+      await updateDoc(doc(db, 'profiles', user.uid), {
+        business_name: formConfig.business_name
+      });
 
       toast({
         title: '¡Guardado!',
@@ -330,31 +371,22 @@ export default function Dashboard() {
     setUploading(true);
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}-${Math.floor(Date.now() / 1000)}.${fileExt}`;
-      const filePath = `proofs/${fileName}`;
+      const fileName = `${user.uid}-${Math.floor(Date.now() / 1000)}.${fileExt}`;
+      const storageRef = ref(storage, `proofs/${fileName}`);
 
-      // Upload to 'payments' bucket (ensure it exists in Supabase)
-      const { error: uploadError } = await supabase.storage
-        .from('payments')
-        .upload(filePath, file);
+      // Upload to Firebase Storage
+      await uploadBytes(storageRef, file);
+      const publicUrl = await getDownloadURL(storageRef);
 
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('payments')
-        .getPublicUrl(filePath);
-
-      const { error: paymentError } = await supabase
-        .from('payments')
-        .insert({
-          user_id: user.id,
-          amount: 30,
-          payment_method: 'Yape/Plin',
-          proof_url: publicUrl,
-          status: 'pending'
-        });
-
-      if (paymentError) throw paymentError;
+      // Add to payments collection
+      await addDoc(collection(db, 'payments'), {
+        user_id: user.uid,
+        amount: 30,
+        payment_method: 'Yape/Plin',
+        proof_url: publicUrl,
+        status: 'pending',
+        created_at: new Date().toISOString()
+      });
 
       toast({
         title: '¡Comprobante enviado!',
@@ -363,9 +395,10 @@ export default function Dashboard() {
 
       loadData();
     } catch (error: any) {
+      console.error(error);
       toast({
         title: 'Error de subida',
-        description: 'No se pudo subir el archivo. Verifica que el bucket "payments" exista y sea público.',
+        description: 'No se pudo subir el archivo. Verifica tu conexión.',
         variant: 'destructive',
       });
     } finally {
@@ -424,12 +457,7 @@ export default function Dashboard() {
 
   const unblockIp = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from('blocked_ips')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
+      await deleteDoc(doc(db, 'blocked_ips', id));
 
       setBlockedIps(blockedIps.filter(ip => ip.id !== id));
       toast({
@@ -531,8 +559,8 @@ export default function Dashboard() {
           </div>
 
           <div className="flex items-center gap-4">
-            {getStatusBadge(profile?.status || 'trial')}
-            {profile?.status === 'trial' && (
+            {getStatusBadge(profile?.subscription_status || 'trial')}
+            {profile?.subscription_status === 'trial' && (
               <span className="text-sm text-muted-foreground">
                 {getTrialDaysLeft()} días restantes
               </span>
@@ -547,7 +575,7 @@ export default function Dashboard() {
 
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Trial Alert Notice */}
-        {profile?.status === 'trial' && (
+        {profile?.subscription_status === 'trial' && (
           <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
@@ -1004,20 +1032,15 @@ export default function Dashboard() {
                     if (!user) return;
                     setSavingAI(true);
                     try {
-                      const { error } = await supabase
-                        .from('profiles')
-                        .update({
-                          ai_enabled: true, // Force enabled on save
-                          ai_provider: aiConfig.ai_provider,
-                          ai_api_key: aiConfig.ai_api_key,
-                          ai_model: aiConfig.ai_model,
-                          ai_temperature: aiConfig.ai_temperature,
-                          ai_max_tokens: aiConfig.ai_max_tokens,
-                          ai_system_prompt: aiConfig.ai_system_prompt,
-                        })
-                        .eq('id', user.id);
-
-                      if (error) throw error;
+                      await updateDoc(doc(db, 'profiles', user.uid), {
+                        ai_enabled: true, // Force enabled on save
+                        ai_provider: aiConfig.ai_provider,
+                        ai_api_key: aiConfig.ai_api_key,
+                        ai_model: aiConfig.ai_model,
+                        ai_temperature: aiConfig.ai_temperature,
+                        ai_max_tokens: aiConfig.ai_max_tokens,
+                        ai_system_prompt: aiConfig.ai_system_prompt,
+                      });
 
                       toast({
                         title: '✅ Configuración guardada',
@@ -1262,10 +1285,10 @@ export default function Dashboard() {
                       <p className="font-semibold">Plan Mensual</p>
                       <p className="text-2xl font-bold">S/30<span className="text-sm font-normal text-muted-foreground">/mes</span></p>
                     </div>
-                    {getStatusBadge(profile?.status || 'trial')}
+                    {getStatusBadge(profile?.subscription_status || 'trial')}
                   </div>
 
-                  {profile?.status === 'trial' && (
+                  {profile?.subscription_status === 'trial' && (
                     <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl">
                       <div className="flex items-center gap-2 text-amber-600 mb-2 font-semibold">
                         <Clock className="w-5 h-5" />

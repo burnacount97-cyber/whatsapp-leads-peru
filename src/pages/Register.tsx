@@ -38,11 +38,11 @@ export default function Register() {
       });
       setLoading(false);
     } else {
-      // If session exists, user is already logged in (confirmation disabled)
-      if (data?.session) {
+      // Firebase automatically logs in the user after registration
+      if (data) {
         navigate('/app');
       } else {
-        // Show confirmation screen
+        // Fallback or confirmation flow if needed (unlikely with default Firebase)
         setIsSubmitted(true);
         setLoading(false);
       }

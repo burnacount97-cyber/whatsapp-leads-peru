@@ -1,4 +1,4 @@
-import { getSupabaseClient } from './_supabase.js';
+import { db } from './_firebase.js';
 import OpenAI from 'openai';
 
 export default async function handler(req, res) {
@@ -24,13 +24,11 @@ export default async function handler(req, res) {
     }
 
     try {
-        const supabase = getSupabaseClient();
-
         let aiConfig = {};
         let dbWidgetConfig = null;
         let actualInternalId = null;
 
-        // 2. Fetch Widget Config (needed for both security check and AI)
+        // 2. Fetch Widget Config
         if (widgetId === 'demo-landing') {
             aiConfig = {
                 ai_enabled: true,
@@ -43,48 +41,35 @@ export default async function handler(req, res) {
                 business_name: 'Lead Widget'
             };
         } else {
-            // First try by internal ID (which the widget script sends)
-            let { data: widgetConfig, error } = await supabase
-                .from('widget_configs')
-                .select(`
-                  id,
-                  user_id,
-                  template,
-                  niche_question,
-                  profiles:user_id (
-                    ai_provider,
-                    ai_api_key,
-                    ai_model,
-                    ai_temperature,
-                    ai_system_prompt,
-                    ai_enabled,
-                    business_name
-                  )
-                `)
-                .eq('id', widgetId)
-                .maybeSingle();
+            // First try by document ID
+            let widgetDoc = await db.collection('widget_configs').doc(widgetId).get();
+            let widgetData = widgetDoc.exists ? { id: widgetDoc.id, ...widgetDoc.data() } : null;
 
-            // Fallback to public widget_id if not found (useful for some direct calls)
-            if (!widgetConfig) {
-                const { data: fallbackConfig } = await supabase
-                    .from('widget_configs')
-                    .select('*, profiles:user_id(*)')
-                    .eq('widget_id', widgetId)
-                    .maybeSingle();
-
-                widgetConfig = fallbackConfig;
+            // Fallback to custom widget_id field if not found by doc id
+            if (!widgetData) {
+                const q = await db.collection('widget_configs').where('widget_id', '==', widgetId).limit(1).get();
+                if (!q.empty) {
+                    widgetData = { id: q.docs[0].id, ...q.docs[0].data() };
+                }
             }
 
-            if (!widgetConfig) {
+            if (!widgetData) {
                 console.error('Widget lookup error or not found:', widgetId);
                 return res.status(404).json({ error: 'Widget not found' });
             }
 
-            dbWidgetConfig = widgetConfig;
-            aiConfig = widgetConfig.profiles;
-            actualInternalId = widgetConfig.id;
+            // Fetch Profile
+            const profileDoc = await db.collection('profiles').doc(widgetData.user_id).get();
+            const profileData = profileDoc.exists ? profileDoc.data() : {};
 
-            const template = widgetConfig.template || 'general';
+            dbWidgetConfig = widgetData;
+            aiConfig = {
+                ...profileData,
+                business_name: profileData.business_name // ensure business_name is available
+            };
+            actualInternalId = widgetData.id;
+
+            const template = widgetData.template || 'general';
             let industryInstructions = '';
             switch (template) {
                 case 'inmobiliaria': industryInstructions = 'Captura: Nombre, Compra/Alquiler, Distrito, Presupuesto.'; break;
@@ -93,20 +78,19 @@ export default async function handler(req, res) {
                 default: industryInstructions = 'Captura: Nombre, Servicio, Presupuesto.';
             }
 
-            const businessContext = widgetConfig.niche_question ? `\n\nCONTEXTO: ${widgetConfig.niche_question}` : '';
+            const businessContext = widgetData.niche_question ? `\n\nCONTEXTO: ${widgetData.niche_question}` : '';
             aiConfig.context = businessContext + `\n\nINSTRUCCIONES: ${industryInstructions}`;
         }
 
         // 3. Security Check: Is IP blocked?
         if (widgetId !== 'demo-landing' && actualInternalId) {
-            const { data: blocked } = await supabase
-                .from('blocked_ips')
-                .select('id')
-                .eq('ip_address', clientIp)
-                .eq('widget_id', actualInternalId)
-                .maybeSingle();
+            const blockedQuery = await db.collection('blocked_ips')
+                .where('ip_address', '==', clientIp)
+                .where('widget_id', '==', actualInternalId)
+                .limit(1)
+                .get();
 
-            if (blocked) {
+            if (!blockedQuery.empty) {
                 return res.status(403).json({
                     response: "Lo sentimos, el acceso al chat ha sido restringido por seguridad debido a actividad inusual.",
                     blocked: true
@@ -130,7 +114,7 @@ export default async function handler(req, res) {
         Al capturar lead usa: {"action": "collect_lead", "data": {...}}
         `;
 
-        const fullSystemPrompt = `${aiConfig.ai_system_prompt}\n${aiConfig.context}\n${securityPrompt}\n${technicalInstructions}`;
+        const fullSystemPrompt = `${aiConfig.ai_system_prompt || ''}\n${aiConfig.context || ''}\n${securityPrompt}\n${technicalInstructions}`;
 
         const messages = [
             { role: 'system', content: fullSystemPrompt },
@@ -152,10 +136,11 @@ export default async function handler(req, res) {
         if (aiResponse.includes('block_user')) {
             const blockMatch = aiResponse.match(/\{"action":\s*"block_user"[^}]*\}/);
             if (blockMatch && widgetId !== 'demo-landing' && dbWidgetConfig) {
-                await supabase.from('blocked_ips').insert({
+                await db.collection('blocked_ips').add({
                     widget_id: dbWidgetConfig.id,
                     ip_address: clientIp,
-                    reason: 'AI detected abuse/jailbreak'
+                    reason: 'AI detected abuse/jailbreak',
+                    created_at: new Date().toISOString()
                 });
             }
             return res.status(403).json({
@@ -169,12 +154,13 @@ export default async function handler(req, res) {
         if (leadMatch && widgetId !== 'demo-landing' && dbWidgetConfig) {
             try {
                 const leadPayload = JSON.parse(leadMatch[0].replace(/\\/g, ''));
-                await supabase.from('leads').insert({
+                await db.collection('leads').add({
                     client_id: dbWidgetConfig.user_id,
                     widget_id: dbWidgetConfig.id,
                     name: leadPayload.data?.name || 'Cliente Interesado',
                     interest: Object.entries(leadPayload.data || {}).map(([k, v]) => `${k}: ${v}`).join(' | '),
-                    phone: 'Pendiente (Click WA)'
+                    phone: 'Pendiente (Click WA)',
+                    created_at: new Date().toISOString()
                 });
             } catch (e) { console.error('Save Lead Error:', e); }
         }
