@@ -128,7 +128,7 @@ export default function Landing() {
       </nav>
 
       {/* --- HERO SECTION --- */}
-      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 px-4 overflow-hidden">
+      <section className="relative pt-24 pb-16 lg:pt-48 lg:pb-32 px-4 overflow-hidden">
         {/* Background Gradients */}
         <div className="absolute top-0 inset-x-0 h-[600px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-background to-background dark:from-primary/5 dark:via-background dark:to-background -z-10" />
 
@@ -136,8 +136,8 @@ export default function Landing() {
           <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
 
             {/* Left Content */}
-            <div className="flex-1 space-y-8 text-center lg:text-left z-10">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-semibold border border-primary/20 animate-fade-in-up">
+            <div className="flex-1 space-y-6 lg:space-y-8 text-center lg:text-left z-10 w-full">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs sm:text-sm font-semibold border border-primary/20 animate-fade-in-up">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
@@ -145,19 +145,19 @@ export default function Landing() {
                 Nuevo Sistema 2026
               </div>
 
-              <h1 className="text-5xl lg:text-7xl font-extrabold tracking-tight leading-[1.1]">
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] text-balance">
                 Convierte visitas en <br className="hidden lg:block" />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-600 dark:to-emerald-400">
                   Leads Reales
                 </span>
               </h1>
 
-              <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto lg:mx-0">
+              <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto lg:mx-0 text-pretty">
                 El widget inteligente que detecta interés, captura datos y envía clientes calificados
                 <strong className="text-foreground"> directo a tu WhatsApp</strong>. Sin formularios aburridos.
               </p>
 
-              <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start w-full sm:w-auto">
                 <Link to="/register" className="w-full sm:w-auto">
                   <Button size="xl" className="w-full sm:w-auto text-lg font-bold h-14 px-8 shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-1 transition-all btn-iridescent text-white">
                     Empezar Gratis
@@ -174,33 +174,33 @@ export default function Landing() {
                 </Button>
               </div>
 
-              <div className="pt-8 flex items-center justify-center lg:justify-start gap-8 opacity-80">
+              <div className="pt-4 lg:pt-8 flex flex-wrap justify-center lg:justify-start gap-8 lg:gap-12 opacity-80">
                 {stats.map(s => (
-                  <div key={s.label}>
+                  <div key={s.label} className="text-center lg:text-left">
                     <p className="text-2xl font-bold text-foreground">{s.value}</p>
-                    <p className="text-xs text-muted-foreground">{s.label}</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wide">{s.label}</p>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Right Image/Mockup */}
-            <div className="flex-1 relative w-full max-w-[500px] lg:max-w-none">
+            <div className="flex-1 relative w-full max-w-[350px] sm:max-w-[500px] lg:max-w-none mx-auto lg:mx-0 mt-8 lg:mt-0">
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-purple-500/20 rounded-full blur-3xl opacity-30 animate-pulse-slow" />
-              <div className="relative bg-card border border-border/50 rounded-[2.5rem] shadow-2xl overflow-hidden p-2 transform hover:scale-[1.01] transition-transform duration-500">
+              <div className="relative bg-card border border-border/50 rounded-[2rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden p-2 transform hover:scale-[1.01] transition-transform duration-500">
                 <img
                   src="/assets/hero-mockup.png"
                   alt="Dashboard Preview"
-                  className="w-full rounded-[2rem] shadow-inner bg-muted/50"
+                  className="w-full rounded-[1.5rem] sm:rounded-[2rem] shadow-inner bg-muted/50"
                 />
-                {/* Floating elements */}
-                <div className="absolute -right-4 top-10 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-xl flex items-center gap-3 animate-float border border-border">
-                  <div className="w-10 h-10 bg-[#25D366] rounded-full flex items-center justify-center text-white">
-                    <MessageCircle className="w-6 h-6" />
+                {/* Floating elements - Hidden on very small screens */}
+                <div className="hidden sm:flex absolute -right-4 top-10 bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-xl shadow-xl items-center gap-3 animate-float border border-border scale-90 sm:scale-100">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-[#25D366] rounded-full flex items-center justify-center text-white">
+                    <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold opacity-60">Nuevo Lead</p>
-                    <p className="font-bold text-sm">+51 902 *** ***</p>
+                    <p className="text-[10px] sm:text-xs font-bold opacity-60">Nuevo Lead</p>
+                    <p className="font-bold text-xs sm:text-sm">+51 902 *** ***</p>
                   </div>
                 </div>
               </div>
@@ -211,15 +211,15 @@ export default function Landing() {
       </section>
 
       {/* --- TRUST BADGE SECTION --- */}
-      <section className="py-10 border-y border-border/40 bg-muted/20">
-        <div className="container mx-auto text-center">
-          <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-8">
+      <section className="py-8 lg:py-10 border-y border-border/40 bg-muted/20">
+        <div className="container mx-auto text-center px-4">
+          <p className="text-xs sm:text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-6 sm:mb-8">
             Compatible con todas las plataformas
           </p>
-          <div className="flex flex-wrap justify-center gap-8 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+          <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-6 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
             {['WordPress', 'Shopify', 'Wix', 'React', 'Webflow', 'Carrd'].map(p => (
-              <div key={p} className="flex items-center gap-2 font-bold text-xl text-slate-500 hover:text-primary cursor-default">
-                <Globe className="w-5 h-5" /> {p}
+              <div key={p} className="flex items-center gap-2 font-bold text-lg sm:text-xl text-slate-500 hover:text-primary cursor-default select-none">
+                <Globe className="w-4 h-4 sm:w-5 sm:h-5" /> {p}
               </div>
             ))}
           </div>
@@ -227,16 +227,16 @@ export default function Landing() {
       </section>
 
       {/* --- PAIN POINTS SECTION (Dark Style) --- */}
-      <section className="py-24 px-4 bg-slate-950 text-white relative overflow-hidden">
+      <section className="py-16 lg:py-24 px-4 bg-slate-950 text-white relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
 
         <div className="container mx-auto max-w-6xl relative z-10">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <h2 className="text-3xl md:text-5xl font-black mb-6 leading-tight">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            <div className="order-2 lg:order-1">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-6 leading-tight text-balance">
                 ¿Tu web tiene visitas pero <span className="text-primary italic">pocas ventas</span>?
               </h2>
-              <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+              <p className="text-slate-400 text-base sm:text-lg mb-8 leading-relaxed text-pretty">
                 El problema no es tu tráfico, es la fricción. Los formularios largos matan la conversión.
                 Lead Widget elimina esa barrera conectando al cliente instantáneamente contigo.
               </p>
@@ -249,24 +249,24 @@ export default function Landing() {
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
                     <div className="w-6 h-6 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <CloseIcon className="w-4 h-4" />
+                      <CloseIcon className="w-3.5 h-3.5" />
                     </div>
-                    <span className="text-slate-300 font-medium">{item}</span>
+                    <span className="text-slate-300 font-medium text-sm sm:text-base">{item}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="relative">
+            <div className="relative order-1 lg:order-2">
               <div className="absolute -inset-1 bg-gradient-to-r from-primary to-blue-600 rounded-3xl blur opacity-30"></div>
-              <div className="relative bg-slate-900 rounded-3xl p-8 border border-slate-800 shadow-2xl">
+              <div className="relative bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-2xl">
                 <div className="flex items-center gap-4 mb-6 border-b border-slate-800 pb-4">
-                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                    <ShieldCheck className="w-6 h-6 text-primary" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                    <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg">La Solución Lead Widget</h3>
-                    <p className="text-slate-400 text-sm">Automatización inteligente</p>
+                    <h3 className="font-bold text-base sm:text-lg">La Solución Lead Widget</h3>
+                    <p className="text-slate-400 text-xs sm:text-sm">Automatización inteligente</p>
                   </div>
                 </div>
                 <div className="space-y-4">
@@ -276,12 +276,12 @@ export default function Landing() {
                     { t: "Conexión Directa", d: "Recibes el lead limpio y listo para cerrar en WhatsApp." },
                   ].map((step, idx) => (
                     <div key={idx} className="flex gap-4">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-primary font-bold flex items-center justify-center text-sm border border-primary/20">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-primary font-bold flex items-center justify-center text-sm border border-primary/20 flex-shrink-0">
                         {idx + 1}
                       </div>
                       <div>
-                        <h4 className="font-bold text-white mb-1">{step.t}</h4>
-                        <p className="text-slate-400 text-sm">{step.d}</p>
+                        <h4 className="font-bold text-white mb-1 text-sm sm:text-base">{step.t}</h4>
+                        <p className="text-slate-400 text-xs sm:text-sm">{step.d}</p>
                       </div>
                     </div>
                   ))}
@@ -293,14 +293,14 @@ export default function Landing() {
       </section>
 
       {/* --- FEATURES GRID --- */}
-      <section className="py-24 px-4 bg-background">
+      <section className="py-16 lg:py-24 px-4 bg-background">
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-16 max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6">Todo lo que necesitas para escalar</h2>
-            <p className="text-lg text-muted-foreground">Más que un botón de WhatsApp, es un sistema completo de captura y cualificación.</p>
+          <div className="text-center mb-12 lg:mb-16 max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-balance">Todo lo que necesitas para escalar</h2>
+            <p className="text-base sm:text-lg text-muted-foreground text-pretty px-4">Más que un botón de WhatsApp, es un sistema completo de captura y cualificación.</p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {[
               { icon: Zap, t: "Instalación Flash", d: "Copia y pega una línea de código. Funciona en WordPress, Shopify, Wix y código propio." },
               { icon: Smartphone, t: "Mobile First", d: "Diseñado para sentirse nativo en celulares, donde ocurre el 80% de las ventas." },
@@ -309,12 +309,12 @@ export default function Landing() {
               { icon: Globe, t: "100% Customizable", d: "Adapta los colores, textos y logo para que coincida perfectamente con tu marca." },
               { icon: ShieldCheck, t: "Anti-Spam", d: "Filtra curiosos. Solo te llegarán notificaciones de clientes reales." },
             ].map((f, i) => (
-              <div key={i} className="group p-8 rounded-3xl bg-card border border-border/50 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
-                <div className="w-14 h-14 rounded-2xl bg-primary/5 text-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                  <f.icon className="w-7 h-7" />
+              <div key={i} className="group p-6 sm:p-8 rounded-3xl bg-card border border-border/50 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-primary/5 text-primary flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <f.icon className="w-6 h-6 sm:w-7 sm:h-7" />
                 </div>
-                <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors">{f.t}</h3>
-                <p className="text-muted-foreground leading-relaxed">{f.d}</p>
+                <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 group-hover:text-primary transition-colors">{f.t}</h3>
+                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{f.d}</p>
               </div>
             ))}
           </div>
@@ -322,19 +322,19 @@ export default function Landing() {
       </section>
 
       {/* --- TEMPLATES SHOWCASE --- */}
-      <section className="py-24 px-4 bg-muted/30">
+      <section className="py-16 lg:py-24 px-4 bg-muted/30">
         <div className="container mx-auto max-w-5xl">
-          <div className="flex flex-col md:flex-row items-end justify-between mb-12 gap-6">
+          <div className="flex flex-col md:flex-row items-start md:items-end justify-between mb-8 md:mb-12 gap-6">
             <div>
-              <h2 className="text-3xl font-bold mb-2">Plantillas por Industria</h2>
-              <p className="text-muted-foreground">La IA ya está entrenada para tu nicho.</p>
+              <h2 className="text-2xl sm:text-3xl font-bold mb-2">Plantillas por Industria</h2>
+              <p className="text-muted-foreground text-sm sm:text-base">La IA ya está entrenada para tu nicho.</p>
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 w-full md:w-auto">
+            <div className="flex gap-2 w-full md:w-auto overflow-x-auto pb-2 -mx-4 px-4 md:mx-0 md:px-0 no-scrollbar">
               {nicheTemplates.map(t => (
                 <button
                   key={t.name}
                   onClick={() => setActiveTemplate(t.name.toLowerCase())}
-                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${activeTemplate === t.name.toLowerCase()
+                  className={`px-4 py-2 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 ${activeTemplate === t.name.toLowerCase()
                     ? 'bg-primary text-primary-foreground shadow-md'
                     : 'bg-background hover:bg-muted-foreground/10 border'
                     }`}
@@ -345,30 +345,30 @@ export default function Landing() {
             </div>
           </div>
 
-          <div className="bg-background rounded-3xl p-8 border shadow-sm flex flex-col md:flex-row gap-8 items-center">
-            <div className="flex-1 space-y-4">
-              <h3 className="text-2xl font-bold">
+          <div className="bg-background rounded-3xl p-6 md:p-8 border shadow-sm flex flex-col md:flex-row gap-8 items-center">
+            <div className="flex-1 space-y-4 w-full">
+              <h3 className="text-xl sm:text-2xl font-bold">
                 {nicheTemplates.find(t => t.name.toLowerCase() === activeTemplate)?.name}
               </h3>
-              <p className="text-lg text-muted-foreground">
+              <p className="text-base sm:text-lg text-muted-foreground">
                 {nicheTemplates.find(t => t.name.toLowerCase() === activeTemplate)?.desc}
               </p>
               <ul className="space-y-3 pt-4">
                 {["Preguntas pre-configuradas", "Tono de voz adaptado", "Campos de captura específicos"].map((item, i) => (
                   <li key={i} className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center">
+                    <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center flex-shrink-0">
                       <Check className="w-3 h-3" />
                     </div>
-                    <span>{item}</span>
+                    <span className="text-sm sm:text-base">{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="flex-1 bg-muted/50 rounded-2xl p-6 w-full flex items-center justify-center min-h-[300px]">
+            <div className="flex-1 bg-muted/50 rounded-2xl p-6 w-full flex items-center justify-center min-h-[250px] sm:min-h-[300px]">
               <div className="text-center opacity-60">
-                <Smartphone className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <p>Vista previa del template {activeTemplate}</p>
-                <p className="text-xs">(Interactúa con el demo real para probarlo)</p>
+                <Smartphone className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 text-muted-foreground" />
+                <p className="text-sm sm:text-base">Vista previa del template {activeTemplate}</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">(Interactúa con el demo real abajo)</p>
               </div>
             </div>
           </div>
@@ -376,25 +376,25 @@ export default function Landing() {
       </section>
 
       {/* --- PRICING --- */}
-      <section className="py-24 px-4 bg-background" id="pricing">
+      <section className="py-16 lg:py-24 px-4 bg-background" id="pricing">
         <div className="container mx-auto max-w-4xl">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-extrabold mb-4">Precio Justo y Simple</h2>
-            <p className="text-xl text-muted-foreground">Sin comisiones por venta. Sin contratos forzosos.</p>
+          <div className="text-center mb-10 lg:mb-12">
+            <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">Precio Justo y Simple</h2>
+            <p className="text-lg sm:text-xl text-muted-foreground">Sin comisiones por venta. Sin contratos forzosos.</p>
           </div>
 
-          <div className="relative p-1 rounded-[2.5rem] bg-gradient-to-b from-primary/50 to-transparent">
-            <div className="bg-card rounded-[2.3rem] p-8 md:p-12 border shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-6 py-2 rounded-bl-3xl font-bold text-sm">
+          <div className="relative p-1 rounded-[2rem] sm:rounded-[2.5rem] bg-gradient-to-b from-primary/50 to-transparent">
+            <div className="bg-card rounded-[1.8rem] sm:rounded-[2.3rem] p-6 md:p-12 border shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-4 py-1.5 sm:px-6 sm:py-2 rounded-bl-3xl font-bold text-xs sm:text-sm">
                 OFERTA LANZAMIENTO
               </div>
 
-              <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center mt-6 md:mt-0">
                 <div>
-                  <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-2">Plan Mensual</p>
+                  <p className="text-xs sm:text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-2">Plan Mensual</p>
                   <div className="flex items-baseline gap-1 mb-6">
-                    <span className="text-6xl font-black tracking-tighter">S/30</span>
-                    <span className="text-xl text-muted-foreground font-medium">/mes</span>
+                    <span className="text-5xl sm:text-6xl font-black tracking-tighter">S/30</span>
+                    <span className="text-lg sm:text-xl text-muted-foreground font-medium">/mes</span>
                   </div>
 
                   <div className="space-y-4 mb-8">
@@ -406,43 +406,43 @@ export default function Landing() {
                     ].map((f, i) => (
                       <div key={i} className="flex items-center gap-3">
                         <Check className="w-5 h-5 text-primary flex-shrink-0" />
-                        <span className="font-medium">{f}</span>
+                        <span className="font-medium text-sm sm:text-base">{f}</span>
                       </div>
                     ))}
                   </div>
 
                   <Link to="/register">
-                    <Button size="xl" className="w-full font-bold text-lg h-14 btn-iridescent text-white shadow-xl shadow-primary/20">
+                    <Button size="xl" className="w-full font-bold text-lg h-12 sm:h-14 btn-iridescent text-white shadow-xl shadow-primary/20">
                       Comenzar Prueba Gratis
                     </Button>
                   </Link>
                   <p className="text-center text-xs text-muted-foreground mt-3">3 días de prueba sin tarjeta</p>
                 </div>
 
-                <div className="bg-muted/30 rounded-3xl p-8 border text-center">
-                  <h4 className="font-bold mb-6">Métodos de Pago Locales</h4>
-                  <div className="grid grid-cols-2 gap-4">
+                <div className="bg-muted/30 rounded-3xl p-6 sm:p-8 border text-center">
+                  <h4 className="font-bold mb-4 sm:mb-6 text-sm sm:text-base">Métodos de Pago Locales</h4>
+                  <div className="grid grid-cols-2 gap-3 sm:gap-4">
                     {/* YAPE CARD */}
-                    <div className="bg-[#0f172a] p-4 rounded-xl border border-slate-700/50 flex flex-col items-center gap-3 hover:border-[#742284]/50 hover:bg-[#742284]/10 transition-all group cursor-default">
-                      <div className="w-12 h-12 rounded-xl bg-[#742284] flex items-center justify-center shadow-lg shadow-purple-900/20 group-hover:scale-110 transition-transform duration-300">
+                    <div className="bg-[#0f172a] p-3 sm:p-4 rounded-xl border border-slate-700/50 flex flex-col items-center gap-2 sm:gap-3 hover:border-[#742284]/50 hover:bg-[#742284]/10 transition-all group cursor-default">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#742284] flex items-center justify-center shadow-lg shadow-purple-900/20 group-hover:scale-110 transition-transform duration-300">
                         {/* CSS Yape Logo Simulation */}
-                        <span className="font-black italic text-white text-[13px] tracking-tighter transform -rotate-2">Yape</span>
+                        <span className="font-black italic text-white text-[10px] sm:text-[13px] tracking-tighter transform -rotate-2">Yape</span>
                       </div>
-                      <span className="font-bold text-xs text-slate-300 group-hover:text-white transition-colors">Yape</span>
+                      <span className="font-bold text-[10px] sm:text-xs text-slate-300 group-hover:text-white transition-colors">Yape</span>
                     </div>
 
                     {/* PLIN CARD */}
-                    <div className="bg-[#0f172a] p-4 rounded-xl border border-slate-700/50 flex flex-col items-center gap-3 hover:border-[#00D1D1]/50 hover:bg-[#00D1D1]/10 transition-all group cursor-default">
-                      <div className="w-12 h-12 rounded-xl bg-[#00D1D1] flex items-center justify-center shadow-lg shadow-cyan-900/20 group-hover:scale-110 transition-transform duration-300">
+                    <div className="bg-[#0f172a] p-3 sm:p-4 rounded-xl border border-slate-700/50 flex flex-col items-center gap-2 sm:gap-3 hover:border-[#00D1D1]/50 hover:bg-[#00D1D1]/10 transition-all group cursor-default">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#00D1D1] flex items-center justify-center shadow-lg shadow-cyan-900/20 group-hover:scale-110 transition-transform duration-300">
                         {/* CSS Plin Logo Simulation */}
-                        <span className="font-bold text-white text-[13px] tracking-tight">Plin</span>
+                        <span className="font-bold text-white text-[10px] sm:text-[13px] tracking-tight">Plin</span>
                       </div>
-                      <span className="font-bold text-xs text-slate-300 group-hover:text-white transition-colors">Plin</span>
+                      <span className="font-bold text-[10px] sm:text-xs text-slate-300 group-hover:text-white transition-colors">Plin</span>
                     </div>
 
                     {/* TRANSFER CARD */}
-                    <div className="col-span-2 bg-[#0f172a] p-4 rounded-xl border border-slate-700/50 flex items-center justify-center gap-2 hover:border-primary/50 transition-all cursor-default">
-                      <span className="font-bold text-xs text-slate-400">Transferencia BCP / Interbank</span>
+                    <div className="col-span-2 bg-[#0f172a] p-3 sm:p-4 rounded-xl border border-slate-700/50 flex items-center justify-center gap-2 hover:border-primary/50 transition-all cursor-default">
+                      <span className="font-bold text-[10px] sm:text-xs text-slate-400">Transferencia BCP / Interbank</span>
                     </div>
                   </div>
                 </div>
@@ -453,8 +453,8 @@ export default function Landing() {
       </section>
 
       {/* --- FAQ --- */}
-      <section className="py-20 px-4 max-w-3xl mx-auto">
-        <h2 className="text-3xl font-bold text-center mb-12">Preguntas Frecuentes</h2>
+      <section className="py-16 lg:py-20 px-4 max-w-3xl mx-auto">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12">Preguntas Frecuentes</h2>
         <Accordion type="single" collapsible className="w-full">
           {[
             {
@@ -475,8 +475,8 @@ export default function Landing() {
             }
           ].map((faq, i) => (
             <AccordionItem key={i} value={`item-${i}`}>
-              <AccordionTrigger className="text-lg font-medium">{faq.q}</AccordionTrigger>
-              <AccordionContent className="text-muted-foreground text-base">
+              <AccordionTrigger className="text-base sm:text-lg font-medium text-left">{faq.q}</AccordionTrigger>
+              <AccordionContent className="text-muted-foreground text-sm sm:text-base">
                 {faq.a}
               </AccordionContent>
             </AccordionItem>
@@ -485,30 +485,30 @@ export default function Landing() {
       </section>
 
       {/* --- CTA BOTTOM --- */}
-      <section className="py-20 px-4">
+      <section className="py-16 sm:py-20 px-4">
         <div className="container mx-auto max-w-5xl">
-          <div className="relative rounded-[3rem] bg-slate-900 overflow-hidden px-8 py-16 md:p-20 text-center shadow-2xl">
+          <div className="relative rounded-[2rem] sm:rounded-[3rem] bg-slate-900 overflow-hidden px-6 py-12 sm:px-8 sm:py-16 md:p-20 text-center shadow-2xl">
             <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(68,68,68,.2)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] bg-[position:-100%_0,0_0] bg-no-repeat animate-[shine_3s_infinite]" />
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[100px]" />
 
-            <h2 className="text-3xl md:text-5xl font-black text-white mb-6 relative z-10">
+            <h2 className="text-3xl md:text-5xl font-black text-white mb-6 relative z-10 text-balance">
               Deja de perder ventas hoy mismo
             </h2>
-            <p className="text-slate-400 text-lg mb-10 max-w-2xl mx-auto relative z-10">
+            <p className="text-slate-400 text-base sm:text-lg mb-8 sm:mb-10 max-w-2xl mx-auto relative z-10 text-pretty">
               Tu competencia ya está automatizando. Adelántate y captura esos leads antes que ellos.
             </p>
-            <Link to="/register" className="relative z-10">
-              <Button size="xl" className="btn-iridescent text-white hover:scale-105 font-bold h-16 px-12 text-lg shadow-xl hover:shadow-2xl transition-all border-none">
+            <Link to="/register" className="relative z-10 w-full sm:w-auto block sm:inline-block">
+              <Button size="xl" className="btn-iridescent text-white hover:scale-105 font-bold h-14 sm:h-16 px-8 sm:px-12 text-base sm:text-lg shadow-xl hover:shadow-2xl transition-all border-none w-full sm:w-auto">
                 Crear Cuenta Gratis
               </Button>
             </Link>
-            <p className="text-slate-500 text-sm mt-6 relative z-10">Hecho en Lima, Perú 🇵🇪</p>
+            <p className="text-slate-500 text-xs sm:text-sm mt-6 relative z-10">Hecho en Lima, Perú 🇵🇪</p>
           </div>
         </div>
       </section>
 
       {/* --- FOOTER --- */}
-      <footer className="py-12 border-t bg-muted/10">
+      <footer className="py-8 sm:py-12 border-t bg-muted/10">
         <div className="container mx-auto text-center text-muted-foreground">
           <div className="flex items-center justify-center gap-2 mb-4">
             <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
