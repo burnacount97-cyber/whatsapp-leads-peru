@@ -85,13 +85,7 @@ export default function SuperAdmin() {
   const [editingClient, setEditingClient] = useState<Profile | null>(null);
   const [editForm, setEditForm] = useState({ business_name: '', phone: '', email: '' });
 
-  // System Announcements State
-  const [announcement, setAnnouncement] = useState({
-    id: '',
-    content: '',
-    type: 'info' as 'info' | 'warning' | 'error' | 'success',
-    is_active: false
-  });
+
 
   // Stats
   const [stats, setStats] = useState({
@@ -170,12 +164,7 @@ export default function SuperAdmin() {
       setStats(prev => ({ ...prev, totalViews }));
     });
 
-    // Real-time Announcements
-    const unsubAnnounce = onSnapshot(query(collection(db, 'system_announcements'), orderBy('updated_at', 'desc'), limit(1)), (snapshot) => {
-      if (!snapshot.empty) {
-        setAnnouncement({ id: snapshot.docs[0].id, ...snapshot.docs[0].data() } as any);
-      }
-    });
+
 
     setLoading(false);
 
@@ -184,7 +173,6 @@ export default function SuperAdmin() {
       unsubPayments();
       unsubLeads();
       unsubAnalytics();
-      unsubAnnounce();
     };
   }, [user]);
 
@@ -316,33 +304,7 @@ export default function SuperAdmin() {
     client.business_name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const saveAnnouncement = async () => {
-    setLoading(true);
-    try {
-      const data = {
-        content: announcement.content,
-        type: announcement.type,
-        is_active: announcement.is_active,
-        updated_at: new Date().toISOString()
-      };
 
-      if (announcement.id) {
-        await updateDoc(doc(db, 'system_announcements', announcement.id), data);
-      } else {
-        const ref = doc(collection(db, 'system_announcements')); // auto-id
-        await setDoc(ref, data);
-      }
-
-      toast({
-        title: 'Aviso actualizado',
-        description: 'Todos los clientes verán el nuevo mensaje en su dashboard.',
-      });
-    } catch (error: any) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSignOut = async () => {
     try {
@@ -459,10 +421,7 @@ export default function SuperAdmin() {
               <BarChart3 className="w-4 h-4" />
               Analytics
             </TabsTrigger>
-            <TabsTrigger value="avisos" className="gap-2">
-              <AlertCircle className="w-4 h-4" />
-              Avisos
-            </TabsTrigger>
+
           </TabsList>
 
           {/* Clients Tab */}
@@ -796,68 +755,6 @@ export default function SuperAdmin() {
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
-          {/* Announcements Tab */}
-          <TabsContent value="avisos">
-            <Card>
-              <CardHeader>
-                <CardTitle>Avisos del Sistema</CardTitle>
-                <CardDescription>Publica mensajes globales que aparecerán en el dashboard de todos los clientes.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="announcement-content">Contenido del Mensaje</Label>
-                    <textarea
-                      id="announcement-content"
-                      className="w-full min-h-[100px] p-4 rounded-xl border bg-background"
-                      placeholder="Ej: Mantenimiento programado para las 10 PM. Toma tus precauciones."
-                      value={announcement.content}
-                      onChange={(e) => setAnnouncement({ ...announcement, content: e.target.value })}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label>Tipo de Alerta</Label>
-                      <div className="flex flex-wrap gap-2">
-                        {['info', 'warning', 'error', 'success'].map((t) => (
-                          <button
-                            key={t}
-                            onClick={() => setAnnouncement({ ...announcement, type: t as any })}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium border transition-all ${announcement.type === t
-                              ? 'bg-primary text-primary-foreground border-primary'
-                              : 'bg-background hover:bg-muted'
-                              }`}
-                          >
-                            {t.charAt(0).toUpperCase() + t.slice(1)}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Estado</Label>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setAnnouncement({ ...announcement, is_active: !announcement.is_active })}
-                          className={`w-12 h-6 rounded-full transition-colors relative ${announcement.is_active ? 'bg-primary' : 'bg-muted'}`}
-                        >
-                          <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${announcement.is_active ? 'translate-x-6' : ''}`} />
-                        </button>
-                        <span className="text-sm font-medium">
-                          {announcement.is_active ? 'Activo (Visible)' : 'Inactivo (Oculto)'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <Button onClick={saveAnnouncement} disabled={loading} className="w-full">
-                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Guardar Aviso'}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
 
