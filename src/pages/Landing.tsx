@@ -87,7 +87,7 @@ export default function Landing() {
             <div className="flex items-center gap-2 pl-2 border-l border-border">
               <ModeToggle />
               <Link to="/register">
-                <Button className="font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all bg-[linear-gradient(110deg,hsl(var(--primary)),45%,#6ee7b7,55%,hsl(var(--primary)))] bg-[length:200%_100%] animate-shine text-primary-foreground border-none">
+                <Button className="font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all btn-iridescent text-white">
                   Probar Gratis <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
@@ -159,7 +159,7 @@ export default function Landing() {
 
               <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
                 <Link to="/register" className="w-full sm:w-auto">
-                  <Button size="xl" className="w-full sm:w-auto text-lg font-bold h-14 px-8 shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-1 transition-all bg-[linear-gradient(110deg,hsl(var(--primary)),45%,#6ee7b7,55%,hsl(var(--primary)))] bg-[length:200%_100%] animate-shine text-primary-foreground border-none">
+                  <Button size="xl" className="w-full sm:w-auto text-lg font-bold h-14 px-8 shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-1 transition-all btn-iridescent text-white">
                     Empezar Gratis
                   </Button>
                 </Link>
@@ -412,7 +412,7 @@ export default function Landing() {
                   </div>
 
                   <Link to="/register">
-                    <Button size="xl" className="w-full font-bold text-lg h-14 bg-[linear-gradient(110deg,hsl(var(--primary)),45%,#6ee7b7,55%,hsl(var(--primary)))] bg-[length:200%_100%] animate-shine text-primary-foreground border-none shadow-xl shadow-primary/20">
+                    <Button size="xl" className="w-full font-bold text-lg h-14 btn-iridescent text-white shadow-xl shadow-primary/20">
                       Comenzar Prueba Gratis
                     </Button>
                   </Link>
@@ -498,7 +498,7 @@ export default function Landing() {
               Tu competencia ya está automatizando. Adelántate y captura esos leads antes que ellos.
             </p>
             <Link to="/register" className="relative z-10">
-              <Button size="xl" className="bg-[linear-gradient(110deg,#ffffff,45%,#cbd5e1,55%,#ffffff)] bg-[length:200%_100%] animate-shine text-slate-900 hover:scale-105 font-bold h-16 px-12 text-lg shadow-xl hover:shadow-2xl transition-all border-none">
+              <Button size="xl" className="btn-iridescent text-white hover:scale-105 font-bold h-16 px-12 text-lg shadow-xl hover:shadow-2xl transition-all border-none">
                 Crear Cuenta Gratis
               </Button>
             </Link>
@@ -533,7 +533,7 @@ export default function Landing() {
               </div>
               <h3 className="text-2xl font-bold">¡Espera un segundo!</h3>
               <p className="text-muted-foreground">¿Te vas sin probar cómo funciona? La demo es gratis y toma 1 minuto.</p>
-              <Button onClick={handleOpenDemoFromPopup} className="w-full font-bold bg-[linear-gradient(110deg,hsl(var(--primary)),45%,#6ee7b7,55%,hsl(var(--primary)))] bg-[length:200%_100%] animate-shine text-primary-foreground border-none" size="lg">Ver Demo Rápida</Button>
+              <Button onClick={handleOpenDemoFromPopup} className="w-full font-bold btn-iridescent text-white" size="lg">Ver Demo Rápida</Button>
               <button onClick={() => setShowExitPopup(false)} className="text-sm text-muted-foreground underline">No gracias, prefiero perder leads</button>
             </div>
           </div>
