@@ -1793,11 +1793,11 @@ export default function Dashboard() {
                               <span className="text-xs font-medium px-2 py-1 bg-slate-100 rounded text-slate-600 uppercase tracking-tighter">{p.payment_method || 'Varios'}</span>
                             </td>
                             <td className="py-4 px-6 text-right">
-                              <span className={`px-3 py-1 rounded-full text-xs font-bold ${p.status === 'completed' || p.status === 'active'
+                              <span className={`px-3 py-1 rounded-full text-xs font-bold ${['completed', 'active', 'verified'].includes(p.status)
                                 ? 'bg-green-100 text-green-700 border border-green-200'
                                 : 'bg-amber-100 text-amber-700 border border-amber-200'
                                 }`}>
-                                {p.status === 'completed' || p.status === 'active' ? '✓ Pagado' : '⏳ Pendiente'}
+                                {['completed', 'active', 'verified'].includes(p.status) ? '✓ Pagado' : '⏳ Pendiente'}
                               </span>
                             </td>
                           </tr>
