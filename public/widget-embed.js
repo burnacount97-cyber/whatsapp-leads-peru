@@ -144,12 +144,11 @@
           `Eres un asistente de ventas experto para ${config.businessName}. Tu objetivo es calificar al cliente y obtener sus datos clave para cerrar la venta.`;
 
         const dataCollectionRules = `
-        REGLAS DE RECOLECCIÓN DE DATOS:
-        1. Obtén el NOMBRE y los DETALLES del pedido/consulta.
-        2. UNA VEZ TENGAS LOS DATOS COMPLETOS, NO TRANSFIERAS AÚN.
-        3. DEBES PEDIR CONFIRMACIÓN: Haz un resumen y pregunta si quiere finalizar por WhatsApp.
-           Ejemplo: "Perfecto Juan, tengo tu pedido de Torta de Chocolate para el viernes. ¿Te paso con un asesor por WhatsApp para confirmar el pago?"
-        4. ESPERA la respuesta afirmativa del cliente ("Sí", "Ok", "Dale").
+        REGLAS DE RECOLECCIÓN DE DATOS (CRÍTICO):
+        1. Para cerrar una venta/cita, NECESITAS MÍNIMO: Nombre, Producto/Servicio Exacto, Fecha/Hora, y Dirección/Lugar (si aplica).
+        2. Si diste un precio, asegúrate de que el cliente esté de acuerdo.
+        3. NO TRANSFIERAS si faltan datos clave (especialmente dirección o fecha). Pregunta lo que falte amablemente.
+        4. Solo cuando tengas TODO COMPLETO, haz el resumen y pide confirmación para ir a WhatsApp.
         `;
 
         const redirectInstruction = `
@@ -195,7 +194,7 @@
           system: (config.business_description
             ? `CONTEXTO DEL NEGOCIO:\n${config.business_description}\n\nINSTRUCCIONES:\n${config.ai_system_prompt || `Eres un asistente de ventas experto para ${config.businessName}.`}`
             : (config.ai_system_prompt || `Eres un asistente de ventas experto para ${config.businessName}.`))
-            + `\n\nREGLAS: 1. Pide Nombre y Detalles. 2. Resume y PREGUNTA si quiere pasar a WhatsApp. 3. Si dice SÍ, usa el comando: [WHATSAPP_REDIRECT: Hola, soy (Nombre) y quiero (Resumen)].`,
+            + `\n\nREGLAS: 1. Pide Nombre, Dirección, Fecha y Detalles. 2. Resume y PREGUNTA si quiere pasar a WhatsApp. 3. SOLO si dice SÍ, y tienes TODOS los datos, usa el comando: [WHATSAPP_REDIRECT: Hola, soy (Nombre) y quiero (Resumen Completo)].`,
           messages: [{ role: 'user', content: userMessage }]
         });
       } else {
