@@ -1382,6 +1382,22 @@ export default function Dashboard() {
                   </p>
                 </div>
 
+                <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-sm space-y-3">
+                  <p className="font-semibold text-blue-800 dark:text-blue-300 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4" />
+                    Cómo hacer re-direcciones automáticas:
+                  </p>
+                  <p className="text-blue-700 dark:text-blue-400 text-xs">
+                    Instruye a la IA para que use el comando especial cuando haya recopilado todos los datos.
+                  </p>
+                  <div className="bg-background/80 p-3 rounded border border-blue-200 dark:border-blue-800 text-xs font-mono space-y-1 overflow-x-auto">
+                    <p className="text-muted-foreground">// Ejemplo de instrucción:</p>
+                    <p className="text-green-600 dark:text-green-400">"Pide Nombre, Fecha y Servicio. Cuando tengas todo, pregunta si quiere confirmar."</p>
+                    <p className="text-green-600 dark:text-green-400">"Si confirma, responde EXACTAMENTE así:"</p>
+                    <p className="text-primary font-bold">[WHATSAPP_REDIRECT: Juan Pérez quiere Cita Dental el Lunes]</p>
+                  </div>
+                </div>
+
                 {/* Save Button */}
                 <Button
                   onClick={async () => {
