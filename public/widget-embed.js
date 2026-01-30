@@ -244,6 +244,22 @@
     } catch (error) { console.error('LeadWidget: Error saving lead', error); }
   }
 
+  // Save Visit to Firestore (Lightweight)
+  async function saveVisitToFirestore() {
+    if (!config.clientId || config.clientId === 'demo_client_id') return;
+    try {
+      const url = `https://firestore.googleapis.com/v1/projects/${config.projectId}/databases/(default)/documents/visits?key=${config.apiKey}`;
+      const payload = {
+        fields: {
+          client_id: { stringValue: config.clientId },
+          source: { stringValue: 'website_widget' },
+          timestamp: { timestampValue: new Date().toISOString() }
+        }
+      };
+      fetch(url, { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' } });
+    } catch (error) { console.error('LeadWidget: Error logging visit', error); }
+  }
+
   // Adjust color brightness
   function adjustColor(color, amount) {
     if (!color) return '#000000';
@@ -558,7 +574,10 @@
       isLoading = true;
       renderMessages();
 
-      // Initial save removed to prevent database clutter. Only converting leads are saved.
+      // Save visit (First interaction only) for Analytics
+      if (messages.filter(m => m.role === 'user').length === 1) {
+        saveVisitToFirestore();
+      }
 
       // Get AI response
       let response;
@@ -605,7 +624,8 @@
         }
 
         // Save with extracted info
-        saveLeadToFirestore(leadName, config.whatsappDestination, waRedirectData);
+        // Use 'Clic en WhatsApp' as marker since we don't have user's phone yet (they are just going to WA)
+        saveLeadToFirestore(leadName, 'Clic en WhatsApp', waRedirectData);
 
         setTimeout(() => {
           const cleanDest = config.whatsappDestination.replace(/\D/g, '');

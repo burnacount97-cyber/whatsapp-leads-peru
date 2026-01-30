@@ -1486,15 +1486,26 @@ export default function Dashboard() {
                           <tr key={lead.id} className="border-b hover:bg-muted/50 transition-colors">
                             <td className="py-4 px-4 font-medium">{lead.name}</td>
                             <td className="py-4 px-4 font-mono text-xs">
-                              {lead.phone === 'Pendiente (Click WA)' ? (
-                                <span className="text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100">Pendiente WA</span>
+                              {(lead.phone === 'Clic en WhatsApp' || lead.phone === 'Usuario WhatsApp') ? (
+                                <span className="flex items-center gap-1 text-green-600 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-full border border-green-200 dark:border-green-800 w-fit font-sans font-medium">
+                                  <MessageCircle className="w-3 h-3" /> Chat Iniciado
+                                </span>
+                              ) : lead.phone === 'Pendiente (Click WA)' ? (
+                                <span className="text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100">Pendiente</span>
                               ) : (
                                 <a href={`https://wa.me/${lead.phone.replace(/\D/g, '')}`} target="_blank" className="text-primary hover:underline">{lead.phone}</a>
                               )}
                             </td>
                             <td className="py-4 px-4 text-muted-foreground truncate max-w-[200px]">{lead.interest || '-'}</td>
-                            <td className="py-4 px-4 text-muted-foreground">
-                              {new Date(lead.created_at).toLocaleString('es-PE')}
+                            <td className="py-4 px-4 text-muted-foreground text-xs">
+                              {(() => {
+                                const d = lead.created_at;
+                                if (!d) return '-';
+                                // Handle Firestore Timestamp (seconds)
+                                if (d.seconds) return new Date(d.seconds * 1000).toLocaleString('es-PE');
+                                // Handle string ISO or Date
+                                return new Date(d).toLocaleString('es-PE');
+                              })()}
                             </td>
                           </tr>
                         ))}
