@@ -225,137 +225,139 @@ export function SalesWidget() {
     }
 
     return (
-        <div className={`fixed bottom-4 right-4 left-4 sm:left-auto sm:bottom-6 sm:right-6 w-auto sm:w-[360px] h-[70vh] max-h-[550px] sm:h-[500px] bg-white rounded-3xl shadow-2xl z-50 overflow-hidden border border-border flex flex-col font-sans animate-in slide-in-from-bottom-5 duration-300 ${isIdle ? 'animate-vibrate-subtle' : ''}`}>
-            {/* Header */}
-            <div className="p-4 flex items-center gap-3 text-white shadow-md" style={{ backgroundColor: config.primaryColor }}>
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center relative">
-                    <Bot className="w-6 h-6" />
-                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 rounded-full" style={{ borderColor: config.primaryColor }}></div>
-                </div>
-                <div>
-                    <h3 className="font-bold text-sm">{config.businessName}</h3>
-                    <p className="text-[10px] opacity-90 text-white/90">Responde al instante con IA</p>
-                </div>
-            </div>
-
-            {/* Chat Area */}
-            <div className="flex-1 bg-slate-50 overflow-y-auto p-4 space-y-4" ref={scrollRef}>
-                {messages.map((msg, idx) => (
-                    <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        {msg.role === 'system' ? (
-                            <div className="w-full text-center my-2 space-y-2 animate-in fade-in zoom-in-95 duration-300">
-                                <p className="text-xs text-slate-500 bg-slate-100 py-1 px-3 rounded-full inline-block">{msg.content}</p>
-                                {msg.actionUrl && (
-                                    <Button
-                                        onClick={() => window.open(msg.actionUrl, '_blank')}
-                                        className="bg-[#25D366] hover:bg-[#128C7E] text-white w-full gap-2 shadow-sm font-semibold h-12"
-                                    >
-                                        <MessageCircle className="w-4 h-4" />
-                                        Abrir WhatsApp Ahora
-                                    </Button>
-                                )}
-                            </div>
-                        ) : (
-                            <div
-                                className={`max-w-[85%] p-3 rounded-2xl text-sm shadow-sm ${msg.role === 'user'
-                                    ? 'text-white rounded-br-none'
-                                    : 'bg-white text-slate-800 border border-slate-100 rounded-bl-none'
-                                    }`}
-                                style={msg.role === 'user' ? { backgroundColor: config.primaryColor } : {}}
-                            >
-                                {msg.content}
-                            </div>
-                        )}
+        <div className="fixed bottom-4 right-4 left-4 sm:left-auto sm:bottom-6 sm:right-6 w-auto sm:w-[360px] z-50">
+            <div className={`relative h-[70vh] max-h-[550px] sm:h-[500px] bg-white rounded-3xl shadow-2xl overflow-hidden border border-border flex flex-col font-sans animate-in slide-in-from-bottom-5 duration-300 ${isIdle ? 'animate-vibrate-subtle' : ''}`}>
+                {/* Header */}
+                <div className="p-4 flex items-center gap-3 text-white shadow-md" style={{ backgroundColor: config.primaryColor }}>
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center relative">
+                        <Bot className="w-6 h-6" />
+                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 rounded-full" style={{ borderColor: config.primaryColor }}></div>
                     </div>
-                ))}
+                    <div>
+                        <h3 className="font-bold text-sm">{config.businessName}</h3>
+                        <p className="text-[10px] opacity-90 text-white/90">Responde al instante con IA</p>
+                    </div>
+                </div>
 
-                {/* Fake interaction hint */}
-                {(isLoading || (isIdle && messages.length === 1)) && (
-                    <div className="flex justify-start animate-pulse-subtle">
-                        <div className="bg-white p-3 rounded-2xl rounded-bl-none border border-slate-100 shadow-sm flex items-center gap-2">
-                            <div className="flex gap-1">
-                                <span className="w-1.5 h-1.5 rounded-full animate-bounce delay-0" style={{ backgroundColor: config.primaryColor }}></span>
-                                <span className="w-1.5 h-1.5 rounded-full animate-bounce delay-150" style={{ backgroundColor: config.primaryColor }}></span>
-                                <span className="w-1.5 h-1.5 rounded-full animate-bounce delay-300" style={{ backgroundColor: config.primaryColor }}></span>
+                {/* Chat Area */}
+                <div className="flex-1 bg-slate-50 overflow-y-auto p-4 space-y-4" ref={scrollRef}>
+                    {messages.map((msg, idx) => (
+                        <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                            {msg.role === 'system' ? (
+                                <div className="w-full text-center my-2 space-y-2 animate-in fade-in zoom-in-95 duration-300">
+                                    <p className="text-xs text-slate-500 bg-slate-100 py-1 px-3 rounded-full inline-block">{msg.content}</p>
+                                    {msg.actionUrl && (
+                                        <Button
+                                            onClick={() => window.open(msg.actionUrl, '_blank')}
+                                            className="bg-[#25D366] hover:bg-[#128C7E] text-white w-full gap-2 shadow-sm font-semibold h-12"
+                                        >
+                                            <MessageCircle className="w-4 h-4" />
+                                            Abrir WhatsApp Ahora
+                                        </Button>
+                                    )}
+                                </div>
+                            ) : (
+                                <div
+                                    className={`max-w-[85%] p-3 rounded-2xl text-sm shadow-sm ${msg.role === 'user'
+                                        ? 'text-white rounded-br-none'
+                                        : 'bg-white text-slate-800 border border-slate-100 rounded-bl-none'
+                                        }`}
+                                    style={msg.role === 'user' ? { backgroundColor: config.primaryColor } : {}}
+                                >
+                                    {msg.content}
+                                </div>
+                            )}
+                        </div>
+                    ))}
+
+                    {/* Fake interaction hint */}
+                    {(isLoading || (isIdle && messages.length === 1)) && (
+                        <div className="flex justify-start animate-pulse-subtle">
+                            <div className="bg-white p-3 rounded-2xl rounded-bl-none border border-slate-100 shadow-sm flex items-center gap-2">
+                                <div className="flex gap-1">
+                                    <span className="w-1.5 h-1.5 rounded-full animate-bounce delay-0" style={{ backgroundColor: config.primaryColor }}></span>
+                                    <span className="w-1.5 h-1.5 rounded-full animate-bounce delay-150" style={{ backgroundColor: config.primaryColor }}></span>
+                                    <span className="w-1.5 h-1.5 rounded-full animate-bounce delay-300" style={{ backgroundColor: config.primaryColor }}></span>
+                                </div>
+                                <span className="text-[10px] text-slate-400 font-medium">
+                                    {isLoading ? 'Escribiendo...' : 'El asistente tiene algo para ti...'}
+                                </span>
                             </div>
-                            <span className="text-[10px] text-slate-400 font-medium">
-                                {isLoading ? 'Escribiendo...' : 'El asistente tiene algo para ti...'}
+                        </div>
+                    )}
+                </div>
+
+                {/* Input Area */}
+                <div className="p-4 bg-white border-t border-slate-100 space-y-3">
+
+                    {/* Quick Actions */}
+                    {messages.length < 3 && (
+                        <div className="flex flex-wrap gap-2 mb-2">
+                            {config.quickReplies.map((text, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => {
+                                        setMessages(prev => [...prev, { role: 'user', content: text }]);
+                                        setInputText('');
+                                        handleSendMessage(text);
+                                    }}
+                                    className="text-[11px] bg-slate-100 hover:text-white text-slate-600 px-3 py-1.5 rounded-full transition-colors border border-slate-200"
+                                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = config.primaryColor; e.currentTarget.style.color = 'white'; }}
+                                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#f1f5f9'; e.currentTarget.style.color = '#475569'; }}
+                                >
+                                    {text}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
+                    {isIdle && messages.length === 1 && (
+                        <div className="text-center animate-bounce-subtle">
+                            <span className="text-[11px] bg-primary/10 text-primary px-3 py-1 rounded-full font-semibold border border-primary/20"
+                                style={{ backgroundColor: `${config.primaryColor}20`, color: config.primaryColor }}>
+                                ¿Tienes alguna duda sobre el servicio? ✨
                             </span>
                         </div>
-                    </div>
-                )}
-            </div>
-
-            {/* Input Area */}
-            <div className="p-4 bg-white border-t border-slate-100 space-y-3">
-
-                {/* Quick Actions */}
-                {messages.length < 3 && (
-                    <div className="flex flex-wrap gap-2 mb-2">
-                        {config.quickReplies.map((text, i) => (
-                            <button
-                                key={i}
-                                onClick={() => {
-                                    setMessages(prev => [...prev, { role: 'user', content: text }]);
-                                    setInputText('');
-                                    handleSendMessage(text);
-                                }}
-                                className="text-[11px] bg-slate-100 hover:text-white text-slate-600 px-3 py-1.5 rounded-full transition-colors border border-slate-200"
-                                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = config.primaryColor; e.currentTarget.style.color = 'white'; }}
-                                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#f1f5f9'; e.currentTarget.style.color = '#475569'; }}
-                            >
-                                {text}
-                            </button>
-                        ))}
-                    </div>
-                )}
-
-                {isIdle && messages.length === 1 && (
-                    <div className="text-center animate-bounce-subtle">
-                        <span className="text-[11px] bg-primary/10 text-primary px-3 py-1 rounded-full font-semibold border border-primary/20"
-                            style={{ backgroundColor: `${config.primaryColor}20`, color: config.primaryColor }}>
-                            ¿Tienes alguna duda sobre el servicio? ✨
-                        </span>
-                    </div>
-                )}
-                <form
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        handleSendMessage();
-                    }}
-                    className={`flex gap-2 transition-transform duration-500 ${isIdle ? 'scale-[1.02]' : ''}`}
-                >
-                    <Input
-                        value={inputText}
-                        onChange={(e) => setInputText(e.target.value)}
-                        onFocus={() => setIsIdle(false)}
-                        placeholder="Escribe tu consulta aquí..."
-                        className={`flex-1 bg-slate-50 text-slate-900 border-slate-200 focus-visible:ring-[#00C185] h-12 shadow-inner transition-all ${isIdle ? 'ring-2 ring-primary/30 border-primary/50' : ''}`}
-                        disabled={isLoading}
-                    />
-                    <Button
-                        type="submit"
-                        size="icon"
-                        className={`text-white shrink-0 h-12 w-12 shadow-lg transition-all ${isIdle ? 'animate-pulse' : ''}`}
-                        style={{ backgroundColor: config.primaryColor }}
-                        disabled={isLoading}
+                    )}
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            handleSendMessage();
+                        }}
+                        className={`flex gap-2 transition-transform duration-500 ${isIdle ? 'scale-[1.02]' : ''}`}
                     >
-                        <Send className="w-5 h-5" />
-                    </Button>
-                </form>
-                <div className="text-center flex justify-center items-center gap-1">
-                    <div className="w-1 h-1 rounded-full" style={{ backgroundColor: config.primaryColor }}></div>
-                    <p className="text-[9px] text-slate-400 font-medium uppercase tracking-wider">
-                        Atención 24/7 con Inteligencia Artificial
-                    </p>
-                    <div className="w-1 h-1 rounded-full" style={{ backgroundColor: config.primaryColor }}></div>
+                        <Input
+                            value={inputText}
+                            onChange={(e) => setInputText(e.target.value)}
+                            onFocus={() => setIsIdle(false)}
+                            placeholder="Escribe tu consulta aquí..."
+                            className={`flex-1 bg-slate-50 text-slate-900 border-slate-200 focus-visible:ring-[#00C185] h-12 shadow-inner transition-all ${isIdle ? 'ring-2 ring-primary/30 border-primary/50' : ''}`}
+                            disabled={isLoading}
+                        />
+                        <Button
+                            type="submit"
+                            size="icon"
+                            className={`text-white shrink-0 h-12 w-12 shadow-lg transition-all ${isIdle ? 'animate-pulse' : ''}`}
+                            style={{ backgroundColor: config.primaryColor }}
+                            disabled={isLoading}
+                        >
+                            <Send className="w-5 h-5" />
+                        </Button>
+                    </form>
+                    <div className="text-center flex justify-center items-center gap-1">
+                        <div className="w-1 h-1 rounded-full" style={{ backgroundColor: config.primaryColor }}></div>
+                        <p className="text-[9px] text-slate-400 font-medium uppercase tracking-wider">
+                            Atención 24/7 con Inteligencia Artificial
+                        </p>
+                        <div className="w-1 h-1 rounded-full" style={{ backgroundColor: config.primaryColor }}></div>
+                    </div>
                 </div>
             </div>
 
-            {/* Floating Close Button - Mobile Only */}
+            {/* Floating Close Button - Mobile Only - Outside overflow container */}
             <button
                 onClick={handleClose}
-                className="absolute -bottom-16 left-1/2 -translate-x-1/2 sm:hidden w-14 h-14 rounded-full bg-red-600 hover:bg-red-700 active:scale-95 transition-all flex items-center justify-center shadow-2xl border-4 border-white z-50"
+                className="absolute -bottom-12 left-1/2 -translate-x-1/2 sm:hidden w-14 h-14 rounded-full bg-red-600 hover:bg-red-700 active:scale-95 transition-all flex items-center justify-center shadow-2xl border-4 border-white z-50"
                 aria-label="Cerrar chat"
             >
                 <X className="w-6 h-6 text-white stroke-[3]" />
