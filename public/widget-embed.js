@@ -558,10 +558,7 @@
       isLoading = true;
       renderMessages();
 
-      // Save first message as lead interest
-      if (messages.filter(m => m.role === 'user').length === 1) {
-        saveLeadToFirestore('Visitante', 'Pendiente', userMessage);
-      }
+      // Initial save removed to prevent database clutter. Only converting leads are saved.
 
       // Get AI response
       let response;
@@ -595,9 +592,21 @@
       isLoading = false;
       messages.push({ role: 'assistant', content: response });
 
-      // Handle Auto-Redirect
+      // Handle Auto-Redirect & Save Lead
       if (waRedirectData && config.whatsappDestination) {
         console.log('LeadWidget: Auto-redirecting to WhatsApp with data:', waRedirectData);
+
+        // Save Qualified Lead to Firestore
+        let leadName = 'Lead Calificado';
+        // Try to extract name from the summary text (e.g. "Soy Juan...")
+        const nameMatch = waRedirectData.match(/soy\s+([A-Za-zÁ-Úá-úñÑ]+)/i) || waRedirectData.match(/nombre\s+es\s+([A-Za-zÁ-Úá-úñÑ]+)/i) || waRedirectData.match(/Cliente\s+([A-Za-zÁ-Úá-úñÑ]+)/i);
+        if (nameMatch) {
+          leadName = nameMatch[1];
+        }
+
+        // Save with extracted info
+        saveLeadToFirestore(leadName, config.whatsappDestination, waRedirectData);
+
         setTimeout(() => {
           const cleanDest = config.whatsappDestination.replace(/\D/g, '');
           const encodedMsg = encodeURIComponent(waRedirectData);
