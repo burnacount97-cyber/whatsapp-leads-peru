@@ -23,23 +23,47 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Message and widgetId are required' });
     }
 
-    // SECURITY: Check if IP is blocked
+    // --- 1. PRE-AI SECURITY FILTER (The Wall) ---
+    const forbiddenPatterns = [
+        /jailbreak/i, /dan mode/i, /ignore previous instructions/i,
+        /olvida tus reglas/i, /acting as/i, /simula ser/i,
+        /system prompt/i, /revela tu prompt/i, /developer mode/i
+    ];
+
+    const isAttack = forbiddenPatterns.some(pattern => pattern.test(message));
+
+    if (isAttack) {
+        console.log(`[Security] Static attack detected from IP: ${clientIp}. Blocking.`);
+        try {
+            await db.collection('blocked_ips').add({
+                widget_id: widgetId,
+                ip_address: clientIp,
+                reason: 'Static filter: Potential jailbreak detected',
+                created_at: new Date().toISOString()
+            });
+        } catch (e) { }
+
+        return res.status(403).json({
+            response: 'Tu comportamiento ha sido identificado como malicioso. Acceso restringido permanentemente.',
+            blocked: true
+        });
+    }
+
+    // --- 2. EXISTING IP BLOCK CHECK ---
     try {
         const blockedQuery = await db.collection('blocked_ips')
             .where('ip_address', '==', clientIp)
-            .where('widget_id', '==', widgetId)
             .limit(1)
             .get();
 
         if (!blockedQuery.empty) {
             return res.status(403).json({
-                response: "Tu acceso a este chat ha sido restringido por incumplir las normas de uso.",
+                response: "Tu acceso a este chat ha sido restringido por seguridad.",
                 blocked: true
             });
         }
     } catch (blockCheckError) {
         console.error('Block check error:', blockCheckError.message);
-        // Non-blocking: continue if check fails
     }
 
     try {
@@ -161,26 +185,31 @@ TU RESPUESTA DEBE SER ÚNICAMENTE ESTE JSON (Sin texto extra, sin disculpas):
         const aiResponse = completion.choices[0].message.content;
 
         // --- SAFE ENFORCEMENT ---
-        // 1. Check for BLOCK action
-        if (aiResponse.includes('block_user')) {
+        // 1. Check for BLOCK action or AI Red-Flags
+        const shouldBlock =
+            aiResponse.includes('block_user') ||
+            aiResponse.includes('Security Violation Detected') ||
+            // Detect model internal refusals that imply safety triggers
+            aiResponse.includes('no puedo ayudar con eso') ||
+            aiResponse.includes('I cannot help with that');
+
+        if (shouldBlock) {
             try {
-                const blockMatch = aiResponse.match(/\{"action":\s*"block_user"[^}]*\}/);
-                if (blockMatch) {
-                    // Permanent IP block for ALL widgets (including demo)
-                    const targetWidgetId = widgetId === 'demo-landing' ? 'demo-landing' : (dbWidgetConfig?.id || widgetId);
+                // Permanent IP block
+                const targetWidgetId = widgetId === 'demo-landing' ? 'demo-landing' : (dbWidgetConfig?.id || widgetId);
 
-                    await db.collection('blocked_ips').add({
-                        widget_id: targetWidgetId,
-                        ip_address: clientIp,
-                        reason: 'AI detected abuse',
-                        created_at: new Date().toISOString()
-                    });
+                await db.collection('blocked_ips').add({
+                    widget_id: targetWidgetId,
+                    ip_address: clientIp,
+                    reason: 'AI/System detected safety violation',
+                    ai_raw_response: aiResponse.substring(0, 100),
+                    created_at: new Date().toISOString()
+                });
 
-                    return res.status(200).json({
-                        response: "Esta conversación ha sido finalizada por incumplir las normas de uso. Tu acceso ha sido restringido.",
-                        blocked: true
-                    });
-                }
+                return res.status(200).json({
+                    response: "Esta conversación ha sido finalizada por seguridad. Tu acceso ha sido restringido permanentemente.",
+                    blocked: true
+                });
             } catch (e) { console.error('Block enforcement error:', e.message); }
         }
 
