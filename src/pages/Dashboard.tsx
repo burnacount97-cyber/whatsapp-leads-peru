@@ -1373,7 +1373,7 @@ export default function Dashboard() {
                     value={aiConfig.ai_system_prompt}
                     onChange={(e) => setAiConfig({ ...aiConfig, ai_system_prompt: e.target.value })}
                     rows={6}
-                    className="w-full p-3 text-sm border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full p-3 text-sm border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary bg-slate-50 text-slate-900 placeholder:text-slate-400"
                     placeholder="Instrucciones para el comportamiento de la IA..."
                   />
                   <p className="text-xs text-muted-foreground">
