@@ -389,21 +389,60 @@
 
       /* Exit intent popup */
       #lw-exit-overlay { 
-        position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000001; 
-        display: none; align-items: center; justify-content: center; padding: 20px;
-        animation: lw-fadeIn 0.3s ease-out;
+        position: fixed; inset: 0; 
+        background: rgba(15, 23, 42, 0.4); 
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 1000001; 
+        display: none; align-items: center; justify-content: center; padding: 24px;
+        animation: lw-fadeMask 0.4s ease-out;
       }
+      @keyframes lw-fadeMask { from { opacity: 0; } to { opacity: 1; } }
+      
       #lw-exit-popup { 
-        background: white; border-radius: 24px; padding: 32px; max-width: 400px; width: 100%; 
-        text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        animation: lw-popIn 0.4s ease-out;
+        background: white; border-radius: 32px; padding: 40px 32px; max-width: 420px; width: 100%; 
+        text-align: center; 
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        animation: lw-popReveal 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        overflow: hidden;
       }
-      @keyframes lw-popIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
-      #lw-exit-icon { width: 64px; height: 64px; background: ${config.primaryColor}15; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
-      #lw-exit-title { font-size: 24px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
-      #lw-exit-desc { font-size: 14px; color: #64748b; margin-bottom: 24px; line-height: 1.6; }
-      #lw-exit-cta { width: 100%; padding: 14px; background: ${config.primaryColor}; color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; font-size: 16px; }
-      #lw-exit-close { background: none; border: none; color: #94a3b8; font-size: 13px; cursor: pointer; margin-top: 16px; }
+      @keyframes lw-popReveal { 
+        from { opacity: 0; transform: scale(0.9) translateY(20px); } 
+        to { opacity: 1; transform: scale(1) translateY(0); } 
+      }
+      
+      #lw-exit-icon { 
+        width: 80px; height: 80px; 
+        background: ${config.primaryColor}10; 
+        color: ${config.primaryColor};
+        border-radius: 24px; display: flex; align-items: center; justify-content: center; 
+        margin: 0 auto 24px;
+        transform: rotate(-10deg);
+      }
+      #lw-exit-title { 
+        font-size: 28px; font-weight: 800; color: #0f172a; 
+        margin-bottom: 12px; line-height: 1.2;
+        letter-spacing: -0.02em;
+      }
+      #lw-exit-desc { 
+        font-size: 16px; color: #475569; margin-bottom: 32px; 
+        line-height: 1.6;
+      }
+      #lw-exit-cta { 
+        width: 100%; padding: 16px; 
+        background: ${config.primaryColor}; color: white; border: none; 
+        border-radius: 16px; font-weight: 700; cursor: pointer; font-size: 16px;
+        box-shadow: 0 10px 15px -3px ${config.primaryColor}40;
+        transition: all 0.2s;
+      }
+      #lw-exit-cta:hover { transform: translateY(-2px); box-shadow: 0 20px 25px -5px ${config.primaryColor}40; }
+      #lw-exit-close { 
+        background: none; border: none; color: #94a3b8; font-size: 14px; 
+        font-weight: 500; cursor: pointer; margin-top: 20px; transition: color 0.2s;
+      }
+      #lw-exit-close:hover { color: #64748b; }
     `;
 
     const html = `
