@@ -700,7 +700,11 @@
 
     // Exit intent handler
     function handleExitIntent(e) {
-      if (e.clientY <= 0 && !exitIntentShown && !isOpen && config.exitIntentEnabled) {
+      // Robust check for exit intent (mouse leaving viewport at the top)
+      const isExit = e.clientY <= 5 || (e.relatedTarget === null && e.clientY < 10);
+
+      if (isExit && !exitIntentShown && !isOpen && config.exitIntentEnabled) {
+        console.log('LeadWidget: Exit intent detected');
         exitIntentShown = true;
         exitOverlay.style.display = 'flex';
       }
@@ -725,8 +729,9 @@
     exitClose.addEventListener('click', () => { exitOverlay.style.display = 'none'; });
     exitOverlay.addEventListener('click', (e) => { if (e.target === exitOverlay) exitOverlay.style.display = 'none'; });
 
-    // Exit intent (desktop only)
+    // Exit intent (desktop only) - Use both mouseout and mouseleave for better coverage
     document.addEventListener('mouseout', handleExitIntent);
+    document.addEventListener('mouseleave', handleExitIntent);
 
     // Start vibration immediately
     startVibration();
