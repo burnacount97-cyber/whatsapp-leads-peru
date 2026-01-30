@@ -149,20 +149,20 @@
             ...conversationHistory,
             { role: 'user', content: userMessage }
           ],
-          temperature: aiConfig.ai_temperature || 0.7,
-          max_tokens: parseInt(aiConfig.ai_max_tokens) || 500
+          temperature: config.ai_temperature || 0.7,
+          max_tokens: parseInt(config.ai_max_tokens) || 500
         });
-      } else if (aiConfig.ai_provider === 'anthropic') {
+      } else if (config.ai_provider === 'anthropic') {
         apiUrl = 'https://api.anthropic.com/v1/messages';
         headers = {
           'Content-Type': 'application/json',
-          'x-api-key': aiConfig.ai_api_key,
+          'x-api-key': config.ai_api_key,
           'anthropic-version': '2023-06-01'
         };
         body = JSON.stringify({
-          model: aiConfig.ai_model || 'claude-3-haiku-20240307',
-          max_tokens: parseInt(aiConfig.ai_max_tokens) || 500,
-          system: aiConfig.ai_system_prompt || `Eres un asistente de ventas amable para ${config.businessName}.`,
+          model: config.ai_model || 'claude-3-haiku-20240307',
+          max_tokens: parseInt(config.ai_max_tokens) || 500,
+          system: config.ai_system_prompt || `Eres un asistente de ventas amable para ${config.businessName}.`,
           messages: [{ role: 'user', content: userMessage }]
         });
       } else {
