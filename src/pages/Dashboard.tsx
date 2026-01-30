@@ -411,34 +411,36 @@ export default function Dashboard() {
             }
 
             const chartDataRaw = days.map(day => ({ name: day, visitas: 0, leads: 0 }));
+            const todayKey = days[days.length - 1];
 
             const getDayKey = (ts: any) => {
-              if (!ts) return '';
-              let d;
-              if (ts?.seconds) d = new Date(ts.seconds * 1000); // Firestore Timestamp
-              else d = new Date(ts); // String or Date object
-
-              // Normalize date to current locale to match the 'days' array
-              return d.toLocaleDateString('es-PE', { weekday: 'short', day: 'numeric' });
+              if (!ts) return null;
+              try {
+                let d;
+                if (ts?.seconds) d = new Date(ts.seconds * 1000);
+                else d = new Date(ts);
+                if (isNaN(d.getTime())) return null;
+                return d.toLocaleDateString('es-PE', { weekday: 'short', day: 'numeric' });
+              } catch (e) { return null; }
             };
 
             // 1. Process visits
             visitsSnap.docs.forEach(doc => {
               const data = doc.data();
               const key = getDayKey(data.created_at);
-              const found = chartDataRaw.find(c => c.name === key);
+              // Fallback to today if timestamp is missing/invalid to keep totals consistent
+              const targetKey = key || todayKey;
+              const found = chartDataRaw.find(c => c.name === targetKey);
               if (found) found.visitas++;
             });
 
             // 2. Process leads and ensure they count as visits too
             leadsData.forEach((lead: any) => {
               const key = getDayKey(lead.created_at);
-              const found = chartDataRaw.find(c => c.name === key);
+              const targetKey = key || todayKey;
+              const found = chartDataRaw.find(c => c.name === targetKey);
               if (found) {
                 found.leads++;
-                // IMPORTANT: Every lead is also a visit. 
-                // If we don't have a record in 'visits' collection (old leads), 
-                // we must ensure 'visitas' is at least equal to 'leads'
                 if (found.visitas < found.leads) {
                   found.visitas = found.leads;
                 }
