@@ -152,15 +152,15 @@ export default function Landing() {
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] text-balance">
-                Convierte visitas en <br className="hidden lg:block" />
+                Ventas en Piloto <br className="hidden lg:block" />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-600 dark:to-emerald-400">
-                  Leads Reales
+                  Automático con IA
                 </span>
               </h1>
 
               <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto lg:mx-0 text-pretty">
-                El widget inteligente que detecta interés, captura datos y envía clientes calificados
-                <strong className="text-foreground"> directo a tu WhatsApp</strong>. Sin formularios aburridos.
+                El único widget que <strong className="text-foreground">cualifica, protege tus créditos</strong> y envía leads 100% listos para comprar
+                <strong className="text-foreground"> directo a tu WhatsApp</strong>.
               </p>
 
               <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start w-full sm:w-auto">
@@ -327,12 +327,12 @@ export default function Landing() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 relative z-10">
             {[
-              { icon: Zap, t: "Instalación Flash", d: "Copia y pega una línea de código. Funciona en WordPress, Shopify, Wix y plataformas propias.", color: "blue" },
-              { icon: Smartphone, t: "Mobile First", d: "Diseñado para sentirse nativo en celulares, donde ocurre el 80% de las ventas en Latinoamérica.", color: "emerald" },
-              { icon: BarChart3, t: "Analytics Pro", d: "Mide cuántas personas abren el chat y cuántas realmente te hablan para optimizar tu inversión.", color: "purple" },
-              { icon: Users, t: "Multi-Agente", d: "La IA responde por ti 24/7, escalando cientos de conversaciones simultáneas sin despeinarse.", color: "orange" },
-              { icon: Globe, t: "100% Personalizable", d: "Adapta colores, textos y personalidad de la IA para que coincida perfectamente con tu marca.", color: "pink" },
-              { icon: ShieldCheck, t: "Filtro de Calidad", d: "Filtra curiosos automáticamente. Solo te llegarán notificaciones de clientes con intención real.", color: "cyan" },
+              { icon: Bot, t: "IA Predictiva", d: "La IA no solo responde, cualifica al cliente detectando su urgencia y capacidad de compra antes de avisarte.", color: "emerald" },
+              { icon: Zap, t: "Auto-Redirección", d: "Elimina la fricción. La IA transfiere al cliente a WhatsApp con un resumen completo de su pedido automáticamente.", color: "blue" },
+              { icon: ShieldCheck, t: "Escudo Anti-Abuso", d: "Protección contra jailbreaks e inyecciones de prompt. Bloqueo de IP automático para salvar tus créditos.", color: "red" },
+              { icon: MousePointer2, t: "Triggers de Conversión", d: "Intención de salida, retraso de tiempo y vibración háptica sincronizada para capturar la atención.", color: "orange" },
+              { icon: BarChart3, t: "Dashboard en Tiempo Real", d: "Gestiona leads, visualiza analíticas detalladas y controla la seguridad de tus widgets desde un solo lugar.", color: "purple" },
+              { icon: Smartphone, t: "Optimización Móvil", d: "Diseñado para la experiencia de WhatsApp. Interfaz premium que parece parte de tu marca.", color: "pink" },
             ].map((f, i) => (
               <div key={i} className="group p-6 sm:p-8 rounded-3xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 hover:shadow-[0_0_30px_-10px_rgba(0,193,133,0.2)] transition-all duration-500">
                 <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500`}>
@@ -340,6 +340,116 @@ export default function Landing() {
                 </div>
                 <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 group-hover:text-primary transition-colors">{f.t}</h3>
                 <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">{f.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* --- SECURITY SHIELD SECTION --- */}
+      <section className="py-20 lg:py-32 px-4 bg-slate-950 relative overflow-hidden">
+        {/* Decorative Grid */}
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+
+        <div className="container mx-auto max-w-6xl relative z-10">
+          <div className="flex flex-col lg:flex-row items-center gap-16">
+            <div className="flex-1 text-center lg:text-left space-y-8">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/10 text-red-500 border border-red-500/20 text-sm font-bold">
+                <ShieldCheck className="w-4 h-4" /> SEGURIDAD DE GRADO MILITAR
+              </div>
+              <h2 className="text-4xl lg:text-6xl font-black text-white leading-tight">
+                Tu presupuesto <br />
+                <span className="text-red-500">está blindado</span>
+              </h2>
+              <p className="text-slate-400 text-lg sm:text-xl leading-relaxed max-w-xl mx-auto lg:mx-0">
+                No permitas que usuarios malintencionados agoten tu API Key con "jailbreaks" o spam. Nuestro motor de IA corta ataques antes de que te cuesten dinero.
+              </p>
+
+              <div className="grid sm:grid-cols-2 gap-4 text-left">
+                {[
+                  { t: "Filtro de Palabras Clave", d: "Detección inmediata de términos de ataque." },
+                  { t: "Bloqueo de IP Automático", d: "Un intento de hackeo = Adiós al acceso." },
+                  { t: "Análisis de Refusal", d: "Si la IA detecta peligro, bloquea la sesión." },
+                  { t: "Gestión en Dashboard", d: "Controla y desbloquea IPs manualmente." },
+                ].map((item, i) => (
+                  <div key={i} className="p-4 rounded-2xl bg-white/5 border border-white/10">
+                    <Check className="w-5 h-5 text-red-500 mb-2" />
+                    <h4 className="text-white font-bold text-sm mb-1">{item.t}</h4>
+                    <p className="text-slate-500 text-xs leading-relaxed">{item.d}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex-1 relative w-full max-w-md mx-auto">
+              {/* Security Shield Visual */}
+              <div className="relative aspect-square flex items-center justify-center">
+                <div className="absolute inset-0 bg-red-500/20 rounded-full blur-[120px] animate-pulse" />
+                <div className="relative w-72 h-72 lg:w-96 lg:h-96 border-2 border-red-500/30 rounded-full flex items-center justify-center animate-spin-slow">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-red-500 rounded-full shadow-[0_0_20px_rgba(239,68,68,0.5)]" />
+                  <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-8 h-8 bg-red-500 rounded-full shadow-[0_0_20px_rgba(239,68,68,0.5)]" />
+                </div>
+                <div className="absolute w-48 h-48 lg:w-64 lg:h-64 border border-white/10 rounded-full flex items-center justify-center animate-spin-reverse">
+                  <ShieldCheck className="w-24 h-24 lg:w-32 lg:h-32 text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.3)]" />
+                </div>
+                {/* Floating alert */}
+                <div className="absolute top-1/4 -right-10 bg-slate-900 border border-red-500/50 p-4 rounded-xl shadow-2xl animate-bounce-slow">
+                  <p className="text-red-500 font-bold text-xs">⚠️ ATENTADO BLOQUEADO</p>
+                  <p className="text-white text-[10px]">IP: 190.11.**.*.89 - Bloqueada</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- SALES FLOW SECTION --- */}
+      <section className="py-20 lg:py-32 bg-background relative overflow-hidden">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16 lg:mb-24">
+            <h2 className="text-4xl lg:text-5xl font-black mb-6">El flujo de venta <span className="text-primary">perfecto</span></h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">Así es como Lead Widget trabaja por ti mientras tú duermes o atiendes otros clientes.</p>
+          </div>
+
+          <div className="grid md:grid-cols-4 gap-8 relative">
+            {/* Connecting Line (Desktop) */}
+            <div className="hidden md:block absolute top-1/4 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-border to-transparent -z-10" />
+
+            {[
+              {
+                icon: MousePointer2,
+                t: "1. Activación",
+                d: "El widget detecta intención de salida o interés y aparece con un mensaje personalizado.",
+                badge: "Proactivo"
+              },
+              {
+                icon: Bot,
+                t: "2. Cualificación",
+                d: "La IA pregunta nombre, necesidad y datos clave. Si detecta un ataque, bloquea al usuario.",
+                badge: "Seguro"
+              },
+              {
+                icon: Sparkles,
+                t: "3. Resumen IA",
+                d: "La IA genera un resumen exacto de lo que el cliente quiere para que no pierdas tiempo.",
+                badge: "Eficiente"
+              },
+              {
+                icon: MessageCircle,
+                t: "4. Cierre en WA",
+                d: "Redirección automática a WhatsApp con todo el pedido listo. ¡Tú solo cierras el trato!",
+                badge: "Conversión"
+              }
+            ].map((step, i) => (
+              <div key={i} className="group flex flex-col items-center text-center p-6 rounded-3xl hover:bg-muted/50 transition-all duration-300">
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 shadow-lg shadow-primary/10 group-hover:scale-110 transition-transform">
+                  <step.icon className="w-8 h-8" />
+                </div>
+                <div className="inline-block px-2 py-1 rounded bg-primary/10 text-primary text-[10px] font-bold uppercase mb-3 tracking-widest">
+                  {step.badge}
+                </div>
+                <h3 className="text-xl font-bold mb-3">{step.t}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{step.d}</p>
               </div>
             ))}
           </div>
@@ -532,20 +642,20 @@ export default function Landing() {
           <Accordion type="single" collapsible className="w-full">
             {[
               {
-                q: "¿Necesito saber programar?",
-                a: "Para nada. Es tan simple como copiar y pegar. Te damos un video tutorial de 2 minutos."
+                q: "¿Cómo protege mis créditos de la IA?",
+                a: "Nuestro sistema tiene un motor de seguridad de doble capa. El primer filtro detiene intentos de jailbreak conocidos instantáneamente sin consultar a OpenAI. El segundo analiza las respuestas de la IA; si detecta una violación, bloquea la IP del usuario permanentemente."
               },
               {
-                q: "¿Qué pasa si se acaban mis 3 días gratis?",
-                a: "El widget se detiene automáticamente. No te cobraremos nada. Si te gustó, puedes activar tu plan por S/30."
+                q: "¿La redirección a WhatsApp es realmente automática?",
+                a: "Sí. Una vez que la IA cualifica al lead y obtiene su confirmación, el navegador abre WhatsApp automáticamente con un mensaje pre-llenado que contiene el nombre del cliente y su pedido. Tú no tienes que copiar ni pegar nada."
               },
               {
-                q: "¿Funciona en celulares?",
-                a: "Sí, el 85% del tráfico web en Perú es móvil. Nuestro widget está 100% optimizado para celulares."
+                q: "¿Qué pasa si bloqueo a un cliente por error?",
+                a: "En tu Dashboard tienes una pestaña de 'Seguridad' donde puedes ver el historial de IPs bloqueadas y el motivo. Con un solo click puedes desbloquear a cualquier usuario."
               },
               {
-                q: "¿Puedo cancelar cuando quiera?",
-                a: "Sí, no hay contratos forzosos. Pagas el mes y si no quieres renovar, simplemente no pagas el siguiente."
+                q: "¿Es compatible con mi sitio web?",
+                a: "Es 100% compatible. Solo necesitas copiar una línea de código <script> antes de cerrar el </body> de tu web. Funciona en WordPress (Elementor/Divi), Shopify, Wix, React y HTML puro."
               }
             ].map((faq, i) => (
               <AccordionItem key={i} value={`item-${i}`} className="border-white/10">
