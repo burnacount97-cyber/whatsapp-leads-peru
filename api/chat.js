@@ -164,7 +164,15 @@ TU RESPUESTA DEBE SER ÚNICAMENTE ESTE JSON (Sin texto extra, sin disculpas):
         const customSecurity = aiConfig.ai_security_prompt || '';
         const securityInstructions = `${baseSecurity}\n\n${customSecurity}`;
 
-        const fullSystemPrompt = (aiConfig.ai_system_prompt || 'Eres un asistente amable.') + "\n\nIMPORTANTE: Sé breve (2-3 oraciones).";
+        // Base instructions including redirect protocol
+        const redirectInstruction = `
+        PROTOCOL DE CIERRE (WHATSAPP):
+        Cuando tengas los datos del usuario (Nombre e interés) y el cliente confirme que quiere contactar, RESPONDE EXACTAMENTE CON ESTE COMANDO AL FINAL:
+        [WHATSAPP_REDIRECT: Hola, soy {NOMBRE} y me interesa {INTERES}]
+        `;
+
+        const businessContext = aiConfig.business_description ? `CONTEXTO DEL NEGOCIO:\n${aiConfig.business_description}\n\n` : '';
+        const fullSystemPrompt = businessContext + (aiConfig.ai_system_prompt || 'Eres un asistente amable.') + "\n\nIMPORTANTE: Sé breve (2-3 oraciones)." + redirectInstruction;
 
         const messages = [
             { role: 'system', content: fullSystemPrompt },
@@ -191,7 +199,10 @@ TU RESPUESTA DEBE SER ÚNICAMENTE ESTE JSON (Sin texto extra, sin disculpas):
             aiResponse.includes('Security Violation Detected') ||
             // Detect model internal refusals that imply safety triggers
             aiResponse.includes('no puedo ayudar con eso') ||
-            aiResponse.includes('I cannot help with that');
+            aiResponse.includes('no puedo cumplir con') ||
+            aiResponse.includes('no puedo proporcionar') ||
+            aiResponse.includes('I cannot help with that') ||
+            aiResponse.includes('I cannot fulfill this');
 
         if (shouldBlock) {
             try {

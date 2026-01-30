@@ -119,107 +119,53 @@
   }
 
   // Send message to AI - now uses config object directly
+  // Send message to AI - Now calls our secure backend to enforce security protocols
   async function sendToAI(userMessage) {
-    if (!config.ai_api_key) {
-      console.log('LeadWidget: No AI API key available in config');
-      return null; // Return null to indicate no AI
-    }
-
     try {
-      let apiUrl, headers, body;
-
-      if (config.ai_provider === 'openai') {
-        apiUrl = 'https://api.openai.com/v1/chat/completions';
-        headers = {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${config.ai_api_key}`
-        };
-
-        const conversationHistory = messages.filter(m => m.role !== 'system').map(m => ({
-          role: m.role === 'assistant' ? 'assistant' : 'user',
-          content: m.content
-        }));
-
-        let systemContent = config.ai_system_prompt ||
-          `Eres un asistente de ventas experto para ${config.businessName}. Tu objetivo es calificar al cliente y obtener sus datos clave para cerrar la venta.`;
-
-        const dataCollectionRules = `
-        REGLAS DE RECOLECCIÓN DE DATOS (CRÍTICO):
-        1. Para cerrar una venta/cita, NECESITAS MÍNIMO: Nombre, Producto/Servicio Exacto, Fecha/Hora, y Dirección/Lugar (si aplica).
-        2. Si diste un precio, asegúrate de que el cliente esté de acuerdo.
-        3. NO TRANSFIERAS si faltan datos clave (especialmente dirección o fecha). Pregunta lo que falte amablemente.
-        4. Solo cuando tengas TODO COMPLETO, haz el resumen y pide confirmación para ir a WhatsApp.
-        `;
-
-        const redirectInstruction = `
-        IMPORTANTE - PROTOCOLO DE TRANSFERENCIA FINAL:
-        SOLO cuando el cliente responda AFIRMATIVAMENTE (Sí, Ok, Claro) a tu pregunta de confirmación:
-        1. Di algo breve como "Excelente, te estoy transfiriendo ahora...".
-        2. EJECUTA OBLIGATORIAMENTE este comando al final, SUSTITUYENDO los datos:
-
-        [WHATSAPP_REDIRECT: Hola, soy {NOMBRE_REAL} y deseo {RESUMEN_PEDIDO}]
-        
-        ADVERTENCIA: NO escribas "(Nombre)" ni "(tu nombre)". Debes poner el nombre REAL que te dio el cliente.
-        
-        MAL: [WHATSAPP_REDIRECT: Hola, soy (Nombre) y quiero torta]
-        BIEN: [WHATSAPP_REDIRECT: Hola, soy Juan y quiero torta de chocolate]
-        `;
-
-        if (config.business_description) {
-          systemContent = `CONTEXTO DEL NEGOCIO:\n${config.business_description}\n\nINSTRUCCIONES:\n${systemContent}\n\n${dataCollectionRules}\n\n${redirectInstruction}`;
-        } else {
-          systemContent = `${systemContent}\n\n${dataCollectionRules}\n\n${redirectInstruction}`;
+      // Find our backend URL based on where the script is hosted
+      let backendUrl = '/api/chat';
+      const scripts = document.getElementsByTagName('script');
+      for (let s of scripts) {
+        if (s.src && s.src.includes('widget-embed.js')) {
+          const url = new URL(s.src);
+          backendUrl = `${url.origin}/api/chat`;
+          break;
         }
-
-        body = JSON.stringify({
-          model: config.ai_model || 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: systemContent },
-            ...conversationHistory,
-            { role: 'user', content: userMessage }
-          ],
-          temperature: config.ai_temperature || 0.7,
-          max_tokens: parseInt(config.ai_max_tokens) || 500
-        });
-      } else if (config.ai_provider === 'anthropic') {
-        apiUrl = 'https://api.anthropic.com/v1/messages';
-        headers = {
-          'Content-Type': 'application/json',
-          'x-api-key': config.ai_api_key,
-          'anthropic-version': '2023-06-01'
-        };
-        body = JSON.stringify({
-          model: config.ai_model || 'claude-3-haiku-20240307',
-          max_tokens: parseInt(config.ai_max_tokens) || 500,
-
-          system: (config.business_description
-            ? `CONTEXTO DEL NEGOCIO:\n${config.business_description}\n\nINSTRUCCIONES:\n${config.ai_system_prompt || `Eres un asistente de ventas experto para ${config.businessName}.`}`
-            : (config.ai_system_prompt || `Eres un asistente de ventas experto para ${config.businessName}.`))
-            + `\n\nREGLAS: 1. Pide Nombre, Dirección, Fecha y Detalles. 2. Resume y PREGUNTA si quiere pasar a WhatsApp. 3. SOLO si dice SÍ, y tienes TODOS los datos, usa el comando: [WHATSAPP_REDIRECT: Hola, soy (Nombre) y quiero (Resumen Completo)].`,
-          messages: [{ role: 'user', content: userMessage }]
-        });
-      } else {
-        return "Proveedor de IA no soportado.";
       }
 
-      console.log('LeadWidget: Sending to AI...');
-      const response = await fetch(apiUrl, { method: 'POST', headers, body });
+      console.log('LeadWidget: Connecting to secure backend:', backendUrl);
+
+      const conversationHistory = messages.filter(m => m.role !== 'system').map(m => ({
+        role: m.role === 'assistant' ? 'assistant' : 'user',
+        content: m.content
+      }));
+
+      const response = await fetch(backendUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: userMessage,
+          history: conversationHistory,
+          widgetId: config.clientId
+        })
+      });
+
       const data = await response.json();
-      console.log('LeadWidget: AI response received');
+
+      if (response.status === 403 || data.blocked) {
+        console.warn('LeadWidget: User is blocked');
+        return data.response || "Tu acceso ha sido restringido por seguridad.";
+      }
 
       if (data.error) {
-        console.error('LeadWidget: AI API Error', data.error);
-        return `Error: ${data.error.message || 'Error de la API'}`;
+        console.error('LeadWidget: Backend Error', data.error);
+        return `Error: ${data.error}`;
       }
 
-      if (config.ai_provider === 'openai') {
-        return data.choices?.[0]?.message?.content || "No pude procesar tu mensaje.";
-      } else if (config.ai_provider === 'anthropic') {
-        return data.content?.[0]?.text || "No pude procesar tu mensaje.";
-      }
+      return data.response || "No pude procesar tu mensaje.";
     } catch (error) {
-      console.error('LeadWidget: AI Error', error);
-      return "Hubo un error al procesar tu mensaje. ¿Te gustaría contactarnos por WhatsApp?";
+      console.error('LeadWidget: Connection Error', error);
+      return "Hubo un error de conexión. ¿Te gustaría contactarnos por WhatsApp?";
     }
   }
 
