@@ -61,6 +61,13 @@ service cloud.firestore {
       allow create: if true; // Public tracking
       allow delete: if isSuperAdmin();
     }
+
+    // Visits (New Analytics Tracking)
+    match /visits/{visitId} {
+      allow create: if true; // Public for widget tracking
+      allow read: if request.auth != null; // Dashboard can read
+      allow update, delete: if request.auth != null; // Manage visits if needed
+    }
     
     // Payments
     match /payments/{paymentId} {
