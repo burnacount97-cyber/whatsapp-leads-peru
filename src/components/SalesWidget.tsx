@@ -225,7 +225,7 @@ export function SalesWidget() {
     }
 
     return (
-        <div className={`fixed bottom-4 right-4 left-4 sm:left-auto sm:bottom-24 sm:right-6 w-auto sm:w-[360px] h-[75vh] sm:h-[500px] bg-white rounded-2xl shadow-2xl z-50 overflow-hidden border border-border flex flex-col font-sans animate-in slide-in-from-bottom-5 duration-300 ${isIdle ? 'animate-vibrate-subtle' : ''}`}>
+        <div className={`fixed bottom-4 right-4 left-4 sm:left-auto sm:bottom-6 sm:right-6 w-auto sm:w-[360px] h-[85vh] max-h-[600px] sm:h-[500px] bg-white rounded-3xl shadow-2xl z-50 overflow-hidden border border-border flex flex-col font-sans animate-in slide-in-from-bottom-5 duration-300 ${isIdle ? 'animate-vibrate-subtle' : ''}`}>
             {/* Header */}
             <div className="p-4 flex items-center justify-between text-white shadow-md" style={{ backgroundColor: config.primaryColor }}>
                 <div className="flex items-center gap-3">
@@ -356,6 +356,14 @@ export function SalesWidget() {
                     <div className="w-1 h-1 rounded-full" style={{ backgroundColor: config.primaryColor }}></div>
                 </div>
             </div>
+
+            {/* Floating Close Button - Mobile */}
+            <button
+                onClick={handleClose}
+                className="absolute -bottom-16 left-1/2 -translate-x-1/2 sm:hidden w-12 h-12 rounded-full bg-slate-900 hover:bg-slate-800 transition-all flex items-center justify-center shadow-lg border-2 border-white"
+            >
+                <X className="w-5 h-5 text-white" />
+            </button>
         </div>
     );
 }
