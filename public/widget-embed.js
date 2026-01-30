@@ -141,7 +141,14 @@
         }));
 
         let systemContent = config.ai_system_prompt ||
-          `Eres un asistente de ventas amable para ${config.businessName}. Tu objetivo es filtrar y pre-calificar a los clientes potenciales. Sé breve y eficiente.`;
+          `Eres un asistente de ventas experto para ${config.businessName}. Tu objetivo es calificar al cliente y obtener sus datos clave para cerrar la venta.`;
+
+        const dataCollectionRules = `
+        REGLAS DE RECOLECCIÓN DE DATOS:
+        1. OBLIGATORIO: Antes de transferir, debes obtener el NOMBRE del cliente simpáticamente.
+        2. OBLIGATORIO: Identifica qué producto/servicio necesita y detalles relevantes (fecha, dirección, modelo, etc).
+        3. PROHIBIDO: NO pidas el número de teléfono (se obtiene automático).
+        `;
 
         const redirectInstruction = `
         IMPORTANTE - PROTOCOLO DE TRANSFERENCIA:
@@ -152,9 +159,9 @@
         `;
 
         if (config.business_description) {
-          systemContent = `CONTEXTO DEL NEGOCIO:\n${config.business_description}\n\nINSTRUCCIONES:\n${systemContent}\n\n${redirectInstruction}`;
+          systemContent = `CONTEXTO DEL NEGOCIO:\n${config.business_description}\n\nINSTRUCCIONES:\n${systemContent}\n\n${dataCollectionRules}\n\n${redirectInstruction}`;
         } else {
-          systemContent = `${systemContent}\n\n${redirectInstruction}`;
+          systemContent = `${systemContent}\n\n${dataCollectionRules}\n\n${redirectInstruction}`;
         }
 
         body = JSON.stringify({
@@ -178,9 +185,9 @@
           model: config.ai_model || 'claude-3-haiku-20240307',
           max_tokens: parseInt(config.ai_max_tokens) || 500,
           system: (config.business_description
-            ? `CONTEXTO DEL NEGOCIO:\n${config.business_description}\n\nINSTRUCCIONES:\n${config.ai_system_prompt || `Eres un asistente de ventas amable para ${config.businessName}.`}`
-            : (config.ai_system_prompt || `Eres un asistente de ventas amable para ${config.businessName}.`))
-            + `\n\nIMPORTANTE: Cuando el cliente esté listo, NO preguntes por WhatsApp. Di "Transfiero tu caso" y usa el comando: [WHATSAPP_REDIRECT: Resumen].`,
+            ? `CONTEXTO DEL NEGOCIO:\n${config.business_description}\n\nINSTRUCCIONES:\n${config.ai_system_prompt || `Eres un asistente de ventas experto para ${config.businessName}.`}`
+            : (config.ai_system_prompt || `Eres un asistente de ventas experto para ${config.businessName}.`))
+            + `\n\nREGLAS: Pide NOMBRE y detalles del pedido. NO pidas teléfono. Cuando tengas los datos, di "Transfiero tu caso" y usa el comando: [WHATSAPP_REDIRECT: Resumen con Nombre].`,
           messages: [{ role: 'user', content: userMessage }]
         });
       } else {
