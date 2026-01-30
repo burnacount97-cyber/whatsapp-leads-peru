@@ -23,7 +23,6 @@
 
   // State
   let config = { ...defaultConfig };
-  let aiConfig = null;
   let messages = [];
   let isLoading = false;
   let isOpen = false;
@@ -82,6 +81,10 @@
           teaserMessages = fields.teaser_messages.stringValue.split('\n').filter(r => r.trim());
         }
 
+        // Extract AI configuration from widget_configs (since profiles has restricted access)
+        const aiApiKey = fields.ai_api_key?.stringValue || '';
+        console.log('LeadWidget: AI API Key found in widget_configs:', aiApiKey ? 'Yes (length: ' + aiApiKey.length + ')' : 'No');
+
         return {
           primaryColor: fields.primary_color?.stringValue || defaultConfig.primaryColor,
           businessName: fields.business_name?.stringValue || defaultConfig.businessName,
@@ -97,7 +100,15 @@
           exitIntentTitle: fields.exit_intent_title?.stringValue || defaultConfig.exitIntentTitle,
           exitIntentDescription: fields.exit_intent_description?.stringValue || defaultConfig.exitIntentDescription,
           exitIntentCta: fields.exit_intent_cta?.stringValue || defaultConfig.exitIntentCta,
-          clientId: clientId
+          clientId: clientId,
+          // AI Configuration (now stored in widget_configs for public access)
+          ai_enabled: fields.ai_enabled?.booleanValue === true,
+          ai_provider: fields.ai_provider?.stringValue || 'openai',
+          ai_api_key: aiApiKey,
+          ai_model: fields.ai_model?.stringValue || 'gpt-4o-mini',
+          ai_system_prompt: fields.ai_system_prompt?.stringValue || '',
+          ai_temperature: parseFloat(fields.ai_temperature?.doubleValue || fields.ai_temperature?.integerValue || 0.7),
+          ai_max_tokens: parseInt(fields.ai_max_tokens?.integerValue || fields.ai_max_tokens?.stringValue) || 500
         };
       }
     } catch (e) {
@@ -106,52 +117,21 @@
     return null;
   }
 
-  // Get AI config from profile
-  async function getAIConfig(clientId) {
-    if (!clientId) return null;
-
-    try {
-      const url = `https://firestore.googleapis.com/v1/projects/${defaultConfig.projectId}/databases/(default)/documents/profiles/${clientId}?key=${defaultConfig.apiKey}`;
-      const response = await fetch(url);
-      const data = await response.json();
-
-      console.log('LeadWidget: AI Config response', data);
-
-      if (data && data.fields) {
-        const aiKey = data.fields.ai_api_key?.stringValue || '';
-        console.log('LeadWidget: AI Key found:', aiKey ? 'Yes (length: ' + aiKey.length + ')' : 'No');
-
-        return {
-          ai_enabled: data.fields.ai_enabled?.booleanValue !== false,
-          ai_provider: data.fields.ai_provider?.stringValue || 'openai',
-          ai_api_key: aiKey,
-          ai_model: data.fields.ai_model?.stringValue || 'gpt-4o-mini',
-          ai_system_prompt: data.fields.ai_system_prompt?.stringValue || '',
-          ai_temperature: parseFloat(data.fields.ai_temperature?.doubleValue || data.fields.ai_temperature?.integerValue) || 0.7,
-          ai_max_tokens: parseInt(data.fields.ai_max_tokens?.integerValue || data.fields.ai_max_tokens?.stringValue) || 500
-        };
-      }
-    } catch (e) {
-      console.error('LeadWidget: Error fetching AI config', e);
-    }
-    return null;
-  }
-
-  // Send message to AI
+  // Send message to AI - now uses config object directly
   async function sendToAI(userMessage) {
-    if (!aiConfig || !aiConfig.ai_api_key) {
-      console.log('LeadWidget: No AI API key available');
+    if (!config.ai_api_key) {
+      console.log('LeadWidget: No AI API key available in config');
       return null; // Return null to indicate no AI
     }
 
     try {
       let apiUrl, headers, body;
 
-      if (aiConfig.ai_provider === 'openai') {
+      if (config.ai_provider === 'openai') {
         apiUrl = 'https://api.openai.com/v1/chat/completions';
         headers = {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${aiConfig.ai_api_key}`
+          'Authorization': `Bearer ${config.ai_api_key}`
         };
 
         const conversationHistory = messages.filter(m => m.role !== 'system').map(m => ({
@@ -159,11 +139,11 @@
           content: m.content
         }));
 
-        const systemPrompt = aiConfig.ai_system_prompt ||
+        const systemPrompt = config.ai_system_prompt ||
           `Eres un asistente de ventas amable para ${config.businessName}. Tu objetivo es ayudar a los clientes y capturar su información de contacto. Sé breve, amigable y útil. Si el cliente muestra interés, invítalo a continuar la conversación por WhatsApp.`;
 
         body = JSON.stringify({
-          model: aiConfig.ai_model || 'gpt-4o-mini',
+          model: config.ai_model || 'gpt-4o-mini',
           messages: [
             { role: 'system', content: systemPrompt },
             ...conversationHistory,
@@ -199,9 +179,9 @@
         return `Error: ${data.error.message || 'Error de la API'}`;
       }
 
-      if (aiConfig.ai_provider === 'openai') {
+      if (config.ai_provider === 'openai') {
         return data.choices?.[0]?.message?.content || "No pude procesar tu mensaje.";
-      } else if (aiConfig.ai_provider === 'anthropic') {
+      } else if (config.ai_provider === 'anthropic') {
         return data.content?.[0]?.text || "No pude procesar tu mensaje.";
       }
     } catch (error) {
@@ -731,16 +711,10 @@
 
       if (hasChanged) {
         Object.assign(config, newConfig);
-        console.log('LeadWidget: Config refreshed');
+        console.log('LeadWidget: Config refreshed (including AI config)');
         // Re-render widget with new config
         renderWidget();
       }
-    }
-
-    // Also refresh AI config
-    const newAiConfig = await getAIConfig(config.clientId);
-    if (newAiConfig) {
-      aiConfig = newAiConfig;
     }
   }
 
@@ -762,12 +736,7 @@
         console.log('LeadWidget: Loaded configuration for', config.businessName);
         console.log('LeadWidget: Teaser messages:', config.teaserMessages);
         console.log('LeadWidget: Vibration:', config.vibrationIntensity);
-      }
-
-      // Load AI config
-      aiConfig = await getAIConfig(clientId);
-      if (aiConfig) {
-        console.log('LeadWidget: AI Config loaded, API key present:', !!aiConfig.ai_api_key);
+        console.log('LeadWidget: AI Config loaded from widget_configs, API key present:', !!config.ai_api_key);
       }
     }
 

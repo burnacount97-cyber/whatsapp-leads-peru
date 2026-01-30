@@ -1385,11 +1385,23 @@ export default function Dashboard() {
                 {/* Save Button */}
                 <Button
                   onClick={async () => {
-                    if (!user) return;
+                    if (!user || !widgetConfig) return;
                     setSavingAI(true);
                     try {
+                      // Save to profiles (for dashboard access)
                       await updateDoc(doc(db, 'profiles', user.uid), {
-                        ai_enabled: true, // Force enabled on save
+                        ai_enabled: true,
+                        ai_provider: aiConfig.ai_provider,
+                        ai_api_key: aiConfig.ai_api_key,
+                        ai_model: aiConfig.ai_model,
+                        ai_temperature: aiConfig.ai_temperature,
+                        ai_max_tokens: aiConfig.ai_max_tokens,
+                        ai_system_prompt: aiConfig.ai_system_prompt,
+                      });
+
+                      // ALSO save to widget_configs (for embedded widget public access)
+                      await updateDoc(doc(db, 'widget_configs', widgetConfig.id), {
+                        ai_enabled: true,
                         ai_provider: aiConfig.ai_provider,
                         ai_api_key: aiConfig.ai_api_key,
                         ai_model: aiConfig.ai_model,
@@ -1820,7 +1832,7 @@ export default function Dashboard() {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </div >
   );
 }
 
