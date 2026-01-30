@@ -155,13 +155,14 @@
         IMPORTANTE - PROTOCOLO DE TRANSFERENCIA FINAL:
         SOLO cuando el cliente responda AFIRMATIVAMENTE (Sí, Ok, Claro) a tu pregunta de confirmación:
         1. Di algo breve como "Excelente, te estoy transfiriendo ahora...".
-        2. EJECUTA OBLIGATORIAMENTE este comando al final (sin él, la transferencia NO FUNCIONA):
+        2. EJECUTA OBLIGATORIAMENTE este comando al final, SUSTITUYENDO los datos:
 
-        [WHATSAPP_REDIRECT: Hola, soy (Nombre) y me interesa (Resumen del pedido/consulta)]
-
-        Ejemplo Correcto: [WHATSAPP_REDIRECT: Hola, soy Juan y quiero una Torta de Chocolate para el viernes]
+        [WHATSAPP_REDIRECT: Hola, soy {NOMBRE_REAL} y deseo {RESUMEN_PEDIDO}]
         
-        ADVERTENCIA CRÍTICA: Si olvidas imprimir el comando entre corchetes, el cliente nunca será transferido. Úsalo siempre al confirmar.
+        ADVERTENCIA: NO escribas "(Nombre)" ni "(tu nombre)". Debes poner el nombre REAL que te dio el cliente.
+        
+        MAL: [WHATSAPP_REDIRECT: Hola, soy (Nombre) y quiero torta]
+        BIEN: [WHATSAPP_REDIRECT: Hola, soy Juan y quiero torta de chocolate]
         `;
 
         if (config.business_description) {

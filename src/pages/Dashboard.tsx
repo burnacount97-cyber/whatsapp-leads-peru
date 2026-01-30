@@ -1393,11 +1393,11 @@ export default function Dashboard() {
                   <div className="bg-background/80 p-3 rounded border border-blue-200 dark:border-blue-800 text-xs font-mono space-y-1 overflow-x-auto">
                     <p className="text-muted-foreground">// Ejemplo de instrucción:</p>
                     <p className="text-green-600 dark:text-green-400">"Pide Nombre, Fecha y Servicio. Cuando tengas todo, pregunta si quiere confirmar."</p>
-                    <p className="text-green-600 dark:text-green-400">"Si confirma, responde EXACTAMENTE así (reemplazando con los datos reales):"</p>
-                    <p className="text-primary font-bold">[WHATSAPP_REDIRECT: Cliente (Nombre) quiere (Servicio) para el (Fecha)]</p>
+                    <p className="text-green-600 dark:text-green-400">"Si confirma, responde EXACTAMENTE así (sustituyendo los datos):"</p>
+                    <p className="text-primary font-bold">[WHATSAPP_REDIRECT: Cliente Juan Pérez quiere Cita Dental el Lunes]</p>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    * La IA sustituirá automáticamente (Nombre), (Servicio), etc. por lo que el cliente haya respondido.
+                    * La IA remplazará "Juan Pérez" por el nombre real del cliente actual.
                   </p>
                 </div>
 
