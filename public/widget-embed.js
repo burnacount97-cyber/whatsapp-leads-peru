@@ -156,12 +156,13 @@
         IMPORTANTE - PROTOCOLO DE TRANSFERENCIA FINAL:
         SOLO cuando el cliente responda AFIRMATIVAMENTE (Sí, Ok, Claro) a tu pregunta de confirmación:
         1. Di algo breve como "Excelente, te estoy transfiriendo ahora...".
-        2. EJECUTA el comando oculto con el resumen REAL:
+        2. EJECUTA OBLIGATORIAMENTE este comando al final (sin él, la transferencia NO FUNCIONA):
 
         [WHATSAPP_REDIRECT: Hola, soy (Nombre) y me interesa (Resumen del pedido/consulta)]
 
         Ejemplo Correcto: [WHATSAPP_REDIRECT: Hola, soy Juan y quiero una Torta de Chocolate para el viernes]
-        NO escribas "Resumen de datos", escribe los datos reales.
+        
+        ADVERTENCIA CRÍTICA: Si olvidas imprimir el comando entre corchetes, el cliente nunca será transferido. Úsalo siempre al confirmar.
         `;
 
         if (config.business_description) {
@@ -579,8 +580,8 @@
           response = `⚠️ El asistente de IA aún no está configurado.\n\nEl administrador debe configurar su API Key de OpenAI o Anthropic en el panel de control para activar las respuestas automáticas.`;
         }
       } else {
-        // Check for WhatsApp redirect command from AI
-        const redirectMatch = response.match(/\[WHATSAPP_REDIRECT:\s?(.*?)\]/s) || response.match(/\[WHATSAPP_REDIRECT:(.*?)\]/s);
+        // Check for WhatsApp redirect command from AI (Robust Regex)
+        const redirectMatch = response.match(/\[\s*WHATSAPP_REDIRECT\s*:\s*([\s\S]*?)\]/i);
 
         if (redirectMatch) {
           waRedirectData = redirectMatch[1].trim().replace(/^["']|["']$/g, '');
