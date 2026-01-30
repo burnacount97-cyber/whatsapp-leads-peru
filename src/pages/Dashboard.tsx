@@ -1077,17 +1077,17 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              {/* Preview - Hidden on mobile */}
-              <div className="hidden lg:block space-y-6 lg:sticky lg:top-24 h-fit">
+              {/* Preview - Responsive */}
+              <div className="space-y-4 sm:space-y-6 lg:sticky lg:top-24 h-fit">
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Vista Previa</CardTitle>
-                    <CardDescription>Así se verá tu widget en tu sitio web</CardDescription>
+                  <CardHeader className="pb-2 sm:pb-6">
+                    <CardTitle className="text-base sm:text-lg">Vista Previa</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">Así se verá tu widget en tu sitio web</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-6">
-                    {/* Widget Preview Container */}
-                    <div className="relative h-[500px] bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden p-6 flex justify-center items-center">
-                      <div className="w-[320px] h-[480px] shadow-2xl rounded-2xl overflow-hidden border border-slate-200 bg-white">
+                  <CardContent className="space-y-4 sm:space-y-6">
+                    {/* Widget Preview Container - Responsive */}
+                    <div className="relative h-[350px] sm:h-[500px] bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden p-2 sm:p-6 flex justify-center items-center">
+                      <div className="w-full max-w-[280px] sm:max-w-[320px] h-full max-h-[320px] sm:max-h-[480px] shadow-2xl rounded-2xl overflow-hidden border border-slate-200 bg-white transform scale-[0.85] sm:scale-100 origin-center">
                         <WidgetPreview
                           primaryColor={formConfig.primary_color}
                           welcomeMessage={formConfig.welcome_message}
