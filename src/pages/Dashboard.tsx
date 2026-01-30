@@ -981,26 +981,10 @@ export default function Dashboard() {
                         <Sparkles className="w-4 h-4" /> Modo Personalizado Activo
                       </h4>
                       <p className="text-xs text-blue-600 dark:text-blue-400">
-                        En este modo, la IA ignorará las plantillas predefinidas. Escribe abajo detalladamente qué vende tu negocio y cómo quieres que responda el asistente.
+                        Para configurar el comportamiento de tu asistente en modo personalizado, ve a la pestaña <strong>IA</strong> y completa la "Descripción del Negocio" y el "Prompt del Sistema".
                       </p>
                     </div>
                   )}
-
-                  {/* Replaced 'Pregunta de interés' with 'Descripción del Negocio' for AI */}
-                  <div className="space-y-2">
-                    <Label>
-                      {formConfig.template === 'personalizado'
-                        ? 'Instrucciones Personalizadas (Prompt)'
-                        : 'Descripción del Negocio (Contexto para la IA)'}
-                    </Label>
-                    <textarea
-                      value={formConfig.niche_question}
-                      onChange={(e) => setFormConfig({ ...formConfig, niche_question: e.target.value })}
-                      className="w-full p-3 text-sm border border-input rounded-md bg-background focus:ring-2 focus:ring-ring focus:outline-none min-h-[100px]"
-                      placeholder="Ej: Vendemos repuestos de autos Toyota y Nissan. Horario 9am-6pm. Hacemos delivery en Lima."
-                    />
-                    <p className="text-xs text-muted-foreground">Esta información ayudará a la IA a responder dudas básicas sobre tu negocio.</p>
-                  </div>
 
                   {/* Campos exclusivos para modo personalizado - REMOVED LEGACY FIELDS */}
 
