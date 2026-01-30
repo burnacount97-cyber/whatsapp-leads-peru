@@ -21,6 +21,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer
+} from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
@@ -153,6 +166,7 @@ export default function Dashboard() {
   const [uploading, setUploading] = useState(false);
   const [savingAI, setSavingAI] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
+  const [chartData, setChartData] = useState<any[]>([]);
 
   // PWA Install Prompt
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -383,9 +397,47 @@ export default function Dashboard() {
           const totalVisits = visitsSnap.size;
 
           setAnalytics({
-            views: totalVisits, // Usaremos visitas como "Vistas"
-            interactions: totalVisits // Y también como interacciones por ahora
+            views: totalVisits,
+            interactions: totalVisits
           });
+
+          // --- CHART DATA PROCESSING ---
+          try {
+            const days = [];
+            for (let i = 6; i >= 0; i--) {
+              const d = new Date();
+              d.setDate(d.getDate() - i);
+              days.push(d.toLocaleDateString('es-PE', { weekday: 'short', day: 'numeric' }));
+            }
+
+            const chartDataRaw = days.map(day => ({ name: day, visitas: 0, leads: 0 }));
+
+            const getDayKey = (ts: any) => {
+              if (!ts) return '';
+              let d;
+              if (ts?.seconds) d = new Date(ts.seconds * 1000); // Firestore Timestamp
+              else d = new Date(ts); // String or Date object
+              return d.toLocaleDateString('es-PE', { weekday: 'short', day: 'numeric' });
+            };
+
+            visitsSnap.docs.forEach(doc => {
+              const data = doc.data();
+              const key = getDayKey(data.created_at);
+              // Normalize keys by trimming/lowercase to ensure matches
+              const found = chartDataRaw.find(c => c.name === key);
+              if (found) found.visitas++;
+            });
+
+            leadsData.forEach((lead: any) => {
+              const key = getDayKey(lead.created_at);
+              const found = chartDataRaw.find(c => c.name === key);
+              if (found) found.leads++;
+            });
+
+            setChartData(chartDataRaw);
+          } catch (chartError) {
+            console.error('Error calculating chart data:', chartError);
+          }
 
 
 
@@ -1573,9 +1625,58 @@ export default function Dashboard() {
                 <CardDescription>Tráfico y captación en los últimos 7 días</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="h-64 flex flex-col items-center justify-center text-muted-foreground border-2 border-dashed rounded-xl">
-                  <BarChart3 className="w-12 h-12 opacity-10 mb-2" />
-                  <span className="text-sm">Gráfica detallada disponible próximamente</span>
+                <div className="h-64 w-full pt-4">
+                  {chartData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={chartData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.5} />
+                        <XAxis
+                          dataKey="name"
+                          fontSize={10}
+                          tickLine={false}
+                          axisLine={false}
+                          stroke="hsl(var(--muted-foreground))"
+                        />
+                        <YAxis
+                          fontSize={10}
+                          tickLine={false}
+                          axisLine={false}
+                          stroke="hsl(var(--muted-foreground))"
+                          allowDecimals={false}
+                        />
+                        <RechartsTooltip
+                          cursor={{ fill: 'hsl(var(--muted)/0.3)' }}
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--popover))',
+                            borderColor: 'hsl(var(--border))',
+                            borderRadius: '8px',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                            fontSize: '12px'
+                          }}
+                          itemStyle={{ color: 'hsl(var(--popover-foreground))' }}
+                          labelStyle={{ color: 'hsl(var(--muted-foreground))', marginBottom: '4px' }}
+                        />
+                        <Bar
+                          dataKey="visitas"
+                          fill="hsl(var(--secondary))"
+                          radius={[4, 4, 0, 0]}
+                          name="Visitas"
+                          maxBarSize={50}
+                        />
+                        <Bar
+                          dataKey="leads"
+                          fill="hsl(var(--primary))"
+                          radius={[4, 4, 0, 0]}
+                          name="Leads"
+                          maxBarSize={50}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-muted-foreground">
+                      <p>Cargando datos...</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
