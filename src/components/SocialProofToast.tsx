@@ -41,15 +41,16 @@ export function SocialProofToast() {
     return (
         <div
             className={cn(
-                "fixed left-1/2 -translate-x-1/2 sm:left-4 sm:translate-x-0 z-[60] transition-all duration-700 transform",
-                // Mobile: Top-Center (below header), Desktop: Bottom-Left
-                "top-20 sm:top-auto sm:bottom-4",
+                // Hidden on mobile, visible only on desktop (sm and up)
+                "hidden sm:block fixed left-4 z-40 transition-all duration-700 transform",
+                // Desktop: Bottom-Left position
+                "bottom-4",
                 isVisible
-                    ? "translate-y-0 opacity-100 scale-100"
-                    : "-translate-y-12 sm:-translate-x-12 sm:translate-y-0 opacity-0 scale-90"
+                    ? "translate-x-0 opacity-100 scale-100"
+                    : "-translate-x-12 opacity-0 scale-90"
             )}
         >
-            <div className="bg-white/80 dark:bg-slate-950/80 backdrop-blur-lg border border-primary/20 text-slate-900 dark:text-slate-100 pr-6 p-3 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] flex items-center gap-4 min-w-[280px] max-w-sm">
+            <div className="bg-white/90 dark:bg-slate-950/90 backdrop-blur-lg border border-primary/20 text-slate-900 dark:text-slate-100 pr-6 p-3 rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] flex items-center gap-4 min-w-[280px] max-w-sm">
 
                 {/* Icon Badge */}
                 <div className="relative">
@@ -79,3 +80,4 @@ export function SocialProofToast() {
         </div>
     )
 }
+
