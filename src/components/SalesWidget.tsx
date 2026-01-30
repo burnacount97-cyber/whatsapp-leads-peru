@@ -39,6 +39,7 @@ export function SalesWidget() {
     const [inputText, setInputText] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isIdle, setIsIdle] = useState(false);
+    const [isBlocked, setIsBlocked] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
     const idleTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -102,6 +103,25 @@ export function SalesWidget() {
             setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
             setInputText('');
         }
+
+        // 1. Client-side Security Filter (Static Wall)
+        const forbiddenPatterns = [
+            /jailbreak/i, /dan mode/i, /ignore (previous )?instructions/i,
+            /ignora (tus )?instrucciones/i, /ignora (mis )?instrucciones/i,
+            /olvida tus reglas/i, /acting as/i, /simula ser/i, /actúa como/i,
+            /system prompt/i, /revela tu prompt/i, /developer mode/i, /modo desarrollador/i
+        ];
+
+        if (forbiddenPatterns.some(pattern => pattern.test(userMsg))) {
+            setIsLoading(false);
+            setIsBlocked(true);
+            setMessages(prev => [...prev, {
+                role: 'assistant',
+                content: '🚫 Tu comportamiento ha sido identificado como malicioso. Acceso restringido permanentemente.'
+            }]);
+            return;
+        }
+
         setIsLoading(true);
 
         const currentHistory = messages.map(m => ({ role: m.role, content: m.content })).filter(m => m.role !== 'system');
@@ -119,6 +139,15 @@ export function SalesWidget() {
             });
 
             const data = await response.json();
+
+            if (data.blocked) {
+                setIsBlocked(true);
+                setMessages(prev => [...prev, {
+                    role: 'assistant',
+                    content: '🚫 Acceso bloqueado por violación de políticas de seguridad.'
+                }]);
+                return;
+            }
 
             if (data.error) throw new Error(data.error);
 
@@ -228,15 +257,25 @@ export function SalesWidget() {
         <div className="fixed bottom-4 right-4 left-4 sm:left-auto sm:bottom-6 sm:right-6 w-auto sm:w-[360px] z-50 pb-20 sm:pb-0">
             <div className={`relative h-[70vh] max-h-[550px] sm:h-[500px] bg-white rounded-3xl shadow-2xl overflow-hidden border border-border flex flex-col font-sans animate-in slide-in-from-bottom-5 duration-300 ${isIdle ? 'animate-vibrate-subtle' : ''}`}>
                 {/* Header */}
-                <div className="p-4 flex items-center gap-3 text-white shadow-md" style={{ backgroundColor: config.primaryColor }}>
-                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center relative">
-                        <Bot className="w-6 h-6" />
-                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 rounded-full" style={{ borderColor: config.primaryColor }}></div>
+                <div className="p-4 flex items-center justify-between text-white shadow-md" style={{ backgroundColor: config.primaryColor }}>
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center relative">
+                            <Bot className="w-6 h-6" />
+                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 rounded-full" style={{ borderColor: config.primaryColor }}></div>
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-sm">{config.businessName}</h3>
+                            <p className="text-[10px] opacity-90 text-white/90">Responde al instante con IA</p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 className="font-bold text-sm">{config.businessName}</h3>
-                        <p className="text-[10px] opacity-90 text-white/90">Responde al instante con IA</p>
-                    </div>
+                    {/* Desktop Close Button */}
+                    <button
+                        onClick={handleClose}
+                        className="hidden sm:flex hover:bg-black/10 p-1.5 rounded-lg transition-colors"
+                        aria-label="Cerrar chat"
+                    >
+                        <X className="w-5 h-5 text-white/80 hover:text-white" />
+                    </button>
                 </div>
 
                 {/* Chat Area */}
@@ -297,10 +336,12 @@ export function SalesWidget() {
                                 <button
                                     key={i}
                                     onClick={() => {
+                                        if (isBlocked) return;
                                         setMessages(prev => [...prev, { role: 'user', content: text }]);
                                         setInputText('');
                                         handleSendMessage(text);
                                     }}
+                                    disabled={isBlocked}
                                     className="text-[11px] bg-slate-100 hover:text-white text-slate-600 px-3 py-1.5 rounded-full transition-colors border border-slate-200"
                                     onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = config.primaryColor; e.currentTarget.style.color = 'white'; }}
                                     onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#f1f5f9'; e.currentTarget.style.color = '#475569'; }}
@@ -330,16 +371,16 @@ export function SalesWidget() {
                             value={inputText}
                             onChange={(e) => setInputText(e.target.value)}
                             onFocus={() => setIsIdle(false)}
-                            placeholder="Escribe tu consulta aquí..."
-                            className={`flex-1 bg-slate-50 text-slate-900 border-slate-200 focus-visible:ring-[#00C185] h-12 shadow-inner transition-all ${isIdle ? 'ring-2 ring-primary/30 border-primary/50' : ''}`}
-                            disabled={isLoading}
+                            placeholder={isBlocked ? "Chat bloqueado" : "Escribe tu consulta aquí..."}
+                            className={`flex-1 bg-slate-50 text-slate-900 border-slate-200 focus-visible:ring-[#00C185] h-12 shadow-inner transition-all ${isIdle ? 'ring-2 ring-primary/30 border-primary/50' : ''} ${isBlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            disabled={isLoading || isBlocked}
                         />
                         <Button
                             type="submit"
                             size="icon"
-                            className={`text-white shrink-0 h-12 w-12 shadow-lg transition-all ${isIdle ? 'animate-pulse' : ''}`}
+                            className={`text-white shrink-0 h-12 w-12 shadow-lg transition-all ${isIdle ? 'animate-pulse' : ''} ${isBlocked ? 'opacity-50' : ''}`}
                             style={{ backgroundColor: config.primaryColor }}
-                            disabled={isLoading}
+                            disabled={isLoading || isBlocked}
                         >
                             <Send className="w-5 h-5" />
                         </Button>
