@@ -1486,7 +1486,9 @@ export default function Dashboard() {
                           <tr key={lead.id} className="border-b hover:bg-muted/50 transition-colors">
                             <td className="py-4 px-4 font-medium">{lead.name}</td>
                             <td className="py-4 px-4 font-mono text-xs">
-                              {(lead.phone === 'Clic en WhatsApp' || lead.phone === 'Usuario WhatsApp') ? (
+                              {(lead.phone === 'Clic en WhatsApp' ||
+                                lead.phone === 'Usuario WhatsApp' ||
+                                (formConfig?.whatsapp_destination && lead.phone.replace(/\D/g, '') === formConfig.whatsapp_destination.replace(/\D/g, ''))) ? (
                                 <span className="flex items-center gap-1 text-green-600 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-full border border-green-200 dark:border-green-800 w-fit font-sans font-medium">
                                   <MessageCircle className="w-3 h-3" /> Chat Iniciado
                                 </span>
