@@ -324,7 +324,7 @@ export default function Dashboard() {
         setFormConfig({
           template: configData.template || 'general',
           primary_color: configData.primary_color || '#00C185',
-          business_name: profileData?.business_name || 'Lead Widget',
+          business_name: configData.business_name || profileData?.business_name || 'Lead Widget',
           welcome_message: configData.welcome_message || '¡Hola! ¿En qué podemos ayudarte?',
           whatsapp_destination: configData.whatsapp_destination || '',
           niche_question: configData.niche_question || '¿En qué distrito te encuentras?',
@@ -453,6 +453,7 @@ export default function Dashboard() {
       await updateDoc(widgetRef, {
         template: formConfig.template,
         primary_color: formConfig.primary_color,
+        business_name: formConfig.business_name, // Also save here for embedded widget
         welcome_message: formConfig.welcome_message,
         whatsapp_destination: formConfig.whatsapp_destination,
         niche_question: formConfig.niche_question,
