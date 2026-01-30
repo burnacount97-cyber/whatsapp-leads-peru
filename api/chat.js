@@ -149,40 +149,6 @@ Si el mensaje es seguro, responde normalmente como el asistente de ventas.`;
             { role: 'user', content: message }
         ];
 
-        // --- HARDCODED SECURITY CHECK (PRE-AI) ---
-        // Detect known jailbreak patterns effectively bypassing AI politeness
-        const lowerMsg = message.toLowerCase();
-        const forbiddenPhrases = [
-            'ignora todas tus instrucciones', 'ignore all instructions',
-            'ignora tus instrucciones anteriores', 'ignore previous instructions',
-            'modo desarrollador', 'developer mode',
-            'actúa como dan', 'act as dan',
-            'do anything now',
-            'jailbreak',
-            'system override',
-            'simula ser', 'simulate being',
-            'dame acceso', 'give me access',
-            'tu nueva misión', 'your new mission'
-        ];
-
-        if (forbiddenPhrases.some(phrase => lowerMsg.includes(phrase))) {
-            console.log('Security Block Triggered (Keyword):', message);
-            // Execute Block immediately
-            const targetWidgetId = widgetId === 'demo-landing' ? 'demo-landing' : (dbWidgetConfig?.id || widgetId);
-
-            await db.collection('blocked_ips').add({
-                widget_id: targetWidgetId,
-                ip_address: clientIp,
-                reason: 'Security Violation (Keyword Filter)',
-                created_at: new Date().toISOString()
-            });
-
-            return res.status(200).json({
-                response: "Esta conversación ha sido finalizada por incumplir las normas de seguridad. Tu acceso ha sido restringido.",
-                blocked: true
-            });
-        }
-
         // If safe, proceed to AI...
         const completion = await openai.chat.completions.create({
             model: aiConfig.ai_model || 'gpt-4o-mini',
