@@ -145,9 +145,11 @@
 
         const dataCollectionRules = `
         REGLAS DE RECOLECCIÓN DE DATOS:
-        1. OBLIGATORIO: Antes de transferir, debes obtener el NOMBRE del cliente simpáticamente.
-        2. OBLIGATORIO: Identifica qué producto/servicio necesita y detalles relevantes (fecha, dirección, modelo, etc).
-        3. PROHIBIDO: NO pidas el número de teléfono (se obtiene automático).
+        1. Tu prioridad es obtener TODOS los datos necesarios para la venta antes de transferir.
+        2. OBLIGATORIO: Obtén el NOMBRE del cliente.
+        3. OBLIGATORIO: Sigue las instrucciones específicas del negocio sobre qué otros datos pedir (ej: fecha, modelo, dirección). Si no hay instrucciones/prompt específico, usa tu criterio para pedir lo esencial del servicio.
+        4. PROHIBIDO: NO pidas el número de teléfono.
+        5. NO uses el comando de redirección hasta que tengas los datos COMPLETOS.
         `;
 
         const redirectInstruction = `
@@ -184,10 +186,11 @@
         body = JSON.stringify({
           model: config.ai_model || 'claude-3-haiku-20240307',
           max_tokens: parseInt(config.ai_max_tokens) || 500,
+
           system: (config.business_description
             ? `CONTEXTO DEL NEGOCIO:\n${config.business_description}\n\nINSTRUCCIONES:\n${config.ai_system_prompt || `Eres un asistente de ventas experto para ${config.businessName}.`}`
             : (config.ai_system_prompt || `Eres un asistente de ventas experto para ${config.businessName}.`))
-            + `\n\nREGLAS: Pide NOMBRE y detalles del pedido. NO pidas teléfono. Cuando tengas los datos, di "Transfiero tu caso" y usa el comando: [WHATSAPP_REDIRECT: Resumen con Nombre].`,
+            + `\n\nREGLAS: Pide NOMBRE y TODOS los detalles necesarios del pedido antes de transferir. NO pidas teléfono. Cuando tengas TODO completo, di "Transfiero tu caso" y usa el comando: [WHATSAPP_REDIRECT: Resumen con Nombre].`,
           messages: [{ role: 'user', content: userMessage }]
         });
       } else {
