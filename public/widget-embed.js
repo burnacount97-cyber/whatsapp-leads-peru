@@ -156,9 +156,12 @@
         IMPORTANTE - PROTOCOLO DE TRANSFERENCIA FINAL:
         SOLO cuando el cliente responda AFIRMATIVAMENTE (Sí, Ok, Claro) a tu pregunta de confirmación:
         1. Di algo breve como "Excelente, te estoy transfiriendo ahora...".
-        2. EJECUTA el comando oculto para abrir WhatsApp:
+        2. EJECUTA el comando oculto con el resumen REAL:
 
-        [WHATSAPP_REDIRECT: Resumen final de los datos capturados]
+        [WHATSAPP_REDIRECT: Hola, soy (Nombre) y me interesa (Resumen del pedido/consulta)]
+
+        Ejemplo Correcto: [WHATSAPP_REDIRECT: Hola, soy Juan y quiero una Torta de Chocolate para el viernes]
+        NO escribas "Resumen de datos", escribe los datos reales.
         `;
 
         if (config.business_description) {
@@ -191,7 +194,7 @@
           system: (config.business_description
             ? `CONTEXTO DEL NEGOCIO:\n${config.business_description}\n\nINSTRUCCIONES:\n${config.ai_system_prompt || `Eres un asistente de ventas experto para ${config.businessName}.`}`
             : (config.ai_system_prompt || `Eres un asistente de ventas experto para ${config.businessName}.`))
-            + `\n\nREGLAS: 1. Pide Nombre y Detalles. 2. Resume y PREGUNTA si quiere pasar a WhatsApp. 3. Si dice SÍ, usa el comando: [WHATSAPP_REDIRECT: Resumen].`,
+            + `\n\nREGLAS: 1. Pide Nombre y Detalles. 2. Resume y PREGUNTA si quiere pasar a WhatsApp. 3. Si dice SÍ, usa el comando: [WHATSAPP_REDIRECT: Hola, soy (Nombre) y quiero (Resumen)].`,
           messages: [{ role: 'user', content: userMessage }]
         });
       } else {
@@ -580,7 +583,7 @@
         const redirectMatch = response.match(/\[WHATSAPP_REDIRECT:\s?(.*?)\]/s) || response.match(/\[WHATSAPP_REDIRECT:(.*?)\]/s);
 
         if (redirectMatch) {
-          waRedirectData = redirectMatch[1].trim();
+          waRedirectData = redirectMatch[1].trim().replace(/^["']|["']$/g, '');
           // Remove the command from the visible response
           response = response.replace(redirectMatch[0], '').trim();
           // If response became empty, provide a default text
