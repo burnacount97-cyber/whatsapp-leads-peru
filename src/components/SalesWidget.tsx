@@ -104,24 +104,6 @@ export function SalesWidget() {
             setInputText('');
         }
 
-        // 1. Client-side Security Filter (Static Wall)
-        const forbiddenPatterns = [
-            /jailbreak/i, /dan mode/i, /ignore (previous )?instructions/i,
-            /ignora (tus )?instrucciones/i, /ignora (mis )?instrucciones/i,
-            /olvida tus reglas/i, /acting as/i, /simula ser/i, /actúa como/i,
-            /system prompt/i, /revela tu prompt/i, /developer mode/i, /modo desarrollador/i
-        ];
-
-        if (forbiddenPatterns.some(pattern => pattern.test(userMsg))) {
-            setIsLoading(false);
-            setIsBlocked(true);
-            setMessages(prev => [...prev, {
-                role: 'assistant',
-                content: '🚫 Tu comportamiento ha sido identificado como malicioso. Acceso restringido permanentemente.'
-            }]);
-            return;
-        }
-
         setIsLoading(true);
 
         const currentHistory = messages.map(m => ({ role: m.role, content: m.content })).filter(m => m.role !== 'system');

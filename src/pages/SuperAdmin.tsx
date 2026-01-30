@@ -171,9 +171,16 @@ export default function SuperAdmin() {
 
     // Real-time Blocked IPs (Demo Widget Only)
     const unsubBlockedIps = onSnapshot(
-      query(collection(db, 'blocked_ips'), where('widget_id', '==', 'demo-landing'), orderBy('created_at', 'desc')),
+      query(collection(db, 'blocked_ips'), where('widget_id', '==', 'demo-landing')),
       (snapshot) => {
-        setBlockedDemoIps(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+        const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        // Sort in JS to avoid index requirement
+        docs.sort((a: any, b: any) => {
+          const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+          const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+          return dateB - dateA;
+        });
+        setBlockedDemoIps(docs);
       }
     );
 
