@@ -143,8 +143,20 @@
         let systemContent = config.ai_system_prompt ||
           `Eres un asistente de ventas amable para ${config.businessName}. Tu objetivo es ayudar a los clientes y capturar su información de contacto. Sé breve, amigable y útil. Si el cliente muestra interés, invítalo a continuar la conversación por WhatsApp.`;
 
+        const redirectInstruction = `
+        IMPORTANTE - PROTOCOLO DE CIERRE:
+        Cuando el cliente esté listo para proceder, comprar, agendar o hablar con un humano, NO te limites a despedirte.
+        DEBES finalizar tu respuesta con este comando oculto para redirigirlo a WhatsApp automáticamente con los datos capturados:
+
+        [WHATSAPP_REDIRECT: Resumen breve del pedido o consulta]
+
+        Ejemplo: "¡Genial! Te paso con un asesor para confirmar el pago. [WHATSAPP_REDIRECT: Cliente quiere Torta Chocolate, delivery a Miraflores]"
+        `;
+
         if (config.business_description) {
-          systemContent = `CONTEXTO DEL NEGOCIO:\n${config.business_description}\n\nINSTRUCCIONES:\n${systemContent}`;
+          systemContent = `CONTEXTO DEL NEGOCIO:\n${config.business_description}\n\nINSTRUCCIONES:\n${systemContent}\n\n${redirectInstruction}`;
+        } else {
+          systemContent = `${systemContent}\n\n${redirectInstruction}`;
         }
 
         body = JSON.stringify({
@@ -167,9 +179,10 @@
         body = JSON.stringify({
           model: config.ai_model || 'claude-3-haiku-20240307',
           max_tokens: parseInt(config.ai_max_tokens) || 500,
-          system: config.business_description
+          system: (config.business_description
             ? `CONTEXTO DEL NEGOCIO:\n${config.business_description}\n\nINSTRUCCIONES:\n${config.ai_system_prompt || `Eres un asistente de ventas amable para ${config.businessName}.`}`
-            : (config.ai_system_prompt || `Eres un asistente de ventas amable para ${config.businessName}.`),
+            : (config.ai_system_prompt || `Eres un asistente de ventas amable para ${config.businessName}.`))
+            + `\n\nIMPORTANTE: Para cerrar la venta/consulta, responde con el comando: [WHATSAPP_REDIRECT: Resumen del pedido]. Ejemplo: "Listo. [WHATSAPP_REDIRECT: Pedido de torta]"`,
           messages: [{ role: 'user', content: userMessage }]
         });
       } else {
@@ -543,6 +556,8 @@
 
       response = await sendToAI(userMessage);
 
+      let waRedirectData = null;
+
       if (response === null) {
         // No AI configured - show helpful message
         showWhatsAppNow = true;
@@ -551,12 +566,33 @@
         } else {
           response = `⚠️ El asistente de IA aún no está configurado.\n\nEl administrador debe configurar su API Key de OpenAI o Anthropic en el panel de control para activar las respuestas automáticas.`;
         }
+      } else {
+        // Check for WhatsApp redirect command from AI
+        const redirectMatch = response.match(/\[WHATSAPP_REDIRECT:\s?(.*?)\]/s) || response.match(/\[WHATSAPP_REDIRECT:(.*?)\]/s);
+
+        if (redirectMatch) {
+          waRedirectData = redirectMatch[1].trim();
+          // Remove the command from the visible response
+          response = response.replace(redirectMatch[0], '').trim();
+          // If response became empty, provide a default text
+          if (!response) response = "¡Excelente! Te paso con un asesor en WhatsApp para confirmar los detalles.";
+        }
       }
 
       isLoading = false;
       messages.push({ role: 'assistant', content: response });
 
-      // Show WhatsApp button immediately if no AI configured
+      // Handle Auto-Redirect
+      if (waRedirectData && config.whatsappDestination) {
+        console.log('LeadWidget: Auto-redirecting to WhatsApp with data:', waRedirectData);
+        setTimeout(() => {
+          const cleanDest = config.whatsappDestination.replace(/\D/g, '');
+          const encodedMsg = encodeURIComponent(waRedirectData);
+          window.open(`https://wa.me/${cleanDest}?text=${encodedMsg}`, '_blank');
+        }, 2000); // 2s delay for better UX
+      }
+
+      // Show WhatsApp button immediately if no AI configured or manual loop
       if (showWhatsAppNow && config.whatsappDestination && !document.getElementById('lw-wa-btn')) {
         renderMessages();
         setTimeout(() => {
