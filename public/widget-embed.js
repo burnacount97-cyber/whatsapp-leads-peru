@@ -32,6 +32,7 @@
   let teaserInterval = null;
   let exitIntentShown = false;
   let configRefreshInterval = null;
+  let vibrationInterval = null;
 
   // Get widget config from Firestore
   async function getWidgetConfig(clientId) {
@@ -114,15 +115,20 @@
       const response = await fetch(url);
       const data = await response.json();
 
+      console.log('LeadWidget: AI Config response', data);
+
       if (data && data.fields) {
+        const aiKey = data.fields.ai_api_key?.stringValue || '';
+        console.log('LeadWidget: AI Key found:', aiKey ? 'Yes (length: ' + aiKey.length + ')' : 'No');
+
         return {
-          ai_enabled: data.fields.ai_enabled?.booleanValue || false,
+          ai_enabled: data.fields.ai_enabled?.booleanValue !== false,
           ai_provider: data.fields.ai_provider?.stringValue || 'openai',
-          ai_api_key: data.fields.ai_api_key?.stringValue || '',
+          ai_api_key: aiKey,
           ai_model: data.fields.ai_model?.stringValue || 'gpt-4o-mini',
           ai_system_prompt: data.fields.ai_system_prompt?.stringValue || '',
-          ai_temperature: data.fields.ai_temperature?.doubleValue || 0.7,
-          ai_max_tokens: parseInt(data.fields.ai_max_tokens?.integerValue) || 500
+          ai_temperature: parseFloat(data.fields.ai_temperature?.doubleValue || data.fields.ai_temperature?.integerValue) || 0.7,
+          ai_max_tokens: parseInt(data.fields.ai_max_tokens?.integerValue || data.fields.ai_max_tokens?.stringValue) || 500
         };
       }
     } catch (e) {
@@ -134,7 +140,8 @@
   // Send message to AI
   async function sendToAI(userMessage) {
     if (!aiConfig || !aiConfig.ai_api_key) {
-      return "Lo siento, el asistente no está configurado correctamente. Por favor, contacta por WhatsApp.";
+      console.log('LeadWidget: No AI API key available');
+      return null; // Return null to indicate no AI
     }
 
     try {
@@ -152,13 +159,13 @@
           content: m.content
         }));
 
+        const systemPrompt = aiConfig.ai_system_prompt ||
+          `Eres un asistente de ventas amable para ${config.businessName}. Tu objetivo es ayudar a los clientes y capturar su información de contacto. Sé breve, amigable y útil. Si el cliente muestra interés, invítalo a continuar la conversación por WhatsApp.`;
+
         body = JSON.stringify({
           model: aiConfig.ai_model || 'gpt-4o-mini',
           messages: [
-            {
-              role: 'system',
-              content: aiConfig.ai_system_prompt || `Eres un asistente de ventas amable para ${config.businessName}. Tu objetivo es ayudar a los clientes y capturar su información de contacto. Sé breve, amigable y útil. Si el cliente muestra interés, invítalo a continuar la conversación por WhatsApp.`
-            },
+            { role: 'system', content: systemPrompt },
             ...conversationHistory,
             { role: 'user', content: userMessage }
           ],
@@ -182,8 +189,15 @@
         return "Proveedor de IA no soportado.";
       }
 
+      console.log('LeadWidget: Sending to AI...');
       const response = await fetch(apiUrl, { method: 'POST', headers, body });
       const data = await response.json();
+      console.log('LeadWidget: AI response received');
+
+      if (data.error) {
+        console.error('LeadWidget: AI API Error', data.error);
+        return `Error: ${data.error.message || 'Error de la API'}`;
+      }
 
       if (aiConfig.ai_provider === 'openai') {
         return data.choices?.[0]?.message?.content || "No pude procesar tu mensaje.";
@@ -227,13 +241,6 @@
     return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
   }
 
-  // Get vibration animation
-  function getVibrationAnimation() {
-    if (config.vibrationIntensity === 'none') return '';
-    if (config.vibrationIntensity === 'strong') return 'lw-vibrate-strong';
-    return 'lw-vibrate-soft';
-  }
-
   // Render the widget
   function renderWidget() {
     // Remove existing if present
@@ -253,10 +260,21 @@
         background: linear-gradient(135deg, ${config.primaryColor} 0%, ${adjustColor(config.primaryColor, -30)} 100%);
       }
       #lw-button:hover { transform: scale(1.08); }
-      #lw-button.lw-vibrate-soft { animation: lw-vibrate-soft 2s ease-in-out infinite; }
-      #lw-button.lw-vibrate-strong { animation: lw-vibrate-strong 0.5s ease-in-out infinite; }
-      @keyframes lw-vibrate-soft { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
-      @keyframes lw-vibrate-strong { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+      
+      /* Vibration animations */
+      @keyframes lw-vibrate-soft { 
+        0%, 100% { transform: scale(1); } 
+        50% { transform: scale(1.08); } 
+      }
+      @keyframes lw-vibrate-strong { 
+        0%, 100% { transform: translateX(0) scale(1); } 
+        20% { transform: translateX(-3px) scale(1.02); } 
+        40% { transform: translateX(3px) scale(1.02); }
+        60% { transform: translateX(-3px) scale(1.02); }
+        80% { transform: translateX(3px) scale(1.02); }
+      }
+      #lw-button.lw-vibrating-soft { animation: lw-vibrate-soft 1.5s ease-in-out infinite; }
+      #lw-button.lw-vibrating-strong { animation: lw-vibrate-strong 0.6s ease-in-out infinite; }
 
       /* Teaser bubble */
       #lw-teaser {
@@ -266,6 +284,7 @@
         font-size: 14px; color: #1e293b; font-weight: 500;
         animation: lw-teaser-in 0.4s ease-out;
         cursor: pointer;
+        display: none;
       }
       @keyframes lw-teaser-in { from { opacity: 0; transform: translateY(10px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
       #lw-teaser-close { position: absolute; top: -8px; right: -8px; width: 20px; height: 20px; border-radius: 50%; background: #64748b; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -281,18 +300,19 @@
       }
       @media (min-width: 640px) { 
         #lw-panel { left: auto; width: 360px; height: 500px; bottom: 20px; right: 20px; } 
-        #lw-close-mobile { display: none !important; }
       }
       @keyframes lw-slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
       /* Header */
-      #lw-header { padding: 16px; display: flex; align-items: center; gap: 12px; color: white; background: ${config.primaryColor}; }
-      #lw-avatar { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
+      #lw-header { padding: 16px; display: flex; align-items: center; gap: 12px; color: white; background: ${config.primaryColor}; position: relative; }
+      #lw-avatar { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; flex-shrink: 0; }
       #lw-avatar::after { content: ''; position: absolute; bottom: 2px; right: 2px; width: 10px; height: 10px; background: #22c55e; border-radius: 50%; border: 2px solid ${config.primaryColor}; }
+      #lw-close-btn { position: absolute; top: 12px; right: 12px; background: rgba(255,255,255,0.2); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; transition: background 0.2s; }
+      #lw-close-btn:hover { background: rgba(255,255,255,0.3); }
 
       /* Messages */
       #lw-messages { flex: 1; overflow-y: auto; padding: 16px; background: #f8fafc; display: flex; flex-direction: column; gap: 12px; }
-      .lw-msg { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.5; animation: lw-fadeIn 0.3s ease-out; word-wrap: break-word; }
+      .lw-msg { max-width: 85%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.5; animation: lw-fadeIn 0.3s ease-out; word-wrap: break-word; white-space: pre-wrap; }
       @keyframes lw-fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
       .lw-msg-assistant { background: white; color: #1e293b; border: 1px solid #e2e8f0; border-bottom-left-radius: 4px; align-self: flex-start; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
       .lw-msg-user { background: ${config.primaryColor}; color: white; border-bottom-right-radius: 4px; align-self: flex-end; }
@@ -314,7 +334,7 @@
       #lw-form { display: flex; gap: 8px; }
       #lw-input { flex: 1; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 14px; background: #f8fafc; outline: none; color: #1e293b; }
       #lw-input:focus { border-color: ${config.primaryColor}; box-shadow: 0 0 0 3px ${config.primaryColor}20; }
-      #lw-send { width: 48px; height: 48px; border-radius: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; background: ${config.primaryColor}; transition: opacity 0.2s; }
+      #lw-send { width: 48px; height: 48px; border-radius: 12px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; background: ${config.primaryColor}; transition: opacity 0.2s; flex-shrink: 0; }
       #lw-send:hover { opacity: 0.9; }
       #lw-send:disabled { opacity: 0.5; cursor: not-allowed; }
       #lw-footer { text-align: center; padding: 8px; font-size: 9px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -323,14 +343,20 @@
       #lw-wa-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; background: #25D366; color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; margin-top: 8px; font-size: 14px; }
       #lw-wa-btn:hover { background: #128C7E; }
 
-      /* Close button mobile */
+      /* Mobile close button - Only on small screens */
       #lw-close-mobile { 
-        position: fixed; bottom: calc(16px + 70vh + 16px); left: 50%; transform: translateX(-50%); z-index: 1000000;
+        position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 1000000;
         width: 56px; height: 56px; border-radius: 50%; background: #dc2626; border: 4px solid white; 
         color: white; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.3); 
         display: none; align-items: center; justify-content: center;
       }
-      @media (max-width: 639px) { #lw-close-mobile.visible { display: flex; } }
+      @media (max-width: 639px) { 
+        #lw-close-mobile.visible { display: flex; }
+        #lw-panel.open { padding-bottom: 70px; }
+      }
+      @media (min-width: 640px) {
+        #lw-close-mobile { display: none !important; }
+      }
 
       /* Exit intent popup */
       #lw-exit-overlay { 
@@ -356,14 +382,14 @@
         <style>${styles}</style>
         
         <!-- Main Button -->
-        <button id="lw-button" class="${getVibrationAnimation()}">
+        <button id="lw-button">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
           </svg>
         </button>
 
         <!-- Teaser Bubble -->
-        <div id="lw-teaser" style="display: none;">
+        <div id="lw-teaser">
           <span id="lw-teaser-text"></span>
           <button id="lw-teaser-close">
             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
@@ -382,10 +408,17 @@
                 <circle cx="12" cy="5" r="3"></circle>
               </svg>
             </div>
-            <div>
+            <div style="flex: 1;">
               <div style="font-weight: 600; font-size: 14px;">${config.businessName}</div>
               <div style="font-size: 11px; opacity: 0.9;">Responde al instante con IA</div>
             </div>
+            <!-- Close button in header -->
+            <button id="lw-close-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
           </div>
 
           <div id="lw-messages"></div>
@@ -441,6 +474,7 @@
     const form = document.getElementById('lw-form');
     const input = document.getElementById('lw-input');
     const quickRepliesContainer = document.getElementById('lw-quick-replies');
+    const closeBtn = document.getElementById('lw-close-btn');
     const closeMobile = document.getElementById('lw-close-mobile');
     const teaser = document.getElementById('lw-teaser');
     const teaserText = document.getElementById('lw-teaser-text');
@@ -448,6 +482,18 @@
     const exitOverlay = document.getElementById('lw-exit-overlay');
     const exitCta = document.getElementById('lw-exit-cta');
     const exitClose = document.getElementById('lw-exit-close');
+
+    // Start vibration animation
+    function startVibration() {
+      if (config.vibrationIntensity === 'none' || isOpen) return;
+
+      const vibClass = config.vibrationIntensity === 'strong' ? 'lw-vibrating-strong' : 'lw-vibrating-soft';
+      button.classList.add(vibClass);
+    }
+
+    function stopVibration() {
+      button.classList.remove('lw-vibrating-soft', 'lw-vibrating-strong');
+    }
 
     // Render quick replies
     function renderQuickReplies() {
@@ -508,9 +554,9 @@
       let response;
       let showWhatsAppNow = false;
 
-      if (aiConfig && aiConfig.ai_api_key) {
-        response = await sendToAI(userMessage);
-      } else {
+      response = await sendToAI(userMessage);
+
+      if (response === null) {
         // No AI configured - show helpful message
         showWhatsAppNow = true;
         if (config.whatsappDestination) {
@@ -575,26 +621,34 @@
     function togglePanel(show) {
       isOpen = show;
       panel.style.display = show ? 'flex' : 'none';
+      panel.classList.toggle('open', show);
       closeMobile.classList.toggle('visible', show);
       button.style.display = show ? 'none' : 'flex';
       teaser.style.display = 'none';
 
-      if (show && messages.length === 0) {
-        messages.push({ role: 'assistant', content: config.welcomeMessage });
-        renderMessages();
-      }
-
-      if (!show) {
-        hasBeenClosedOnce = true;
-        startTeaserCycle();
-      } else {
+      if (show) {
+        stopVibration();
         stopTeaserCycle();
+        if (messages.length === 0) {
+          messages.push({ role: 'assistant', content: config.welcomeMessage });
+          renderMessages();
+        }
+      } else {
+        hasBeenClosedOnce = true;
+        startVibration();
+        // Start teaser cycle after a short delay
+        setTimeout(() => {
+          startTeaserCycle();
+        }, 2000);
       }
     }
 
     // Teaser cycle
     function startTeaserCycle() {
-      if (!hasBeenClosedOnce || isOpen || config.teaserMessages.length === 0) return;
+      if (isOpen || !config.teaserMessages || config.teaserMessages.length === 0) {
+        console.log('LeadWidget: Teaser cycle not started', { isOpen, teaserCount: config.teaserMessages?.length });
+        return;
+      }
 
       stopTeaserCycle();
       let index = Math.floor(Math.random() * config.teaserMessages.length);
@@ -604,6 +658,7 @@
         activeTeaser = config.teaserMessages[index];
         teaserText.textContent = activeTeaser;
         teaser.style.display = 'block';
+        console.log('LeadWidget: Showing teaser:', activeTeaser);
         index = (index + 1) % config.teaserMessages.length;
       };
 
@@ -629,6 +684,7 @@
 
     // Event listeners
     button.addEventListener('click', () => togglePanel(true));
+    closeBtn.addEventListener('click', () => togglePanel(false));
     closeMobile.addEventListener('click', () => togglePanel(false));
     teaser.addEventListener('click', () => togglePanel(true));
     teaserClose.addEventListener('click', (e) => { e.stopPropagation(); teaser.style.display = 'none'; });
@@ -647,6 +703,9 @@
 
     // Exit intent (desktop only)
     document.addEventListener('mouseout', handleExitIntent);
+
+    // Start vibration immediately
+    startVibration();
 
     // Auto-open after delay
     setTimeout(() => {
@@ -677,11 +736,19 @@
         renderWidget();
       }
     }
+
+    // Also refresh AI config
+    const newAiConfig = await getAIConfig(config.clientId);
+    if (newAiConfig) {
+      aiConfig = newAiConfig;
+    }
   }
 
   // Main Initialization
   async function initialize() {
     const clientId = window.LEADWIDGET_CLIENT_ID || window.LEADWIDGET_CONFIG?.clientId;
+
+    console.log('LeadWidget: Initializing with client ID:', clientId);
 
     if (clientId) {
       config.clientId = clientId;
@@ -693,12 +760,14 @@
       if (remoteConfig) {
         Object.assign(config, remoteConfig);
         console.log('LeadWidget: Loaded configuration for', config.businessName);
+        console.log('LeadWidget: Teaser messages:', config.teaserMessages);
+        console.log('LeadWidget: Vibration:', config.vibrationIntensity);
       }
 
       // Load AI config
       aiConfig = await getAIConfig(clientId);
-      if (aiConfig && aiConfig.ai_api_key) {
-        console.log('LeadWidget: AI enabled with', aiConfig.ai_provider);
+      if (aiConfig) {
+        console.log('LeadWidget: AI Config loaded, API key present:', !!aiConfig.ai_api_key);
       }
     }
 
