@@ -225,7 +225,7 @@ export function SalesWidget() {
     }
 
     return (
-        <div className="fixed bottom-4 right-4 left-4 sm:left-auto sm:bottom-6 sm:right-6 w-auto sm:w-[360px] z-50">
+        <div className="fixed bottom-4 right-4 left-4 sm:left-auto sm:bottom-6 sm:right-6 w-auto sm:w-[360px] z-50 pb-20 sm:pb-0">
             <div className={`relative h-[70vh] max-h-[550px] sm:h-[500px] bg-white rounded-3xl shadow-2xl overflow-hidden border border-border flex flex-col font-sans animate-in slide-in-from-bottom-5 duration-300 ${isIdle ? 'animate-vibrate-subtle' : ''}`}>
                 {/* Header */}
                 <div className="p-4 flex items-center gap-3 text-white shadow-md" style={{ backgroundColor: config.primaryColor }}>
@@ -357,7 +357,7 @@ export function SalesWidget() {
             {/* Floating Close Button - Mobile Only - Outside overflow container */}
             <button
                 onClick={handleClose}
-                className="absolute -bottom-12 left-1/2 -translate-x-1/2 sm:hidden w-14 h-14 rounded-full bg-red-600 hover:bg-red-700 active:scale-95 transition-all flex items-center justify-center shadow-2xl border-4 border-white z-50"
+                className="absolute bottom-2 left-1/2 -translate-x-1/2 sm:hidden w-14 h-14 rounded-full bg-red-600 hover:bg-red-700 active:scale-95 transition-all flex items-center justify-center shadow-2xl border-4 border-white z-50"
                 aria-label="Cerrar chat"
             >
                 <X className="w-6 h-6 text-white stroke-[3]" />
