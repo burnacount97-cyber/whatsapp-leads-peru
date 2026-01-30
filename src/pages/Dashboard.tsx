@@ -891,8 +891,8 @@ export default function Dashboard() {
           </TabsList>
 
           {/* Widget Config Tab */}
-          <TabsContent value="config" className="space-y-6">
-            <div className="grid lg:grid-cols-2 gap-8">
+          <TabsContent value="config" className="space-y-6 overflow-hidden">
+            <div className="grid lg:grid-cols-2 gap-4 sm:gap-8">
               {/* Config Form */}
               <Card>
                 <CardHeader>
@@ -1077,8 +1077,8 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              {/* Preview */}
-              <div className="space-y-6 lg:sticky lg:top-24 h-fit">
+              {/* Preview - Hidden on mobile */}
+              <div className="hidden lg:block space-y-6 lg:sticky lg:top-24 h-fit">
                 <Card>
                   <CardHeader>
                     <CardTitle>Vista Previa</CardTitle>
