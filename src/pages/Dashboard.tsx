@@ -1439,10 +1439,10 @@ export default function Dashboard() {
                     value={aiConfig.ai_security_prompt}
                     onChange={(e) => setAiConfig({ ...aiConfig, ai_security_prompt: e.target.value })}
                     rows={4}
-                    className="w-full p-3 text-sm border-2 border-red-50/50 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-red-500 bg-red-50/10 text-slate-900 placeholder:text-slate-400 font-medium"
+                    className="w-full p-3 text-sm border-2 border-red-500/20 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-red-500 bg-red-500/5 text-foreground placeholder:text-muted-foreground font-medium"
                     placeholder="Instrucciones para detectar ataques y bloquear..."
                   />
-                  <p className="text-xs text-red-600/70">
+                  <p className="text-xs text-red-600 dark:text-red-400 font-medium">
                     <b>Protección de Créditos:</b> Define aquí qué comportamientos causarán el bloqueo inmediato de la IP del usuario.
                   </p>
                 </div>
