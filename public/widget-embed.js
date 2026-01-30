@@ -152,20 +152,16 @@
 
       const data = await response.json();
 
-      if (response.status === 403 || data.blocked) {
-        console.warn('LeadWidget: User is blocked');
-        return data.response || "Tu acceso ha sido restringido por seguridad.";
-      }
-
-      if (data.error) {
-        console.error('LeadWidget: Backend Error', data.error);
-        return `Error: ${data.error}`;
-      }
-
-      return data.response || "No pude procesar tu mensaje.";
+      return {
+        response: data.response || "No pude procesar tu mensaje.",
+        blocked: response.status === 403 || data.blocked === true
+      };
     } catch (error) {
       console.error('LeadWidget: Connection Error', error);
-      return "Hubo un error de conexión. ¿Te gustaría contactarnos por WhatsApp?";
+      return {
+        response: "Hubo un error de conexión. ¿Te gustaría contactarnos por WhatsApp?",
+        blocked: false
+      };
     }
   }
 
@@ -565,34 +561,34 @@
       }
 
       // Get AI response
-      let response;
-      let showWhatsAppNow = false;
-
-      response = await sendToAI(userMessage);
-
+      let response = '';
+      let isBlocked = false;
       let waRedirectData = null;
 
-      if (response === null) {
+      const aiResult = await sendToAI(userMessage);
+
+      if (aiResult === null) {
         // No AI configured - show helpful message
-        showWhatsAppNow = true;
         if (config.whatsappDestination) {
           response = `⚠️ El asistente de IA aún no está configurado por el administrador.\n\n¡Pero no te preocupes! Puedes contactarnos directamente por WhatsApp para una atención inmediata. 👇`;
         } else {
           response = `⚠️ El asistente de IA aún no está configurado.\n\nEl administrador debe configurar su API Key de OpenAI o Anthropic en el panel de control para activar las respuestas automáticas.`;
         }
       } else {
-        // Check for WhatsApp redirect command from AI (Robust Regex)
-        const redirectMatch = response.match(/\[\s*WHATSAPP_REDIRECT\s*:\s*([\s\S]*?)\]/i);
-
-        if (redirectMatch) {
-          waRedirectData = redirectMatch[1].trim().replace(/^["']|["']$/g, '');
-          // Remove the command from the visible response
-          response = response.replace(redirectMatch[0], '').trim();
-          // If response became empty, provide a default text
-          if (!response) response = "¡Excelente! Te paso con un asesor en WhatsApp para confirmar los detalles.";
-        }
+        response = aiResult.response;
+        isBlocked = aiResult.blocked;
       }
 
+      // Check for WhatsApp redirect command from AI (Robust Regex)
+      const redirectMatch = response.match(/\[\s*WHATSAPP_REDIRECT\s*:\s*([\s\S]*?)\]/i);
+
+      if (redirectMatch) {
+        waRedirectData = redirectMatch[1].trim().replace(/^["']|["']$/g, '');
+        // Remove the command from the visible response
+        response = response.replace(redirectMatch[0], '').trim();
+        // If response became empty, provide a default text
+        if (!response) response = "¡Excelente! Te paso con un asesor en WhatsApp para confirmar los detalles.";
+      }
       isLoading = false;
       messages.push({ role: 'assistant', content: response });
 
@@ -619,11 +615,27 @@
         }, 2000); // 2s delay for better UX
       }
 
-      // Show WhatsApp button logic REMOVED as per user request (Auto-redirect only)
-      // If AI is not configured, the user will see the error message set above.
-
-
       renderMessages();
+
+      if (isBlocked) {
+        disableChatInput();
+      }
+    }
+
+    // Disable Chat UI on Block
+    function disableChatInput() {
+      if (input) {
+        input.disabled = true;
+        input.placeholder = "Chat bloqueado por seguridad";
+        input.style.opacity = "0.6";
+        input.style.cursor = "not-allowed";
+      }
+      const sendBtn = document.getElementById('lw-send');
+      if (sendBtn) {
+        sendBtn.disabled = true;
+        sendBtn.style.opacity = "0.5";
+        sendBtn.style.cursor = "not-allowed";
+      }
     }
 
     // Toggle panel
