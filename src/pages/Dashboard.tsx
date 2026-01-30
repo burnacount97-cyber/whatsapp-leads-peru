@@ -1085,9 +1085,9 @@ export default function Dashboard() {
                     <CardDescription className="text-xs sm:text-sm">Así se verá tu widget en tu sitio web</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4 sm:space-y-6">
-                    {/* Widget Preview Container - Responsive */}
+                    {/* Widget Preview Container - Responsive (View-only, no interactions) */}
                     <div className="relative h-[350px] sm:h-[500px] bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden p-2 sm:p-6 flex justify-center items-center">
-                      <div className="w-full max-w-[280px] sm:max-w-[320px] h-full max-h-[320px] sm:max-h-[480px] shadow-2xl rounded-2xl overflow-hidden border border-slate-200 bg-white transform scale-[0.85] sm:scale-100 origin-center">
+                      <div className="w-full max-w-[280px] sm:max-w-[320px] h-full max-h-[320px] sm:max-h-[480px] shadow-2xl rounded-2xl overflow-hidden border border-slate-200 bg-white transform scale-[0.85] sm:scale-100 origin-center pointer-events-none select-none">
                         <WidgetPreview
                           primaryColor={formConfig.primary_color}
                           welcomeMessage={formConfig.welcome_message}
