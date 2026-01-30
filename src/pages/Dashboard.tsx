@@ -359,6 +359,8 @@ export default function Dashboard() {
       const leadsSnap = await getDocs(qLeads);
       const leadsData = leadsSnap.docs
         .map(doc => ({ id: doc.id, ...doc.data() }))
+        // Filter out old 'Visitante' leads (only show converted ones)
+        .filter((lead: any) => lead.name !== 'Visitante')
         .sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()) as Lead[];
 
       setLeads(leadsData);
@@ -385,13 +387,7 @@ export default function Dashboard() {
             interactions: totalVisits // Y también como interacciones por ahora
           });
 
-          // Update main stats
-          setStats(prev => ({
-            ...prev,
-            visits: totalVisits,
-            total_leads: leadsData.length,
-            conversion_rate: totalVisits > 0 ? ((leadsData.length / totalVisits) * 100).toFixed(1) : 0
-          }));
+
 
         } catch (analyticsError) {
           console.error('Non-critical: Error loading visits:', analyticsError);
