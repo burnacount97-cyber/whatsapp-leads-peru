@@ -25,9 +25,10 @@ export default async function handler(req, res) {
 
     // --- 1. PRE-AI SECURITY FILTER (The Wall) ---
     const forbiddenPatterns = [
-        /jailbreak/i, /dan mode/i, /ignore previous instructions/i,
-        /olvida tus reglas/i, /acting as/i, /simula ser/i,
-        /system prompt/i, /revela tu prompt/i, /developer mode/i
+        /jailbreak/i, /dan mode/i, /ignore (previous )?instructions/i,
+        /ignora (tus )?instrucciones/i, /ignora (mis )?instrucciones/i,
+        /olvida tus reglas/i, /acting as/i, /simula ser/i, /actúa como/i,
+        /system prompt/i, /revela tu prompt/i, /developer mode/i, /modo desarrollador/i
     ];
 
     const isAttack = forbiddenPatterns.some(pattern => pattern.test(message));
@@ -201,6 +202,9 @@ TU RESPUESTA DEBE SER ÚNICAMENTE ESTE JSON (Sin texto extra, sin disculpas):
             aiResponse.includes('no puedo ayudar con eso') ||
             aiResponse.includes('no puedo cumplir con') ||
             aiResponse.includes('no puedo proporcionar') ||
+            aiResponse.includes('lo siento, no puedo') ||
+            aiResponse.includes('como modelo de lenguaje') ||
+            aiResponse.includes('no estoy autorizado') ||
             aiResponse.includes('I cannot help with that') ||
             aiResponse.includes('I cannot fulfill this');
 
