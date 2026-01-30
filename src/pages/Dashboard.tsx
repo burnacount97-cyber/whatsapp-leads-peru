@@ -1336,9 +1336,12 @@ export default function Dashboard() {
                     className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
                   />
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Preciso</span>
-                    <span>Creativo</span>
+                    <span>Preciso (0.1)</span>
+                    <span>Creativo (1.0)</span>
                   </div>
+                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                    🌟 Recomendado: <strong>0.5 - 0.7</strong> para conversaciones naturales.
+                  </p>
                 </div>
 
                 {/* Max Tokens */}
