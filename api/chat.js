@@ -113,9 +113,18 @@ export default async function handler(req, res) {
                 business_name: 'Lead Widget'
             };
         } else {
-            // Widget lookup
-            const q = await db.collection('widget_configs').where('widget_id', '==', widgetId).limit(1).get();
-            if (q.empty) return res.status(404).json({ error: 'Widget not found' });
+            // Widget lookup: Try both widget_id and user_id (since clientId can be user.uid)
+            let q = await db.collection('widget_configs').where('widget_id', '==', widgetId).limit(1).get();
+
+            if (q.empty) {
+                // Try searching by user_id as fallback
+                q = await db.collection('widget_configs').where('user_id', '==', widgetId).limit(1).get();
+            }
+
+            if (q.empty) {
+                console.error(`[Error] Widget not found for identity: ${widgetId}`);
+                return res.status(404).json({ error: 'Widget not found' });
+            }
 
             const widgetData = { id: q.docs[0].id, ...q.docs[0].data() };
             const profileDoc = await db.collection('profiles').doc(widgetData.user_id).get();
