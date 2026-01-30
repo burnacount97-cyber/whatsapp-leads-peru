@@ -808,13 +808,16 @@ export default function Dashboard() {
             <span className="font-bold text-xl">Lead Widget</span>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1 sm:gap-3 flex-wrap">
             {/* Theme Toggle - Removed */}
             {isSuperAdmin && (
               <Link to="/superadmin">
-                <Button variant="outline" size="sm" className="flex border-primary text-primary hover:bg-primary/10">
+                <Button variant="outline" size="sm" className="hidden sm:flex border-primary text-primary hover:bg-primary/10">
                   <Shield className="w-4 h-4 mr-2" />
                   Panel SuperAdmin
+                </Button>
+                <Button variant="outline" size="icon" className="sm:hidden border-primary text-primary hover:bg-primary/10">
+                  <Shield className="w-4 h-4" />
                 </Button>
               </Link>
             )}
@@ -831,59 +834,59 @@ export default function Dashboard() {
                 Instalar App
               </Button>
             )}
-            <Button variant="ghost" size="sm" onClick={handleSignOut}>
-              <LogOut className="w-4 h-4 mr-2" />
-              Salir
+            <Button variant="ghost" size="sm" onClick={handleSignOut} className="px-2 sm:px-4">
+              <LogOut className="w-4 h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Salir</span>
             </Button>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-6xl">
         {/* Trial Alert Notice */}
         {profile?.subscription_status === 'trial' && (
-          <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-between animate-in fade-in slide-in-from-top-4">
+          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-primary/10 border border-primary/20 rounded-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 animate-in fade-in slide-in-from-top-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                <Clock className="w-5 h-5 text-primary" />
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
               </div>
               <div>
-                <p className="font-semibold text-sm">Estás en periodo de prueba</p>
-                <p className="text-xs text-muted-foreground">Tu trial de 3 días finaliza el {getTrialEndDateString()}</p>
+                <p className="font-semibold text-xs sm:text-sm">Estás en periodo de prueba</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground">Tu trial de 3 días finaliza el {getTrialEndDateString()}</p>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-lg font-bold text-primary">{getTrialDaysLeft()} días</p>
+            <div className="text-left sm:text-right ml-11 sm:ml-0">
+              <p className="text-base sm:text-lg font-bold text-primary">{getTrialDaysLeft()} días</p>
               <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Restantes</p>
             </div>
           </div>
         )}
 
         <Tabs defaultValue="config" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-6 max-w-3xl">
-            <TabsTrigger value="config" className="gap-2">
+          <TabsList className="flex w-full overflow-x-auto no-scrollbar gap-1 sm:grid sm:grid-cols-6 sm:max-w-3xl">
+            <TabsTrigger value="config" className="gap-2 flex-shrink-0 px-4">
               <Settings className="w-4 h-4" />
-              Widget
+              <span className="hidden sm:inline">Widget</span>
             </TabsTrigger>
-            <TabsTrigger value="ai" className="gap-2">
+            <TabsTrigger value="ai" className="gap-2 flex-shrink-0 px-4">
               <Bot className="w-4 h-4" />
-              IA
+              <span className="hidden sm:inline">IA</span>
             </TabsTrigger>
-            <TabsTrigger value="leads" className="gap-2">
+            <TabsTrigger value="leads" className="gap-2 flex-shrink-0 px-4">
               <Users className="w-4 h-4" />
-              Leads
+              <span className="hidden sm:inline">Leads</span>
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="gap-2">
+            <TabsTrigger value="analytics" className="gap-2 flex-shrink-0 px-4">
               <BarChart3 className="w-4 h-4" />
-              Analíticas
+              <span className="hidden sm:inline">Analíticas</span>
             </TabsTrigger>
-            <TabsTrigger value="security" className="gap-2">
+            <TabsTrigger value="security" className="gap-2 flex-shrink-0 px-4">
               <ShieldCheck className="w-4 h-4" />
-              Seguridad
+              <span className="hidden sm:inline">Seguridad</span>
             </TabsTrigger>
-            <TabsTrigger value="billing" className="gap-2">
+            <TabsTrigger value="billing" className="gap-2 flex-shrink-0 px-4">
               <CreditCard className="w-4 h-4" />
-              Pagos
+              <span className="hidden sm:inline">Pagos</span>
             </TabsTrigger>
           </TabsList>
 
