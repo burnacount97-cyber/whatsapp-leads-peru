@@ -614,20 +614,36 @@ export default function Dashboard() {
 
   const exportLeadsCSV = () => {
     // Helper to escape CSV values
-    const escape = (val: any) => {
-      const s = val?.toString() || '';
-      return '"' + s.replace(/"/g, '""') + '"';
+    const escape = (str: string | undefined | null) => {
+      if (!str) return '';
+      return `"${String(str).replace(/"/g, '""')}"`; // Proper CSV escaping
+    };
+
+    const formatDateCSV = (date: any) => {
+      if (!date) return '';
+      if (date.seconds) return new Date(date.seconds * 1000).toLocaleString('es-PE');
+      return new Date(date).toLocaleString('es-PE');
+    };
+
+    const formatPhoneCSV = (phone: string) => {
+      if (phone === 'Clic en WhatsApp' || phone === 'Usuario WhatsApp') return 'Chat Iniciado (Redirigido)';
+      if (phone === 'Pendiente (Click WA)') return 'Pendiente';
+      // Check if phone matches destination number and hide it if preferred, or just show it
+      if (formConfig?.whatsapp_destination && phone.replace(/\D/g, '') === formConfig.whatsapp_destination.replace(/\D/g, '')) {
+        return 'Chat Iniciado (Redirigido)';
+      }
+      return phone;
     };
 
     const headers = ['Nombre', 'Teléfono', 'Datos Capturados', 'URL de Origen', 'Trigger', 'Fecha'];
 
     const rows = leads.map(lead => [
       escape(lead.name),
-      escape(lead.phone),
+      escape(formatPhoneCSV(lead.phone)),
       escape(lead.interest),
       escape(lead.page_url),
       escape(lead.trigger_used || 'IA Chat'),
-      escape(new Date(lead.created_at).toLocaleString('es-PE'))
+      escape(formatDateCSV(lead.created_at))
     ]);
 
     const csvContent = [
@@ -635,7 +651,8 @@ export default function Dashboard() {
       ...rows.map(row => row.join(','))
     ].join('\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    // Add BOM for Excel compatibility with clean characters
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
