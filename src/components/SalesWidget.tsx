@@ -225,22 +225,17 @@ export function SalesWidget() {
     }
 
     return (
-        <div className={`fixed bottom-4 right-4 left-4 sm:left-auto sm:bottom-6 sm:right-6 w-auto sm:w-[360px] h-[85vh] max-h-[600px] sm:h-[500px] bg-white rounded-3xl shadow-2xl z-50 overflow-hidden border border-border flex flex-col font-sans animate-in slide-in-from-bottom-5 duration-300 ${isIdle ? 'animate-vibrate-subtle' : ''}`}>
+        <div className={`fixed bottom-4 right-4 left-4 sm:left-auto sm:bottom-6 sm:right-6 w-auto sm:w-[360px] h-[70vh] max-h-[550px] sm:h-[500px] bg-white rounded-3xl shadow-2xl z-50 overflow-hidden border border-border flex flex-col font-sans animate-in slide-in-from-bottom-5 duration-300 ${isIdle ? 'animate-vibrate-subtle' : ''}`}>
             {/* Header */}
-            <div className="p-4 flex items-center justify-between text-white shadow-md" style={{ backgroundColor: config.primaryColor }}>
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center relative">
-                        <Bot className="w-6 h-6" />
-                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 rounded-full" style={{ borderColor: config.primaryColor }}></div>
-                    </div>
-                    <div>
-                        <h3 className="font-bold text-sm">{config.businessName}</h3>
-                        <p className="text-[10px] opacity-90 text-white/90">Responde al instante con IA</p>
-                    </div>
+            <div className="p-4 flex items-center gap-3 text-white shadow-md" style={{ backgroundColor: config.primaryColor }}>
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center relative">
+                    <Bot className="w-6 h-6" />
+                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-400 border-2 rounded-full" style={{ borderColor: config.primaryColor }}></div>
                 </div>
-                <button onClick={handleClose} className="hover:bg-white/20 p-1 rounded-full transition-colors">
-                    <X className="w-5 h-5" />
-                </button>
+                <div>
+                    <h3 className="font-bold text-sm">{config.businessName}</h3>
+                    <p className="text-[10px] opacity-90 text-white/90">Responde al instante con IA</p>
+                </div>
             </div>
 
             {/* Chat Area */}
@@ -357,12 +352,13 @@ export function SalesWidget() {
                 </div>
             </div>
 
-            {/* Floating Close Button - Mobile */}
+            {/* Floating Close Button - Mobile Only */}
             <button
                 onClick={handleClose}
-                className="absolute -bottom-16 left-1/2 -translate-x-1/2 sm:hidden w-12 h-12 rounded-full bg-slate-900 hover:bg-slate-800 transition-all flex items-center justify-center shadow-lg border-2 border-white"
+                className="absolute -bottom-16 left-1/2 -translate-x-1/2 sm:hidden w-14 h-14 rounded-full bg-red-600 hover:bg-red-700 active:scale-95 transition-all flex items-center justify-center shadow-2xl border-4 border-white z-50"
+                aria-label="Cerrar chat"
             >
-                <X className="w-5 h-5 text-white" />
+                <X className="w-6 h-6 text-white stroke-[3]" />
             </button>
         </div>
     );
