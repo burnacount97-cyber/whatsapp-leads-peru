@@ -707,20 +707,40 @@
   async function refreshConfig() {
     const newConfig = await getWidgetConfig(config.clientId);
     if (newConfig) {
-      const hasChanged = JSON.stringify(newConfig) !== JSON.stringify({
-        primaryColor: config.primaryColor,
-        businessName: config.businessName,
-        welcomeMessage: config.welcomeMessage,
-        whatsappDestination: config.whatsappDestination,
-        quickReplies: config.quickReplies,
-        teaserMessages: config.teaserMessages
-      });
+      // Check for visual changes that require re-render
+      const visualKeys = [
+        'primaryColor', 'businessName', 'welcomeMessage',
+        'whatsappDestination', 'quickReplies', 'teaserMessages',
+        'chatPlaceholder', 'exitIntentTitle', 'exitIntentDescription', 'exitIntentCta',
+        'vibrationIntensity'
+      ];
 
-      if (hasChanged) {
+      let hasVisualChanges = false;
+      for (const key of visualKeys) {
+        if (JSON.stringify(newConfig[key]) !== JSON.stringify(config[key])) {
+          hasVisualChanges = true;
+          break;
+        }
+      }
+
+      // Check for functional changes (AI, etc) to log them
+      const hasFunctionalChanges = JSON.stringify(newConfig) !== JSON.stringify(config);
+
+      // Always update config state (for AI parameters, logic, etc)
+      if (hasFunctionalChanges) {
         Object.assign(config, newConfig);
-        console.log('LeadWidget: Config refreshed (including AI config)');
-        // Re-render widget with new config
-        renderWidget();
+        console.log('LeadWidget: Config updated in background');
+      }
+
+      // Only re-render if visual changes occurred AND widget is closed
+      // If widget is open, we avoid re-rendering to not disrupt the user
+      if (hasVisualChanges) {
+        if (!isOpen) {
+          console.log('LeadWidget: Visual changes detected, re-rendering...');
+          renderWidget();
+        } else {
+          console.log('LeadWidget: Visual changes detected but widget is open. Skipping re-render.');
+        }
       }
     }
   }
