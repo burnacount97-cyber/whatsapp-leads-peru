@@ -145,19 +145,20 @@
 
         const dataCollectionRules = `
         REGLAS DE RECOLECCIÓN DE DATOS:
-        1. Tu prioridad es obtener TODOS los datos necesarios para la venta antes de transferir.
-        2. OBLIGATORIO: Obtén el NOMBRE del cliente.
-        3. OBLIGATORIO: Sigue las instrucciones específicas del negocio sobre qué otros datos pedir (ej: fecha, modelo, dirección). Si no hay instrucciones/prompt específico, usa tu criterio para pedir lo esencial del servicio.
-        4. PROHIBIDO: NO pidas el número de teléfono.
-        5. NO uses el comando de redirección hasta que tengas los datos COMPLETOS.
+        1. Obtén el NOMBRE y los DETALLES del pedido/consulta.
+        2. UNA VEZ TENGAS LOS DATOS COMPLETOS, NO TRANSFIERAS AÚN.
+        3. DEBES PEDIR CONFIRMACIÓN: Haz un resumen y pregunta si quiere finalizar por WhatsApp.
+           Ejemplo: "Perfecto Juan, tengo tu pedido de Torta de Chocolate para el viernes. ¿Te paso con un asesor por WhatsApp para confirmar el pago?"
+        4. ESPERA la respuesta afirmativa del cliente ("Sí", "Ok", "Dale").
         `;
 
         const redirectInstruction = `
-        IMPORTANTE - PROTOCOLO DE TRANSFERENCIA:
-        Tu misión es pre-calificar al cliente. Cuando tengas los datos necesarios o el cliente muestre intención clara, NO preguntes si quiere ir a WhatsApp ni menciones "WhatsApp".
-        Simplemente confirma la acción (ej: "Perfecto, le paso tu pedido a cocina" o "Transfiero tu consulta a un humano ahora") y EJECUTA inmediatamente el comando de oculto:
+        IMPORTANTE - PROTOCOLO DE TRANSFERENCIA FINAL:
+        SOLO cuando el cliente responda AFIRMATIVAMENTE (Sí, Ok, Claro) a tu pregunta de confirmación:
+        1. Di algo breve como "Excelente, te estoy transfiriendo ahora...".
+        2. EJECUTA el comando oculto para abrir WhatsApp:
 
-        [WHATSAPP_REDIRECT: Resumen completo de lo que el cliente quiere]
+        [WHATSAPP_REDIRECT: Resumen final de los datos capturados]
         `;
 
         if (config.business_description) {
@@ -190,7 +191,7 @@
           system: (config.business_description
             ? `CONTEXTO DEL NEGOCIO:\n${config.business_description}\n\nINSTRUCCIONES:\n${config.ai_system_prompt || `Eres un asistente de ventas experto para ${config.businessName}.`}`
             : (config.ai_system_prompt || `Eres un asistente de ventas experto para ${config.businessName}.`))
-            + `\n\nREGLAS: Pide NOMBRE y TODOS los detalles necesarios del pedido antes de transferir. NO pidas teléfono. Cuando tengas TODO completo, di "Transfiero tu caso" y usa el comando: [WHATSAPP_REDIRECT: Resumen con Nombre].`,
+            + `\n\nREGLAS: 1. Pide Nombre y Detalles. 2. Resume y PREGUNTA si quiere pasar a WhatsApp. 3. Si dice SÍ, usa el comando: [WHATSAPP_REDIRECT: Resumen].`,
           messages: [{ role: 'user', content: userMessage }]
         });
       } else {
