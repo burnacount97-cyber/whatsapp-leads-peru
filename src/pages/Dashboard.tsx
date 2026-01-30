@@ -96,6 +96,7 @@ interface Profile {
   ai_temperature?: number;
   ai_system_prompt?: string;
   ai_max_tokens?: number;
+  business_description?: string;
 }
 
 type Payment = any;
@@ -211,6 +212,7 @@ export default function Dashboard() {
     ai_model: 'gpt-4o-mini',
     ai_temperature: 0.7,
     ai_max_tokens: 500,
+    business_description: '',
     ai_system_prompt: 'Eres un asistente virtual amable y profesional que ayuda a capturar leads para un negocio. Tu objetivo es obtener información del cliente de manera natural y amigable.',
   });
 
@@ -273,6 +275,7 @@ export default function Dashboard() {
           ai_model: profileData.ai_model || 'gpt-4o-mini',
           ai_temperature: profileData.ai_temperature || 0.7,
           ai_max_tokens: 500,
+          business_description: profileData.business_description || '',
           ai_system_prompt: profileData.ai_system_prompt || 'Eres un asistente virtual amable y profesional que ayuda a capturar leads para un negocio. Tu objetivo es obtener información del cliente de manera natural y amigable.',
         });
       }
@@ -1367,6 +1370,19 @@ export default function Dashboard() {
                   <p className="text-xs text-muted-foreground">Longitud máxima de las respuestas (100-4000)</p>
                 </div>
 
+                {/* Business Description */}
+                <div className="space-y-2">
+                  <Label>Descripción del Negocio (Contexto)</Label>
+                  <textarea
+                    value={aiConfig.business_description}
+                    onChange={(e) => setAiConfig({ ...aiConfig, business_description: e.target.value })}
+                    rows={4}
+                    className="w-full p-3 text-sm border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary bg-slate-50 text-slate-900 placeholder:text-slate-400"
+                    placeholder="Describe tu negocio, productos, servicios y valores clave..."
+                  />
+                  <p className="text-xs text-muted-foreground">Esta información le dará contexto a la IA sobre quién eres.</p>
+                </div>
+
                 {/* System Prompt */}
                 <div className="space-y-2">
                   <Label>Prompt del Sistema</Label>
@@ -1396,6 +1412,7 @@ export default function Dashboard() {
                         ai_model: aiConfig.ai_model,
                         ai_temperature: aiConfig.ai_temperature,
                         ai_max_tokens: aiConfig.ai_max_tokens,
+                        business_description: aiConfig.business_description,
                         ai_system_prompt: aiConfig.ai_system_prompt,
                       });
 
@@ -1407,6 +1424,7 @@ export default function Dashboard() {
                         ai_model: aiConfig.ai_model,
                         ai_temperature: aiConfig.ai_temperature,
                         ai_max_tokens: aiConfig.ai_max_tokens,
+                        business_description: aiConfig.business_description,
                         ai_system_prompt: aiConfig.ai_system_prompt,
                       });
 

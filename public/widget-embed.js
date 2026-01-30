@@ -107,6 +107,7 @@
           ai_api_key: aiApiKey,
           ai_model: fields.ai_model?.stringValue || 'gpt-4o-mini',
           ai_system_prompt: fields.ai_system_prompt?.stringValue || '',
+          business_description: fields.business_description?.stringValue || '',
           ai_temperature: parseFloat(fields.ai_temperature?.doubleValue || fields.ai_temperature?.integerValue || 0.7),
           ai_max_tokens: parseInt(fields.ai_max_tokens?.integerValue || fields.ai_max_tokens?.stringValue) || 500
         };
@@ -139,13 +140,17 @@
           content: m.content
         }));
 
-        const systemPrompt = config.ai_system_prompt ||
+        let systemContent = config.ai_system_prompt ||
           `Eres un asistente de ventas amable para ${config.businessName}. Tu objetivo es ayudar a los clientes y capturar su información de contacto. Sé breve, amigable y útil. Si el cliente muestra interés, invítalo a continuar la conversación por WhatsApp.`;
+
+        if (config.business_description) {
+          systemContent = `CONTEXTO DEL NEGOCIO:\n${config.business_description}\n\nINSTRUCCIONES:\n${systemContent}`;
+        }
 
         body = JSON.stringify({
           model: config.ai_model || 'gpt-4o-mini',
           messages: [
-            { role: 'system', content: systemPrompt },
+            { role: 'system', content: systemContent },
             ...conversationHistory,
             { role: 'user', content: userMessage }
           ],
@@ -162,7 +167,9 @@
         body = JSON.stringify({
           model: config.ai_model || 'claude-3-haiku-20240307',
           max_tokens: parseInt(config.ai_max_tokens) || 500,
-          system: config.ai_system_prompt || `Eres un asistente de ventas amable para ${config.businessName}.`,
+          system: config.business_description
+            ? `CONTEXTO DEL NEGOCIO:\n${config.business_description}\n\nINSTRUCCIONES:\n${config.ai_system_prompt || `Eres un asistente de ventas amable para ${config.businessName}.`}`
+            : (config.ai_system_prompt || `Eres un asistente de ventas amable para ${config.businessName}.`),
           messages: [{ role: 'user', content: userMessage }]
         });
       } else {
