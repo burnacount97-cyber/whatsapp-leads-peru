@@ -23,7 +23,11 @@ import {
   Play,
   Bot,
   Send,
-  Sparkles
+  Sparkles,
+  Cloud,
+  Database,
+  Lock,
+  Server
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -346,6 +350,76 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* --- DATA SAFETY SECTION --- */}
+      <section className="py-20 bg-slate-50 dark:bg-slate-900/30 border-y border-border/50">
+        <div className="container mx-auto max-w-6xl px-4">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-wide mb-4">
+              <ShieldCheck className="w-3 h-3" />
+              Privacidad y Confianza
+            </div>
+            <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-6">
+              Tus datos, en la bóveda de <span className="text-blue-600">Google</span>
+            </h2>
+            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+              No alojamos tus datos en servidores baratos. Utilizamos la misma infraestructura que potencia a Gmail y YouTube para garantizar seguridad total.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Card 1 */}
+            <div className="bg-white dark:bg-slate-950 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 dark:bg-blue-900/20 rounded-bl-[100px] -mr-8 -mt-8 transition-transform group-hover:scale-110" />
+              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/50 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 mb-6 relative z-10">
+                <Cloud className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 relative z-10">Infraestructura Google Cloud</h3>
+              <p className="text-slate-500 dark:text-slate-400 leading-relaxed relative z-10 text-sm">
+                Tu información vive en los centros de datos más seguros del mundo. 99.9% de uptime garantizado y copias de seguridad automáticas.
+              </p>
+            </div>
+
+            {/* Card 2 */}
+            <div className="bg-white dark:bg-slate-950 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 dark:bg-emerald-900/20 rounded-bl-[100px] -mr-8 -mt-8 transition-transform group-hover:scale-110" />
+              <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/50 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-6 relative z-10">
+                <Lock className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 relative z-10">Encriptación Militar</h3>
+              <p className="text-slate-500 dark:text-slate-400 leading-relaxed relative z-10 text-sm">
+                Todos los datos viajan encriptados (SSL/TLS) y se almacenan con cifrado AES-256. Nadie sin autorización puede leer tus leads.
+              </p>
+            </div>
+
+            {/* Card 3 */}
+            <div className="bg-white dark:bg-slate-950 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-purple-50 dark:bg-purple-900/20 rounded-bl-[100px] -mr-8 -mt-8 transition-transform group-hover:scale-110" />
+              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/50 rounded-2xl flex items-center justify-center text-purple-600 dark:text-purple-400 mb-6 relative z-10">
+                <Database className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 relative z-10">Base de Datos Aislada</h3>
+              <p className="text-slate-500 dark:text-slate-400 leading-relaxed relative z-10 text-sm">
+                Utilizamos Firebase (Google) para mantener tus registros aislados y privados. Tú eres el único dueño de tu información.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-12 text-center">
+            <div className="inline-flex items-center gap-4 px-6 py-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm mx-auto">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Infraestructura</span>
+              <div className="flex items-center gap-2 opacity-80">
+                <Cloud className="w-4 h-4 text-slate-500" />
+                <span className="font-bold text-slate-600 dark:text-slate-300 text-sm">Google Cloud</span>
+              </div>
+              <div className="h-4 w-px bg-slate-300 dark:bg-slate-700 mx-2"></div>
+              <div className="flex items-center gap-2 opacity-80">
+                <span className="font-bold text-[#FFCA28] text-sm">Firebase</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* --- SECURITY SHIELD SECTION --- */}
       <section className="py-20 lg:py-32 px-4 bg-slate-950 relative overflow-hidden">
         {/* Decorative Grid */}
@@ -401,10 +475,10 @@ export default function Landing() {
             </div>
           </div>
         </div>
-      </section>
+      </section >
 
       {/* --- SALES FLOW SECTION --- */}
-      <section className="py-20 lg:py-32 bg-background relative overflow-hidden">
+      < section className="py-20 lg:py-32 bg-background relative overflow-hidden" >
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16 lg:mb-24">
             <h2 className="text-4xl lg:text-5xl font-black mb-6">El flujo de venta <span className="text-primary">perfecto</span></h2>
@@ -454,10 +528,10 @@ export default function Landing() {
             ))}
           </div>
         </div>
-      </section>
+      </section >
 
       {/* --- TEMPLATES SHOWCASE --- */}
-      <section className="py-16 lg:py-24 px-4 bg-slate-950 text-white relative border-y border-white/5" id="templates">
+      < section className="py-16 lg:py-24 px-4 bg-slate-950 text-white relative border-y border-white/5" id="templates" >
         <div className="container mx-auto max-w-5xl">
           <div className="mb-8 md:mb-12">
             <div className="text-left mb-6">
@@ -545,10 +619,10 @@ export default function Landing() {
             </div>
           </div>
         </div>
-      </section>
+      </section >
 
       {/* --- PRICING --- */}
-      <section className="py-16 lg:py-24 px-4 bg-slate-950 text-white" id="pricing">
+      < section className="py-16 lg:py-24 px-4 bg-slate-950 text-white" id="pricing" >
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-10 lg:mb-12">
             <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">Precio Justo y Simple</h2>
@@ -633,10 +707,10 @@ export default function Landing() {
             </div>
           </div>
         </div>
-      </section>
+      </section >
 
       {/* --- FAQ --- */}
-      <section className="py-16 lg:py-24 px-4 bg-slate-950 text-white border-t border-white/5">
+      < section className="py-16 lg:py-24 px-4 bg-slate-950 text-white border-t border-white/5" >
         <div className="container mx-auto max-w-3xl">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12">Preguntas Frecuentes</h2>
           <Accordion type="single" collapsible className="w-full">
@@ -667,10 +741,10 @@ export default function Landing() {
             ))}
           </Accordion>
         </div>
-      </section>
+      </section >
 
       {/* --- CTA BOTTOM --- */}
-      <section className="py-16 sm:py-20 px-4">
+      < section className="py-16 sm:py-20 px-4" >
         <div className="container mx-auto max-w-5xl">
           <div className="relative rounded-[2rem] sm:rounded-[3rem] bg-slate-900 overflow-hidden px-6 py-12 sm:px-8 sm:py-16 md:p-20 text-center shadow-2xl">
             <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(68,68,68,.2)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] bg-[position:-100%_0,0_0] bg-no-repeat animate-[shine_3s_infinite]" />
@@ -690,10 +764,10 @@ export default function Landing() {
             <p className="text-slate-500 text-xs sm:text-sm mt-6 relative z-10">Hecho en Lima, Perú 🇵🇪</p>
           </div>
         </div>
-      </section>
+      </section >
 
       {/* --- FOOTER --- */}
-      <footer className="py-16 border-t border-white/10 bg-slate-950 text-white relative overflow-hidden px-4">
+      < footer className="py-16 border-t border-white/10 bg-slate-950 text-white relative overflow-hidden px-4" >
         <div className="container mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-12">
             <div className="col-span-2 md:col-span-1">
@@ -744,56 +818,58 @@ export default function Landing() {
             </div>
           </div>
         </div>
-      </footer>
+      </footer >
 
       <SalesWidget />
 
       {/* Exit Popup */}
-      {showExitPopup && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-md animate-in fade-in duration-500">
-          <div className="bg-card w-full max-w-lg p-1 sm:p-2 rounded-[2.5rem] border shadow-2xl relative animate-in zoom-in-95 duration-300">
-            <div className="bg-background rounded-[2rem] p-8 md:p-12 text-center space-y-6 relative overflow-hidden">
-              {/* Decorative background circle */}
-              <div className="absolute -top-12 -right-12 w-32 h-32 bg-primary/10 rounded-full blur-2xl" />
+      {
+        showExitPopup && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-md animate-in fade-in duration-500">
+            <div className="bg-card w-full max-w-lg p-1 sm:p-2 rounded-[2.5rem] border shadow-2xl relative animate-in zoom-in-95 duration-300">
+              <div className="bg-background rounded-[2rem] p-8 md:p-12 text-center space-y-6 relative overflow-hidden">
+                {/* Decorative background circle */}
+                <div className="absolute -top-12 -right-12 w-32 h-32 bg-primary/10 rounded-full blur-2xl" />
 
-              <button
-                onClick={() => setShowExitPopup(false)}
-                className="absolute top-6 right-6 text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <CloseIcon className="w-5 h-5" />
-              </button>
-
-              <div className="w-16 h-16 bg-gradient-to-tr from-primary to-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-white shadow-xl shadow-primary/20 rotate-6 transform transition-transform group-hover:rotate-0">
-                <Sparkles className="w-8 h-8" />
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="text-3xl font-black tracking-tight">¡Vaya, no te vayas!</h3>
-                <p className="text-muted-foreground text-lg text-balance">
-                  Estás a un click de ver cómo la IA puede <span className="text-primary font-bold">duplicar tus ventas</span>. Prueba la demo sin compromiso.
-                </p>
-              </div>
-
-              <div className="pt-2">
-                <Button
-                  onClick={handleOpenDemoFromPopup}
-                  className="w-full font-bold h-14 text-lg btn-iridescent text-white shadow-xl shadow-primary/30 rounded-xl"
-                  size="lg"
-                >
-                  Probar Demo Gratis Ahora
-                </Button>
                 <button
                   onClick={() => setShowExitPopup(false)}
-                  className="mt-4 text-sm text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
+                  className="absolute top-6 right-6 text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  No, prefiero seguir perdiendo clientes
+                  <CloseIcon className="w-5 h-5" />
                 </button>
+
+                <div className="w-16 h-16 bg-gradient-to-tr from-primary to-emerald-400 rounded-2xl flex items-center justify-center mx-auto text-white shadow-xl shadow-primary/20 rotate-6 transform transition-transform group-hover:rotate-0">
+                  <Sparkles className="w-8 h-8" />
+                </div>
+
+                <div className="space-y-2">
+                  <h3 className="text-3xl font-black tracking-tight">¡Vaya, no te vayas!</h3>
+                  <p className="text-muted-foreground text-lg text-balance">
+                    Estás a un click de ver cómo la IA puede <span className="text-primary font-bold">duplicar tus ventas</span>. Prueba la demo sin compromiso.
+                  </p>
+                </div>
+
+                <div className="pt-2">
+                  <Button
+                    onClick={handleOpenDemoFromPopup}
+                    className="w-full font-bold h-14 text-lg btn-iridescent text-white shadow-xl shadow-primary/30 rounded-xl"
+                    size="lg"
+                  >
+                    Probar Demo Gratis Ahora
+                  </Button>
+                  <button
+                    onClick={() => setShowExitPopup(false)}
+                    className="mt-4 text-sm text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
+                  >
+                    No, prefiero seguir perdiendo clientes
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
-    </div>
+    </div >
   );
 }
