@@ -33,8 +33,14 @@ import {
   ShieldCheck, ShieldAlert, TrendingUp, Info, MessageCircle, Copy, Check, Download,
   ExternalLink, Settings, History, Lock, AlertCircle, LogOut, Loader2, Sparkles,
   Layout, Palette, Code, BarChart as BarChartIcon, BarChart3, Users, CreditCard,
-  Eye, Target, Upload, Clock, Bot, Key, Shield, X, Smartphone, EyeOff
+  Eye, Target, Upload, Clock, Bot, Key, Shield, X, Smartphone, EyeOff, MoreHorizontal
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   BarChart,
   Bar,
@@ -142,6 +148,7 @@ export default function Dashboard() {
 
   const [profile, setProfile] = useState<Profile | null>(null);
   const [widgetConfig, setWidgetConfig] = useState<WidgetConfig | null>(null);
+  const [activeTab, setActiveTab] = useState("config");
   const [leads, setLeads] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState({ views: 0, interactions: 0, viewsToday: 0 });
   const [payments, setPayments] = useState<any[]>([]);
@@ -929,31 +936,91 @@ export default function Dashboard() {
           </div>
         )}
 
-        <Tabs defaultValue="config" className="space-y-8">
-          <TabsList className="flex w-full overflow-x-auto no-scrollbar gap-1 sm:grid sm:grid-cols-6 sm:max-w-3xl">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+          {/* Mobile Navigation (Segmented Control) */}
+          <div className="sm:hidden grid grid-cols-5 gap-1 mb-6 bg-background/50 backdrop-blur-sm p-1 rounded-2xl sticky top-[73px] z-40 border border-border/50 shadow-sm">
+            {/* 1. Widget */}
+            <button
+              onClick={() => setActiveTab('config')}
+              className={`flex flex-col items-center justify-center gap-1 min-h-[56px] rounded-xl transition-all duration-300 active:scale-95 ${activeTab === 'config' ? 'bg-primary/10 text-primary font-bold shadow-sm' : 'text-muted-foreground hover:bg-muted/50'}`}
+            >
+              <Settings className={`w-5 h-5 ${activeTab === 'config' ? 'stroke-[2.5px]' : ''}`} />
+              <span className="text-[10px] leading-none">Widget</span>
+            </button>
+
+            {/* 2. IA */}
+            <button
+              onClick={() => setActiveTab('ai')}
+              className={`flex flex-col items-center justify-center gap-1 min-h-[56px] rounded-xl transition-all duration-300 active:scale-95 ${activeTab === 'ai' ? 'bg-primary/10 text-primary font-bold shadow-sm' : 'text-muted-foreground hover:bg-muted/50'}`}
+            >
+              <Bot className={`w-5 h-5 ${activeTab === 'ai' ? 'stroke-[2.5px]' : ''}`} />
+              <span className="text-[10px] leading-none">IA</span>
+            </button>
+
+            {/* 3. Leads */}
+            <button
+              onClick={() => setActiveTab('leads')}
+              className={`flex flex-col items-center justify-center gap-1 min-h-[56px] rounded-xl transition-all duration-300 active:scale-95 ${activeTab === 'leads' ? 'bg-primary/10 text-primary font-bold shadow-sm' : 'text-muted-foreground hover:bg-muted/50'}`}
+            >
+              <Users className={`w-5 h-5 ${activeTab === 'leads' ? 'stroke-[2.5px]' : ''}`} />
+              <span className="text-[10px] leading-none">Leads</span>
+            </button>
+
+            {/* 4. Data */}
+            <button
+              onClick={() => setActiveTab('analytics')}
+              className={`flex flex-col items-center justify-center gap-1 min-h-[56px] rounded-xl transition-all duration-300 active:scale-95 ${activeTab === 'analytics' ? 'bg-primary/10 text-primary font-bold shadow-sm' : 'text-muted-foreground hover:bg-muted/50'}`}
+            >
+              <BarChart3 className={`w-5 h-5 ${activeTab === 'analytics' ? 'stroke-[2.5px]' : ''}`} />
+              <span className="text-[10px] leading-none">Data</span>
+            </button>
+
+            {/* 5. More (Dropdown) */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className={`flex flex-col items-center justify-center gap-1 min-h-[56px] rounded-xl transition-all duration-300 active:scale-95 ${['security', 'billing'].includes(activeTab) ? 'bg-primary/10 text-primary font-bold shadow-sm' : 'text-muted-foreground hover:bg-muted/50'}`}
+                >
+                  <MoreHorizontal className="w-5 h-5" />
+                  <span className="text-[10px] leading-none">Más</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 rounded-xl">
+                <DropdownMenuItem onClick={() => setActiveTab('security')} className="gap-2 h-10 cursor-pointer">
+                  <ShieldCheck className="w-4 h-4" /> Seguridad
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveTab('billing')} className="gap-2 h-10 cursor-pointer">
+                  <CreditCard className="w-4 h-4" /> Pagos
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* Desktop Navigation */}
+          <TabsList className="hidden sm:grid sm:grid-cols-6 w-full no-scrollbar gap-1 sm:max-w-3xl">
             <TabsTrigger value="config" className="gap-2 flex-shrink-0 px-4">
               <Settings className="w-4 h-4" />
-              <span className="hidden sm:inline">Widget</span>
+              <span>Widget</span>
             </TabsTrigger>
             <TabsTrigger value="ai" className="gap-2 flex-shrink-0 px-4">
               <Bot className="w-4 h-4" />
-              <span className="hidden sm:inline">IA</span>
+              <span>IA</span>
             </TabsTrigger>
             <TabsTrigger value="leads" className="gap-2 flex-shrink-0 px-4">
               <Users className="w-4 h-4" />
-              <span className="hidden sm:inline">Leads</span>
+              <span>Leads</span>
             </TabsTrigger>
             <TabsTrigger value="analytics" className="gap-2 flex-shrink-0 px-4">
               <BarChart3 className="w-4 h-4" />
-              <span className="hidden sm:inline">Analíticas</span>
+              <span>Analíticas</span>
             </TabsTrigger>
             <TabsTrigger value="security" className="gap-2 flex-shrink-0 px-4">
               <ShieldCheck className="w-4 h-4" />
-              <span className="hidden sm:inline">Seguridad</span>
+              <span>Seguridad</span>
             </TabsTrigger>
             <TabsTrigger value="billing" className="gap-2 flex-shrink-0 px-4">
               <CreditCard className="w-4 h-4" />
-              <span className="hidden sm:inline">Pagos</span>
+              <span>Pagos</span>
             </TabsTrigger>
           </TabsList>
 
