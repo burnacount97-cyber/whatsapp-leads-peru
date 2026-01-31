@@ -143,7 +143,7 @@ export default function Dashboard() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [widgetConfig, setWidgetConfig] = useState<WidgetConfig | null>(null);
   const [leads, setLeads] = useState<any[]>([]);
-  const [analytics, setAnalytics] = useState({ views: 0, interactions: 0 });
+  const [analytics, setAnalytics] = useState({ views: 0, interactions: 0, viewsToday: 0 });
   const [payments, setPayments] = useState<any[]>([]);
   const [blockedIps, setBlockedIps] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -383,11 +383,6 @@ export default function Dashboard() {
           const visitsSnap = await getDocs(qVisits);
           const totalVisits = visitsSnap.size;
 
-          setAnalytics({
-            views: totalVisits,
-            interactions: totalVisits
-          });
-
           // --- CHART DATA PROCESSING ---
           try {
             const days = [];
@@ -414,22 +409,43 @@ export default function Dashboard() {
             // 1. Process visits
             visitsSnap.docs.forEach(doc => {
               const data = doc.data();
-              const key = getDayKey(data.created_at);
-              // Fallback to today if timestamp is missing/invalid to keep totals consistent
-              const targetKey = key || todayKey;
-              const found = chartDataRaw.find(c => c.name === targetKey);
-              if (found) found.visitas++;
+              // Fix: Widget uses 'timestamp', API uses 'created_at'. Check both.
+              const dateField = data.created_at || data.timestamp;
+              const key = getDayKey(dateField);
+
+              // Only count as 'Today' if key matches todayKey essentially, but for chart we map to days
+              // If date is invalid/missing, we shouldn't default to today for historical data integrity, 
+              // but for now let's keep it safe or ignore. 
+              // Better: If no date, don't plot it, or plot as today only if it really just happened?
+              // Let's stick to the mapping but fix the field read.
+              if (key) {
+                const found = chartDataRaw.find(c => c.name === key);
+                if (found) found.visitas++;
+              }
+            });
+
+            // Calculate Today's counts for the summary card
+            const todayStr = new Date().toLocaleDateString('es-PE', { weekday: 'short', day: 'numeric' });
+            const todayStats = chartDataRaw.find(c => c.name === todayStr);
+            const visitsToday = todayStats ? todayStats.visitas : 0;
+
+            setAnalytics({
+              views: totalVisits,
+              interactions: totalVisits, // This could be refined if we had distinct 'chats' vs 'visits'
+              viewsToday: visitsToday
             });
 
             // 2. Process leads and ensure they count as visits too
             leadsData.forEach((lead: any) => {
               const key = getDayKey(lead.created_at);
-              const targetKey = key || todayKey;
-              const found = chartDataRaw.find(c => c.name === targetKey);
-              if (found) {
-                found.leads++;
-                if (found.visitas < found.leads) {
-                  found.visitas = found.leads;
+              if (key) {
+                const found = chartDataRaw.find(c => c.name === key);
+                if (found) {
+                  found.leads++;
+                  // Only increment visit if it wasn't already tracked (simple heuristic: ensure visits >= leads)
+                  if (found.visitas < found.leads) {
+                    found.visitas = found.leads;
+                  }
                 }
               }
             });
@@ -1616,8 +1632,15 @@ export default function Dashboard() {
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-muted-foreground">Visitas</p>
-                      <p className="text-3xl font-bold">{analytics.views}</p>
+                      <p className="text-sm text-muted-foreground">Visitas (Total)</p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-3xl font-bold">{analytics.views}</p>
+                        {analytics.viewsToday > 0 && (
+                          <span className="text-xs font-medium text-green-600 bg-green-100 px-1.5 py-0.5 rounded-full">
+                            +{analytics.viewsToday} hoy
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center">
                       <Eye className="w-6 h-6 text-secondary" />
