@@ -798,12 +798,14 @@ export default function Dashboard() {
                 <p className="text-center text-sm font-medium mb-2">Métodos de Pago:</p>
                 <div className="grid grid-cols-2 gap-3 text-xs">
                   <div className="p-2 bg-sky-50 rounded border border-sky-100">
-                    <span className="font-bold block text-sky-700">BCP</span>
-                    193-XXXXXXXX-X-XX
+                    <span className="font-bold block text-sky-700">Scotiabank</span>
+                    <span className="font-medium">0997561105</span>
+                    <p className="text-[10px] opacity-70">Kenneth Herrera</p>
                   </div>
                   <div className="p-2 bg-purple-50 rounded border border-purple-100">
                     <span className="font-bold block text-purple-700">Yape/Plin</span>
                     902 105 668
+                    <p className="text-[10px] opacity-70">Kenneth Herrera</p>
                   </div>
                 </div>
 
@@ -1840,12 +1842,13 @@ export default function Dashboard() {
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="p-4 bg-sky-50 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-800 rounded-xl">
                       <h4 className="font-bold flex items-center gap-2 mb-3">
-                        <div className="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center text-white text-[10px]">BCP</div>
-                        Transferencia BCP
+                        <div className="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center text-white text-[10px]">Scotia</div>
+                        Transferencia Scotiabank
                       </h4>
                       <div className="space-y-1 text-xs">
-                        <div className="flex justify-between"><span>Soles:</span> <span className="font-medium">193-XXXXXXXX-X-XX</span></div>
-                        <div className="flex justify-between"><span>CCI:</span> <span className="font-medium">002-193-XXXXXXXX-X-XX</span></div>
+                        <div className="flex justify-between"><span>Soles:</span> <span className="font-medium">0997561105</span></div>
+                        <div className="flex justify-between"><span>CCI:</span> <span className="font-medium">00926320099756110553</span></div>
+                        <div className="flex justify-between mt-1"><span>Titular:</span> <span className="font-medium">Kenneth Herrera</span></div>
                       </div>
                     </div>
 
@@ -1856,7 +1859,7 @@ export default function Dashboard() {
                       </h4>
                       <div className="space-y-1 text-xs">
                         <div className="flex justify-between"><span>Número:</span> <span className="font-medium text-lg">902 105 668</span></div>
-                        <div className="flex justify-between"><span>Titular:</span> <span className="font-medium">Ken Ryzen</span></div>
+                        <div className="flex justify-between"><span>Titular:</span> <span className="font-medium">Kenneth Herrera</span></div>
                       </div>
                     </div>
                   </div>
