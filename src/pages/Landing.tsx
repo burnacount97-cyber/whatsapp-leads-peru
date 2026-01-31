@@ -163,7 +163,7 @@ export default function Landing() {
               </h1>
 
               <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto lg:mx-0 text-pretty">
-                El único widget que <strong className="text-foreground">cualifica, protege tus créditos</strong> y envía leads 100% listos para comprar
+                El único widget que <strong className="text-foreground">filtra curiosos, asegura ventas reales</strong> y envía leads 100% listos para comprar
                 <strong className="text-foreground"> directo a tu WhatsApp</strong>.
               </p>
 
