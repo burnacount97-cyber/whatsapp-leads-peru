@@ -476,22 +476,34 @@ export default function SuperAdmin() {
         </div>
 
         <Tabs defaultValue="clients" className="space-y-8">
-          <TabsList className="flex w-full overflow-x-auto no-scrollbar gap-1 sm:grid sm:grid-cols-4 sm:max-w-2xl bg-muted/50 p-1">
-            <TabsTrigger value="clients" className="gap-2 flex-shrink-0 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
-              <Users className="w-4 h-4" />
-              <span>Clientes</span>
+          <TabsList className="bg-slate-900/90 text-slate-400 p-1 rounded-2xl border border-slate-800 backdrop-blur-sm inline-flex h-auto w-full sm:w-auto">
+            <TabsTrigger
+              value="clients"
+              className="flex flex-col gap-1 px-6 py-3 h-auto data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500 data-[state=active]:shadow-none rounded-xl transition-all"
+            >
+              <Users className="w-5 h-5 stroke-[2.5px]" />
+              <span className="text-[10px] font-medium">Clientes</span>
             </TabsTrigger>
-            <TabsTrigger value="payments" className="gap-2 flex-shrink-0 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
-              <CreditCard className="w-4 h-4" />
-              <span>Pagos</span>
+            <TabsTrigger
+              value="payments"
+              className="flex flex-col gap-1 px-6 py-3 h-auto data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500 data-[state=active]:shadow-none rounded-xl transition-all"
+            >
+              <CreditCard className="w-5 h-5 stroke-[2.5px]" />
+              <span className="text-[10px] font-medium">Pagos</span>
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="gap-2 flex-shrink-0 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
-              <BarChart3 className="w-4 h-4" />
-              <span>Analíticas</span>
+            <TabsTrigger
+              value="analytics"
+              className="flex flex-col gap-1 px-6 py-3 h-auto data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500 data-[state=active]:shadow-none rounded-xl transition-all"
+            >
+              <BarChart3 className="w-5 h-5 stroke-[2.5px]" />
+              <span className="text-[10px] font-medium">Data</span>
             </TabsTrigger>
-            <TabsTrigger value="security" className="gap-2 flex-shrink-0 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
-              <ShieldCheck className="w-4 h-4" />
-              <span>Seguridad</span>
+            <TabsTrigger
+              value="security"
+              className="flex flex-col gap-1 px-6 py-3 h-auto data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500 data-[state=active]:shadow-none rounded-xl transition-all"
+            >
+              <ShieldCheck className="w-5 h-5 stroke-[2.5px]" />
+              <span className="text-[10px] font-medium">Seguridad</span>
             </TabsTrigger>
           </TabsList>
 
