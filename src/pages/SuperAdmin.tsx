@@ -398,67 +398,101 @@ export default function SuperAdmin() {
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
           <Card className="stat-card">
             <CardContent className="pt-4 pb-4">
-              <p className="text-xs text-muted-foreground">Clientes</p>
-              <p className="text-2xl font-bold">{stats.totalClients}</p>
+              <p className="text-sm text-muted-foreground">Clientes Totales</p>
+              <div className="flex items-center justify-between">
+                <p className="text-2xl font-bold">{stats.totalClients}</p>
+                <div className="w-8 h-8 bg-secondary/10 rounded-lg flex items-center justify-center">
+                  <Users className="w-4 h-4 text-secondary" />
+                </div>
+              </div>
             </CardContent>
           </Card>
           <Card className="stat-card">
             <CardContent className="pt-4 pb-4">
-              <p className="text-xs text-muted-foreground">Activos</p>
-              <p className="text-2xl font-bold text-green-600">{stats.activeClients}</p>
+              <p className="text-sm text-muted-foreground">Activos</p>
+              <div className="flex items-center justify-between">
+                <p className="text-2xl font-bold text-green-600">{stats.activeClients}</p>
+                <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                  <Check className="w-4 h-4 text-green-600" />
+                </div>
+              </div>
             </CardContent>
           </Card>
           <Card className="stat-card">
             <CardContent className="pt-4 pb-4">
-              <p className="text-xs text-muted-foreground">Trial</p>
-              <p className="text-2xl font-bold text-yellow-600">{stats.trialClients}</p>
+              <p className="text-sm text-muted-foreground">En Demo/Trial</p>
+              <div className="flex items-center justify-between">
+                <p className="text-2xl font-bold text-yellow-600">{stats.trialClients}</p>
+                <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                  <Clock className="w-4 h-4 text-yellow-600" />
+                </div>
+              </div>
             </CardContent>
           </Card>
           <Card className="stat-card">
             <CardContent className="pt-4 pb-4">
-              <p className="text-xs text-muted-foreground">Suspendidos</p>
-              <p className="text-2xl font-bold text-red-600">{stats.suspendedClients}</p>
+              <p className="text-sm text-muted-foreground">Suspendidos</p>
+              <div className="flex items-center justify-between">
+                <p className="text-2xl font-bold text-red-600">{stats.suspendedClients}</p>
+                <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                  <X className="w-4 h-4 text-red-600" />
+                </div>
+              </div>
             </CardContent>
           </Card>
           <Card className="stat-card">
             <CardContent className="pt-4 pb-4">
-              <p className="text-xs text-muted-foreground">Leads Total</p>
-              <p className="text-2xl font-bold">{stats.totalLeads}</p>
+              <p className="text-sm text-muted-foreground">Leads Totales</p>
+              <div className="flex items-center justify-between">
+                <p className="text-2xl font-bold">{stats.totalLeads}</p>
+                <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <Users className="w-4 h-4 text-primary" />
+                </div>
+              </div>
             </CardContent>
           </Card>
           <Card className="stat-card">
             <CardContent className="pt-4 pb-4">
-              <p className="text-xs text-muted-foreground">Visitas Global</p>
-              <p className="text-2xl font-bold">{stats.totalViews}</p>
+              <p className="text-sm text-muted-foreground">Visitas Global</p>
+              <div className="flex items-center justify-between">
+                <p className="text-2xl font-bold">{stats.totalViews}</p>
+                <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Eye className="w-4 h-4 text-blue-600" />
+                </div>
+              </div>
             </CardContent>
           </Card>
           <Card className="stat-card bg-primary text-primary-foreground">
             <CardContent className="pt-4 pb-4">
-              <p className="text-xs opacity-80">MRR</p>
-              <p className="text-2xl font-bold">S/{stats.mrr}</p>
+              <p className="text-sm font-medium text-primary-foreground/80">MRR Mensual</p>
+              <div className="flex items-center justify-between">
+                <p className="text-2xl font-bold text-white">S/{stats.mrr}</p>
+                <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                  <TrendingUp className="w-4 h-4 text-white" />
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
 
         <Tabs defaultValue="clients" className="space-y-8">
-          <TabsList className="w-full justify-start overflow-x-auto">
-            <TabsTrigger value="clients" className="gap-2">
+          <TabsList className="flex w-full overflow-x-auto no-scrollbar gap-1 sm:grid sm:grid-cols-4 sm:max-w-2xl bg-muted/50 p-1">
+            <TabsTrigger value="clients" className="gap-2 flex-shrink-0 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
               <Users className="w-4 h-4" />
-              Clientes
+              <span>Clientes</span>
             </TabsTrigger>
-            <TabsTrigger value="payments" className="gap-2">
+            <TabsTrigger value="payments" className="gap-2 flex-shrink-0 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
               <CreditCard className="w-4 h-4" />
-              Pagos Pendientes
+              <span>Pagos</span>
             </TabsTrigger>
-            <TabsTrigger value="analytics" className="gap-2">
+            <TabsTrigger value="analytics" className="gap-2 flex-shrink-0 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
               <BarChart3 className="w-4 h-4" />
-              Analytics
+              <span>Analíticas</span>
             </TabsTrigger>
-            <TabsTrigger value="security" className="gap-2">
+            <TabsTrigger value="security" className="gap-2 flex-shrink-0 px-4 data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-300">
               <ShieldCheck className="w-4 h-4" />
-              Seguridad
+              <span>Seguridad</span>
             </TabsTrigger>
-
           </TabsList>
 
           {/* Clients Tab */}
