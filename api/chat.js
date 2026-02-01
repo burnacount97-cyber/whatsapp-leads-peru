@@ -151,6 +151,7 @@ REGLAS DE COMPORTAMIENTO:
                 return res.status(404).json({ error: 'Widget not found' });
             }
 
+            const widgetData = { id: q.docs[0].id, ...q.docs[0].data() };
             dbWidgetConfig = widgetData;
 
             // --- SUBSCRIPTION ENFORCEMENT ---
@@ -356,7 +357,7 @@ When you have the user's data (Name and interest) and they confirm they want to 
         console.error('API Chat Error:', error);
 
         // Detailed error for common failures
-        let userMessage = `Error Técnico: ${error.message}`; // Temporary exposure for debugging
+        let userMessage = "Lo siento, tuve un error de conexión con mi cerebro artificial. ¿Puedes intentar de nuevo?";
 
         if (error.message?.includes('JSON at position')) {
             userMessage = "Error de configuración: El archivo de cuenta de servicio (service_account) en Vercel no es un JSON válido.";
