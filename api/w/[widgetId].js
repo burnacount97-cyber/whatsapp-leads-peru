@@ -41,31 +41,68 @@ export default async function handler(req, res) {
     const host = req.headers.host;
     const baseUrl = `${protocol}://${host}`;
 
+    const TRANSLATIONS = {
+      es: {
+        welcome: '¡Hola! soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
+        placeholder: 'Escribe tu mensaje...',
+        exitTitle: '¡Espera!',
+        exitDesc: 'Prueba Lead Widget gratis por 3 días y aumenta tus ventas.',
+        exitCTA: 'Probar Demo Ahora',
+        online: 'En línea ahora',
+        hint: '¿Tienes alguna duda? ✨',
+        wa_pre: 'Envía este mensaje así tal cual:',
+        connecting: '✅ Conectando con WhatsApp...',
+        wa_msg_pre: '¡Hola! Vengo de la web de ',
+        teaser_text: '¿Cómo puedo ayudarte con tu negocio? 👋',
+        fields: { name: 'Nombre', interest: 'Interés', budget: 'Presupuesto', website: 'Web', service: 'Servicio', phone: 'Teléfono' },
+        teasers: ['¿Cómo podemos ayudarte? 👋', '¿Tienes alguna duda sobre el servicio? ✨', '¡Hola! Estamos en línea para atenderte 🚀'],
+        quick: ['¿Cómo funciona?', 'Quiero más información', 'Ver precios'],
+        blocked_chat: 'Chat bloqueado por seguridad',
+        connection_error: 'Lo siento, hubo un error de conexión.',
+        whatsapp_btn: 'Abrir WhatsApp Ahora'
+      },
+      en: {
+        welcome: 'Hello! I am your virtual assistant. How can I help you today?',
+        placeholder: 'Type your message...',
+        exitTitle: 'Wait!',
+        exitDesc: 'Try Lead Widget free for 3 days and boost your sales.',
+        exitCTA: 'Try Demo Now',
+        online: 'Online now',
+        hint: 'Any questions? ✨',
+        wa_pre: 'Send this message as is:',
+        connecting: '✅ Connecting to WhatsApp...',
+        wa_msg_pre: 'Hello! I coming from ',
+        teaser_text: 'How can I help you with your business? 👋',
+        fields: { name: 'Name', interest: 'Interest', budget: 'Budget', website: 'Website', service: 'Service', phone: 'Phone' },
+        teasers: ['How can we help you? 👋', 'Any questions? ✨', 'Hello! We are online to assist you 🚀'],
+        quick: ['How does it work?', 'More info', 'See pricing'],
+        blocked_chat: 'Chat blocked for security',
+        connection_error: 'Sorry, connection error.',
+        whatsapp_btn: 'Open WhatsApp Now'
+      }
+    };
+
+    const lang = widgetData.language || 'es';
+    const t = TRANSLATIONS[lang] || TRANSLATIONS.es;
+
     const config = {
       primaryColor: widgetData.primary_color || '#00C185',
       businessName: profileData.business_name || 'Lead Widget',
-      welcomeMessage: widgetData.welcome_message || '¡Hola! soy tu asistente virtual. ¿En qué puedo ayudarte hoy?',
+      welcomeMessage: widgetData.welcome_message || t.welcome,
       whatsappDestination: widgetData.whatsapp_destination || profileData.whatsapp_number || '',
       widgetId: widgetData.id,
       triggerDelay: widgetData.trigger_delay || 5,
-      chatPlaceholder: widgetData.chat_placeholder || 'Escribe tu mensaje...',
+      chatPlaceholder: widgetData.chat_placeholder || t.placeholder,
       vibrationIntensity: widgetData.vibration_intensity || 'soft',
-      exitIntentTitle: widgetData.exit_intent_title || '¡Espera!',
-      exitIntentDescription: widgetData.exit_intent_description || 'Prueba Lead Widget gratis por 3 días y aumenta tus ventas.',
-      exitIntentCTA: widgetData.exit_intent_cta || 'Probar Demo Ahora',
-      teaserMessages: widgetData.teaser_messages || [
-        '¿Cómo podemos ayudarte? 👋',
-        '¿Tienes alguna duda sobre el servicio? ✨',
-        '¡Hola! Estamos en línea para atenderte 🚀'
-      ],
-      quickReplies: widgetData.quick_replies || [
-        '¿Cómo funciona?',
-        'Quiero más información',
-        'Ver precios'
-      ],
-      exitIntentEnabled: widgetData.trigger_exit_intent, // Added explicit field
+      exitIntentTitle: widgetData.exit_intent_title || t.exitTitle,
+      exitIntentDescription: widgetData.exit_intent_description || t.exitDesc,
+      exitIntentCTA: widgetData.exit_intent_cta || t.exitCTA,
+      teaserMessages: widgetData.teaser_messages || t.teasers,
+      quickReplies: widgetData.quick_replies || t.quick,
+      exitIntentEnabled: widgetData.trigger_exit_intent,
       apiUrl: `${baseUrl}/api/chat`,
-      trackUrl: `${baseUrl}/api/track`
+      trackUrl: `${baseUrl}/api/track`,
+      text: t
     };
 
     const widgetScript = `
@@ -257,7 +294,7 @@ export default async function handler(req, res) {
     <div id="leadwidget-container">
       <style>\${styles}</style>
       <div id="lw-teaser" class="lw-teaser">
-         <div class="lw-teaser-text">¿Cómo puedo ayudarte con tu negocio? 👋</div>
+         <div class="lw-teaser-text">\${config.text.teaser_text}</div>
       </div>
       <button id="leadwidget-button">
         <div id="lw-badge" class="lw-badge">1</div>
@@ -274,8 +311,8 @@ export default async function handler(req, res) {
                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2Z"/></svg>
               </div>
               <div>
-                 <div style="font-weight: 600; font-size: 14px; line-height: 1.2;">\${config.businessName}</div>
-                 <div style="font-size: 11px; opacity: 0.9;">En línea ahora</div>
+                 <div style="font-weight: 600; font-size: 14px; line-height: 1.2;">${config.businessName}</div>
+                 <div style="font-size: 11px; opacity: 0.9;">${config.text.online}</div>
               </div>
            </div>
            <button id="lw-close" style="background:none; border:none; color:white; cursor:pointer;">
@@ -290,10 +327,10 @@ export default async function handler(req, res) {
         <form id="lw-form" class="lw-input-area">
            <div id="lw-quick-replies" class="lw-quick-replies"></div>
            <div id="lw-hint" style="text-align:center; display:none; animation: lw-bounce-small 2s infinite;">
-              <span style="font-size:10px; background:\${config.primaryColor}15; color:\${config.primaryColor}; padding:2px 10px; border-radius:10px; font-weight:600;">¿Tienes alguna duda? ✨</span>
+              <span style="font-size:10px; background:${config.primaryColor}15; color:${config.primaryColor}; padding:2px 10px; border-radius:10px; font-weight:600;">${config.text.hint}</span>
            </div>
            <div class="lw-input-row">
-              <input id="lw-input" class="lw-input" type="text" placeholder="\${config.chatPlaceholder}" autocomplete="off">
+              <input id="lw-input" class="lw-input" type="text" placeholder="${config.chatPlaceholder}" autocomplete="off">
               <button type="submit" id="lw-submit" class="lw-send-btn" disabled>
                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
               </button>
@@ -311,179 +348,175 @@ export default async function handler(req, res) {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
           <div style="font-size: 40px; margin-bottom: 16px;">🚀</div>
-          <div class="lw-popup-title">\${config.exitIntentTitle}</div>
-          <div class="lw-popup-desc">\${config.exitIntentDescription}</div>
-          <button id="lw-popup-cta" class="lw-popup-btn">\${config.exitIntentCTA}</button>
+          <div class="lw-popup-title">${config.exitIntentTitle}</div>
+          <div class="lw-popup-desc">${config.exitIntentDescription}</div>
+          <button id="lw-popup-cta" class="lw-popup-btn">${config.exitIntentCTA}</button>
         </div>
       </div>
     </div>
-  \`;
+  `;
 
-  // Render Function
-  function renderMessages() {
-    const container = document.getElementById('lw-messages');
-    if (!container) return;
-    
-    container.innerHTML = messages.map(msg => {
-      if (msg.role === 'system') {
-        return \`
+    // Render Function
+    function renderMessages() {
+      const container = document.getElementById('lw-messages');
+      if (!container) return;
+
+      container.innerHTML = messages.map(msg => {
+        if (msg.role === 'system') {
+          return `
           <div class="lw-msg lw-msg-system">
-             <div class="lw-system-text">\${msg.content}</div>
-             \${msg.actionUrl ? \`<a href="\${msg.actionUrl}" target="_blank" class="lw-btn-whatsapp">
+             <div class="lw-system-text">${msg.content}</div>
+             ${msg.actionUrl ? `<a href="${msg.actionUrl}" target="_blank" class="lw-btn-whatsapp">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                Abrir WhatsApp Ahora
-             </a>\` : ''}
+                ${config.text.whatsapp_btn}
+             </a>` : ''}
           </div>
-        \`;
-      }
-      return \`<div class="lw-msg lw-msg-\${msg.role}">\${msg.content}</div>\`;
-    }).join('');
+        `;
+        }
+        return `<div class="lw-msg lw-msg-${msg.role}">${msg.content}</div>`;
+      }).join('');
 
-    if (isLoading) {
-      container.innerHTML += \`
+      if (isLoading) {
+        container.innerHTML += `
         <div class="lw-msg lw-msg-assistant" style="width: fit-content;">
            <div class="typing-indicator">
               <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
            </div>
         </div>
-      \`;
-    }
-    
-    // Scroll to bottom
-    container.scrollTop = container.scrollHeight;
-  }
+      `;
+      }
 
-  // API Call
-  async function sendMessage(text) {
-    if (!text.trim()) return;
-    
-    // Add user message
-    messages.push({ role: 'user', content: text });
-    isLoading = true;
-    renderMessages();
-    
-    try {
-      const resp = await fetch(config.apiUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: text,
-          history: messages.filter(m => m.role !== 'system'),
-          widgetId: config.widgetId
-        })
-      });
-      
-      const data = await resp.json();
-      
-      if (data.blocked) {
+      // Scroll to bottom
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // API Call
+    async function sendMessage(text) {
+      if (!text.trim()) return;
+
+      // Add user message
+      messages.push({ role: 'user', content: text });
+      isLoading = true;
+      renderMessages();
+
+      try {
+        const resp = await fetch(config.apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: text,
+            history: messages.filter(m => m.role !== 'system'),
+            widgetId: config.widgetId
+          })
+        });
+
+        const data = await resp.json();
+
+        if (data.blocked) {
           messages.push({ role: 'assistant', content: data.response });
           const inputEl = document.getElementById('lw-input');
           if (inputEl) {
-              inputEl.disabled = true;
-              inputEl.placeholder = 'Chat bloqueado por seguridad';
+            inputEl.disabled = true;
+            inputEl.placeholder = config.text.blocked_chat;
           }
           const submitEl = document.getElementById('lw-submit');
           if (submitEl) submitEl.disabled = true;
           return;
-      }
+        }
 
-      if (data.error) throw new Error(data.error);
+        if (data.error) throw new Error(data.error);
 
-      // Check for action
-      const jsonMatch = data.response.match(/\\{"action":\\s*"collect_lead"[^}]*\\}/);
-      
-      if (jsonMatch) {
-         let capturedData = { name: 'Cliente' };
-         try {
-             const leadPayload = JSON.parse(jsonMatch[0].replace(/\\\\/g, ''));
-             if (leadPayload.data) capturedData = Object.assign(capturedData, leadPayload.data);
-         } catch(e) {}
+        // Check for action
+        const jsonMatch = data.response.match(/\{"action":\s*"collect_lead"[^}]*\}/);
 
-         const cleanResponse = data.response.replace(jsonMatch[0], '').trim();
-         if (cleanResponse) {
-             messages.push({ role: 'assistant', content: cleanResponse });
-         }
-         
-         // Generate Dynamic WhatsApp Message from captured fields
-         let messageBody = "¡Hola! Vengo de la web de " + config.businessName + ".\\n\\n";
-         const emojis = ["👤", "🎯", "💰", "🏠", "📍", "🩺", "🔧", "🛵", "⏰", "📦"];
-         let emojiIdx = 0;
+        if (jsonMatch) {
+          let capturedData = { name: 'Cliente' };
+          try {
+            const leadPayload = JSON.parse(jsonMatch[0].replace(/\\/g, ''));
+            if (leadPayload.data) capturedData = Object.assign(capturedData, leadPayload.data);
+          } catch (e) { }
 
-         const fieldLabels = {
-            name: 'Nombre',
-            interest: 'Interés',
-            budget: 'Presupuesto Ads',
-            website: 'Sitio Web',
-            service: 'Servicio',
-            phone: 'Teléfono'
-         };
+          const cleanResponse = data.response.replace(jsonMatch[0], '').trim();
+          if (cleanResponse) {
+            messages.push({ role: 'assistant', content: cleanResponse });
+          }
 
-         Object.entries(capturedData).forEach(([key, value]) => {
-             const label = fieldLabels[key.toLowerCase()] || (key.charAt(0).toUpperCase() + key.slice(1));
-             const emoji = emojis[emojiIdx % emojis.length];
-             messageBody += emoji + " *" + label + ":* " + value + "\\n";
-             emojiIdx++;
-         });
+          // Generate Dynamic WhatsApp Message from captured fields
+          let messageBody = config.text.wa_msg_pre + config.businessName + ".\\n\\n";
+          const emojis = ["👤", "🎯", "💰", "🏠", "📍", "🩺", "🔧", "🛵", "⏰", "📦"];
+          let emojiIdx = 0;
 
-         const waNumber = config.whatsappDestination.replace(/\D/g, '');
-         const waUrl = "https://wa.me/" + waNumber + "?text=" + encodeURIComponent(messageBody);
-         
-         // Instruction for the user
-         const previewBody = messageBody.replace(/\\n/g, '<br/>');
-         messages.push({
+          const fieldLabels = config.text.fields;
+
+          Object.entries(capturedData).forEach(([key, value]) => {
+            const label = fieldLabels[key.toLowerCase()] || (key.charAt(0).toUpperCase() + key.slice(1));
+            const emoji = emojis[emojiIdx % emojis.length];
+            messageBody += emoji + " *" + label + ":* " + value + "\\n";
+            emojiIdx++;
+          });
+
+          const waNumber = config.whatsappDestination.replace(/\D/g, '');
+          const waUrl = "https://wa.me/" + waNumber + "?text=" + encodeURIComponent(messageBody);
+
+          // Instruction for the user
+          const previewBody = messageBody.replace(/\\n/g, '<br/>');
+          messages.push({
             role: 'system',
-            content: '<div style="margin-bottom:4px;">👉 <b>Envía este mensaje así tal cual:</b></div><div style="margin-top:8px; padding:12px; background:rgba(0,0,0,0.04); border:1px solid rgba(0,0,0,0.05); border-radius:12px; font-size:12px; line-height:1.5; text-align:left; color:#475569; font-family:monospace;">' + previewBody + '</div>'
-         });
+            content: '<div style="margin-bottom:4px;">👉 <b>' + config.text.wa_pre + '</b></div><div style="margin-top:8px; padding:12px; background:rgba(0,0,0,0.04); border:1px solid rgba(0,0,0,0.05); border-radius:12px; font-size:12px; line-height:1.5; text-align:left; color:#475569; font-family:monospace;">' + previewBody + '</div>'
+          });
 
-         // Add system message with button
-         messages.push({
+          // Add system message with button
+          messages.push({
             role: 'system',
-            content: '✅ Conectando con WhatsApp...',
+            content: config.text.connecting,
             actionUrl: waUrl
-         });
-         
-         // Auto-redirect attempt
-         setTimeout(() => { window.open(waUrl, '_blank'); }, 4000);
-         
-      } else {
-         messages.push({ role: 'assistant', content: data.response });
+          });
+
+          // Auto-redirect attempt
+          setTimeout(() => { window.open(waUrl, '_blank'); }, 4000);
+
+        } else {
+          messages.push({ role: 'assistant', content: data.response });
+        }
+
+      } catch (err) {
+        console.error(err);
+        messages.push({ role: 'assistant', content: config.text.connection_error });
+      } finally {
+        isLoading = false;
+        renderMessages();
       }
-
-    } catch (err) {
-      console.error(err);
-      messages.push({ role: 'assistant', content: 'Lo siento, hubo un error de conexión.' });
-    } finally {
-      isLoading = false;
-      renderMessages();
     }
-  }
 
-// Init
-function init() {
-  const div = document.createElement('div');
-  div.innerHTML = widgetHTML;
-  document.body.appendChild(div);
+    // Init
+    function init() {
+      const div = document.createElement('div');
+      div.innerHTML = widgetHTML;
+      document.body.appendChild(div);
 
-  const btn = document.getElementById('leadwidget-button');
-  const win = document.getElementById('leadwidget-chat-window');
-  const close = document.getElementById('lw-close');
-  const form = document.getElementById('lw-form');
-  const input = document.getElementById('lw-input');
-  const submitBtn = document.getElementById('lw-submit');
-  const teaser = document.getElementById('lw-teaser');
-  const badge = document.getElementById('lw-badge');
-  const quickRepliesContainer = document.getElementById('lw-quick-replies');
+      const btn = document.getElementById('leadwidget-button');
+      const win = document.getElementById('leadwidget-chat-window');
+      const close = document.getElementById('lw-close');
+      const form = document.getElementById('lw-form');
+      const input = document.getElementById('lw-input');
+      const submitBtn = document.getElementById('lw-submit');
+      const teaser = document.getElementById('lw-teaser');
+      const badge = document.getElementById('lw-badge');
+      const quickRepliesContainer = document.getElementById('lw-quick-replies');
+      const messagesContainer = document.getElementById('lw-messages'); // Ensure we have reference
 
-  // Render Quick Replies
-  function renderQuickReplies() {
-    if (!quickRepliesContainer || messages.length > 2) {
-      if (quickRepliesContainer) quickRepliesContainer.style.display = 'none';
-      return;
-    }
-    quickRepliesContainer.style.display = 'flex';
-    quickRepliesContainer.innerHTML = config.quickReplies.map(text => 
-      \`<button type="button" class="lw-quick-chip" data-text="\${text}">\${text}</button>\`
-    ).join('');
+      // Render Quick Replies
+      function renderQuickReplies() {
+        if (!quickRepliesContainer || messages.length > 2) {
+          if (quickRepliesContainer) quickRepliesContainer.style.display = 'none';
+          return;
+        }
+        quickRepliesContainer.style.display = 'flex';
+        if (quickRepliesContainer.querySelectorAll('.lw-quick-chip').length === 0) {
+          quickRepliesContainer.innerHTML = config.quickReplies.map(text =>
+            \`<button type="button" class="lw-quick-chip" data-text="\${text}">\${text}</button>\`
+           ).join('');
+        }
     
     // Add click handlers
     quickRepliesContainer.querySelectorAll('.lw-quick-chip').forEach(chip => {
@@ -654,14 +687,15 @@ if (document.readyState === 'loading') {
   init();
 }
 }) ();
-`;
+  `;
 
-    res.setHeader('Content-Type', 'application/javascript');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.status(200).send(widgetScript);
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).send('// Error generating widget');
-  }
-}
+          res.setHeader('Content-Type', 'application/javascript');
+          res.setHeader('Access-Control-Allow-Origin', '*');
+          res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+          res.status(200).send(widgetScript);
+
+        } catch (error) {
+          console.error('Error:', error);
+          res.status(500).send('// Error generating widget');
+        }
+      }

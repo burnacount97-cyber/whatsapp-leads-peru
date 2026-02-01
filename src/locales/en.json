@@ -169,6 +169,10 @@
             "report_payment_title": "Report Payment",
             "report_payment_desc": "Enter operation number or holder name to validate payment.",
             "report_btn": "Report and Activate"
-        }
+        },
+        "widget_language": "Widget Language",
+        "widget_language_desc": "Define the chat interface language.",
+        "lang_es": "Spanish 🇪🇸",
+        "lang_en": "English 🇺🇸"
     }
 }

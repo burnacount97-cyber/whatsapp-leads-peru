@@ -84,6 +84,7 @@ interface WidgetConfig {
   is_active: boolean;
   created_at: string;
   ai_security_prompt?: string;
+  language?: 'es' | 'en';
 }
 
 interface Profile {
@@ -230,6 +231,7 @@ export default function Dashboard() {
   // Widget config form state
   const [formConfig, setFormConfig] = useState({
     template: 'general',
+    language: 'es',
     primary_color: '#00C185',
     business_name: 'Lead Widget',
     welcome_message: '¡Hola! ¿En qué podemos ayudarte?',
@@ -305,6 +307,7 @@ export default function Dashboard() {
           user_id: userId,
           widget_id: Math.random().toString(36).substring(2, 12),
           template: 'general',
+          language: 'es',
           primary_color: '#00C165',
           welcome_message: '¡Hola! ¿En qué podemos ayudarte?',
           whatsapp_destination: '',
@@ -338,6 +341,7 @@ export default function Dashboard() {
         setWidgetConfig(configData);
         setFormConfig({
           template: configData.template || 'general',
+          language: configData.language || 'es',
           primary_color: configData.primary_color || '#00C185',
           business_name: configData.business_name || profileData?.business_name || 'Lead Widget',
           welcome_message: configData.welcome_message || '¡Hola! ¿En qué podemos ayudarte?',
@@ -510,6 +514,7 @@ export default function Dashboard() {
       const widgetRef = doc(db, 'widget_configs', widgetConfig.id);
       await updateDoc(widgetRef, {
         template: formConfig.template,
+        language: formConfig.language,
         primary_color: formConfig.primary_color,
         business_name: formConfig.business_name, // Also save here for embedded widget
         welcome_message: formConfig.welcome_message,
@@ -1092,6 +1097,26 @@ export default function Dashboard() {
                         ))}
                       </SelectContent>
                     </Select>
+
+                    <div className="space-y-2 mt-4">
+                      <Label>{t('dashboard.widget_language')}</Label>
+                      <Select
+                        value={formConfig.language}
+                        onValueChange={(v) => {
+                          setFormConfig(prev => ({ ...prev, language: v }));
+                          // Optional: Auto-update helper texts if needed, relying on manual edit for now as per instructions
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="es">{t('dashboard.lang_es')}</SelectItem>
+                          <SelectItem value="en">{t('dashboard.lang_en')}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">{t('dashboard.widget_language_desc')}</p>
+                    </div>
                     {formConfig.template === 'personalizado' && (
                       <div className="mt-3 p-3 bg-primary/10 border border-primary/20 rounded-lg">
                         <p className="text-sm text-primary font-medium flex items-center gap-2">
@@ -1267,6 +1292,7 @@ export default function Dashboard() {
                           exitIntentDescription={formConfig.exit_intent_description}
                           exitIntentCTA={formConfig.exit_intent_cta}
                           mode="dashboard"
+                          language={formConfig.language as 'es' | 'en'}
                         />
                       </div>
                     </div>

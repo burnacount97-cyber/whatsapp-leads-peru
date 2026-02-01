@@ -19,21 +19,37 @@ interface WidgetPreviewProps {
   exitIntentTitle?: string;
   exitIntentDescription?: string;
   exitIntentCTA?: string;
+  language?: 'es' | 'en';
 }
+
+const PREVIEW_TRANSLATIONS = {
+  es: {
+    subtitle: 'Responde al instante con IA',
+    preview_note: '⚡ Vista previa del Widget IA',
+    placeholder: 'Escribe Hola...'
+  },
+  en: {
+    subtitle: 'Replies instantly with AI',
+    preview_note: '⚡ AI Widget Preview',
+    placeholder: 'Type Hello...'
+  }
+};
 
 export function WidgetPreview({
   primaryColor = '#00C185',
   welcomeMessage = '👋 ¡Hola! Soy la IA de LeadWidget. ¿En qué te ayudo?',
   businessName = 'LeadWidget',
-  chatPlaceholder = 'Escribe Hola...',
+  chatPlaceholder,
   mode = 'landing',
   vibrationIntensity = 'soft',
   exitIntentEnabled = true,
   exitIntentTitle = '¡Espera!',
   exitIntentDescription = 'Prueba LeadWidget gratis por 3 días y aumenta tus ventas.',
   exitIntentCTA = 'Probar Demo Ahora',
+  language = 'es'
 }: WidgetPreviewProps) {
   const [isOpen, setIsOpen] = useState(true); // Default open for preview
+  const t = PREVIEW_TRANSLATIONS[language] || PREVIEW_TRANSLATIONS.es;
   const [messages, setMessages] = useState([
     { role: 'assistant', content: welcomeMessage }
   ]);
@@ -138,7 +154,7 @@ export function WidgetPreview({
             <Input
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder={chatPlaceholder}
+              placeholder={chatPlaceholder || t.placeholder}
               className="flex-1 bg-slate-50 border-slate-200"
             />
             <Button
@@ -178,7 +194,7 @@ export function WidgetPreview({
             </div>
             <div>
               <h3 className="font-bold text-sm">{businessName}</h3>
-              <p className="text-[10px] opacity-90 text-white/90">Responde al instante con IA</p>
+              <p className="text-[10px] opacity-90 text-white/90">{t.subtitle}</p>
             </div>
           </div>
           <button onClick={() => setIsOpen(false)} className="hover:bg-white/20 p-1 rounded-full transition-colors">
@@ -209,7 +225,7 @@ export function WidgetPreview({
             <Input
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder="Escribe Hola..."
+              placeholder={chatPlaceholder || t.placeholder}
               className="flex-1 bg-slate-50 border-slate-200"
             />
             <Button
@@ -224,7 +240,7 @@ export function WidgetPreview({
           </form>
           <div className="text-center mt-2">
             <p className="text-[10px] text-slate-400">
-              ⚡ Vista previa del Widget IA
+              {t.preview_note}
             </p>
           </div>
         </div>

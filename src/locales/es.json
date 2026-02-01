@@ -169,6 +169,10 @@
             "report_payment_title": "Reportar Pago",
             "report_payment_desc": "Ingresa el número de operación o titular para validar tu pago.",
             "report_btn": "Reportar y Activar"
-        }
+        },
+        "widget_language": "Idioma del Widget",
+        "widget_language_desc": "Define el idioma de la interfaz del chat.",
+        "lang_es": "Español",
+        "lang_en": "Inglés"
     }
 }
