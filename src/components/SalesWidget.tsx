@@ -48,10 +48,10 @@ export function SalesWidget() {
             if (prev.length === 0) {
                 return [{ role: 'assistant', content: t('demo_widget.welcome') }];
             }
-            // Optional: Update the first message if it matches the OLD welcome message? 
-            // For simplicity, we won't mutate history to avoid confusion, 
-            // BUT for a fresher feel on lang switch, we could.
-            // Let's just ensure init is correct.
+            // If the user hasn't started chatting yet (only 1 message from assistant), update the welcome message
+            if (prev.length === 1 && prev[0].role === 'assistant') {
+                return [{ role: 'assistant', content: t('demo_widget.welcome') }];
+            }
             return prev;
         });
     }, [t]);

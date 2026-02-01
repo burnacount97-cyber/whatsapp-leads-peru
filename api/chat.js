@@ -277,14 +277,14 @@ When you have the user's data (Name and interest) and they confirm they want to 
         // 3. Language Constraint
         // 4. Redirect Protocol
         const userTz = req.body.userTimezone || 'America/Lima';
-        const currentDateTime = new Date().toLocaleString('es-PE', { timeZone: userTz });
+        const currentDateTime = new Date().toLocaleString('en-US', { timeZone: userTz });
 
         const fullSystemPrompt =
-            `FECHA Y HORA ACTUAL PARA EL USUARIO: ${currentDateTime} (Zona Horaria: ${userTz})\n\n` +
+            `CURRENT DATE/TIME FOR USER: ${currentDateTime} (Timezone: ${userTz})\n\n` +
             businessContext +
-            (aiConfig.ai_system_prompt || 'Eres un asistente amable.') +
-            "\n\n" + (widgetId === 'demo-landing' ? "IMPORTANTE: DETECTA EL IDIOMA DEL USUARIO (Inglés o Español) y responde SIEMPRE en ese mismo idioma. Si es inglés, usa inglés. Si es español, usa español." : t.lang_instruction) +
-            "\nIMPORTANTE: Sé breve (2-3 oraciones)." +
+            (aiConfig.ai_system_prompt || 'You are a helpful assistant.') +
+            "\n\n" + (widgetId === 'demo-landing' ? "CRITICAL: IGNORE previous language context. FOCUS ONLY on the user's LAST message. If they write in English, reply in English. If Spanish, reply in Spanish." : t.lang_instruction) +
+            "\nIMPORTANT: Keep it short (2-3 sentences)." +
             redirectInstruction;
 
         const messages = [
