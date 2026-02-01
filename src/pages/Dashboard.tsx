@@ -41,6 +41,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { PayPalPaymentButton } from '@/components/PayPalButton';
 import {
   BarChart,
   Bar,
@@ -139,6 +142,7 @@ const templates = [
 ];
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const { user, signOut, loading: authLoading, isSuperAdmin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -798,6 +802,47 @@ export default function Dashboard() {
               Esperamos que Lead Widget haya sido útil. Para seguir capturando leads ilimitadamente, activa tu plan hoy.
             </CardDescription>
           </CardHeader>
+          <CardContent className="space-y-6 pt-6 animate-in fade-in slide-in-from-bottom-4">
+            <PayPalPaymentButton
+              amount="9.90"
+              currency="USD"
+              onSuccess={async (details) => {
+                try {
+                  await addDoc(collection(db, 'payments'), {
+                    user_id: user?.uid,
+                    amount: 9.90,
+                    currency: 'USD',
+                    payment_method: 'PayPal',
+                    description: 'Lead Widget Pro Subscription',
+                    status: 'completed',
+                    paypal_order_id: details.id,
+                    payer_email: details.payer.email_address,
+                    created_at: new Date().toISOString()
+                  });
+
+                  if (user?.uid) {
+                    await updateDoc(doc(db, 'profiles', user.uid), {
+                      subscription_status: 'active',
+                      plan_type: 'pro',
+                      trial_ends_at: null
+                    });
+                  }
+
+                  toast({
+                    title: "¡Suscripción Activada!",
+                    description: "Gracias por confiar en Lead Widget.",
+                  });
+
+                  // Reload to update UI
+                  window.location.reload();
+                } catch (e: any) {
+                  console.error("Payment Error: ", e);
+                  toast({ title: "Error activando suscripción", description: e.message, variant: "destructive" });
+                }
+              }}
+            />
+            <p className="text-xs text-center text-muted-foreground mt-4">Secure payment via PayPal</p>
+          </CardContent>
           <CardContent className="space-y-6 pt-6">
             <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm text-center">
               <p className="text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">Plan Mensual</p>
@@ -883,6 +928,7 @@ export default function Dashboard() {
           </div>
 
           <div className="flex items-center gap-1 sm:gap-3 flex-wrap">
+            <LanguageSwitcher />
             {/* Theme Toggle - Removed */}
             {isSuperAdmin && (
               <Link to="/superadmin">
@@ -1000,7 +1046,7 @@ export default function Dashboard() {
           <TabsList className="hidden sm:grid sm:grid-cols-6 w-full no-scrollbar gap-1 sm:max-w-3xl">
             <TabsTrigger value="config" className="gap-2 flex-shrink-0 px-4">
               <Settings className="w-4 h-4" />
-              <span>Widget</span>
+              <span>{t('dashboard.config')}</span>
             </TabsTrigger>
             <TabsTrigger value="ai" className="gap-2 flex-shrink-0 px-4">
               <Bot className="w-4 h-4" />
@@ -1008,19 +1054,19 @@ export default function Dashboard() {
             </TabsTrigger>
             <TabsTrigger value="leads" className="gap-2 flex-shrink-0 px-4">
               <Users className="w-4 h-4" />
-              <span>Leads</span>
+              <span>{t('dashboard.leads')}</span>
             </TabsTrigger>
             <TabsTrigger value="analytics" className="gap-2 flex-shrink-0 px-4">
               <BarChart3 className="w-4 h-4" />
-              <span>Analíticas</span>
+              <span>{t('dashboard.analytics')}</span>
             </TabsTrigger>
             <TabsTrigger value="security" className="gap-2 flex-shrink-0 px-4">
               <ShieldCheck className="w-4 h-4" />
-              <span>Seguridad</span>
+              <span>{t('dashboard.security')}</span>
             </TabsTrigger>
             <TabsTrigger value="billing" className="gap-2 flex-shrink-0 px-4">
               <CreditCard className="w-4 h-4" />
-              <span>Pagos</span>
+              <span>{t('dashboard.billing')}</span>
             </TabsTrigger>
           </TabsList>
 
@@ -1888,13 +1934,13 @@ export default function Dashboard() {
               {/* Plan Status */}
               <Card className="lg:col-span-1">
                 <CardHeader>
-                  <CardTitle>Mi Plan</CardTitle>
+                  <CardTitle>{t('dashboard.billing_section.title')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="p-6 bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-2xl">
                     <div className="flex justify-between items-start mb-4">
                       <div>
-                        <p className="text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">Plan Actual</p>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">{t('dashboard.billing_section.current_plan')}</p>
                         <p className="text-2xl font-black text-primary capitalize">{profile?.plan_type || 'Trial'}</p>
                       </div>
                       {getStatusBadge(profile?.subscription_status || 'trial')}
@@ -1903,21 +1949,13 @@ export default function Dashboard() {
                     <div className="space-y-3 py-4 border-t border-slate-200 mt-4">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Precio:</span>
-                        <span className="font-bold text-slate-900 dark:text-white">S/ 30.00 / mes</span>
+                        <span className="font-bold text-slate-900 dark:text-white">$9.90 USD / mes</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Siguiente Pago:</span>
                         <span className="font-bold text-slate-900 dark:text-white">{getTrialEndDateString()}</span>
                       </div>
                     </div>
-
-                    {profile?.subscription_status === 'trial' && (
-                      <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-100 dark:border-amber-800 rounded-xl">
-                        <p className="text-xs text-amber-800 dark:text-amber-200 font-medium leading-relaxed">
-                          ⚠️ Te quedan {getTrialDaysLeft()} días de prueba. Paga S/ 30 hoy para mantener tu bot activo ilimitadamente.
-                        </p>
-                      </div>
-                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -1925,97 +1963,157 @@ export default function Dashboard() {
               {/* Payment Info */}
               <Card className="lg:col-span-2">
                 <CardHeader>
-                  <CardTitle>Renovar o Activar Plan</CardTitle>
-                  <CardDescription>Usa cualquiera de estos métodos y sube tu captura para activación inmediata</CardDescription>
+                  <CardTitle>{t('dashboard.billing_section.renew_title')}</CardTitle>
+                  <CardDescription>{t('dashboard.billing_section.renew_desc')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="p-4 bg-sky-50 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-800 rounded-xl">
-                      <h4 className="font-bold flex items-center gap-2 mb-3">
-                        <div className="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center text-white text-[10px]">Scotia</div>
-                        Transferencia Scotiabank
-                      </h4>
-                      <div className="space-y-1 text-xs">
-                        <div className="flex justify-between"><span>Soles:</span> <span className="font-medium">0997561105</span></div>
-                        <div className="flex justify-between"><span>CCI:</span> <span className="font-medium">00926320099756110553</span></div>
-                        <div className="flex justify-between mt-1"><span>Titular:</span> <span className="font-medium">Kenneth Herrera</span></div>
+                  <Tabs defaultValue="paypal" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2 mb-6">
+                      <TabsTrigger value="paypal">{t('dashboard.billing_section.tab_paypal')}</TabsTrigger>
+                      <TabsTrigger value="local">{t('dashboard.billing_section.tab_local')}</TabsTrigger>
+                    </TabsList>
+
+                    {/* PayPal Tab */}
+                    <TabsContent value="paypal" className="space-y-4">
+                      <div className="max-w-md mx-auto py-4">
+                        <PayPalPaymentButton
+                          amount="9.90"
+                          currency="USD"
+                          onSuccess={async (details) => {
+                            try {
+                              await addDoc(collection(db, 'payments'), {
+                                user_id: user?.uid,
+                                amount: 9.90,
+                                currency: 'USD',
+                                payment_method: 'PayPal',
+                                description: 'Lead Widget Pro Subscription',
+                                status: 'completed',
+                                paypal_order_id: details.id,
+                                payer_email: details.payer.email_address,
+                                created_at: new Date().toISOString()
+                              });
+
+                              if (user?.uid) {
+                                await updateDoc(doc(db, 'profiles', user.uid), {
+                                  subscription_status: 'active',
+                                  plan_type: 'pro',
+                                  trial_ends_at: null
+                                });
+                              }
+
+                              toast({
+                                title: t('dashboard.billing_section.success_title'),
+                                description: t('dashboard.billing_section.success_desc'),
+                              });
+
+                              // Reload to update UI
+                              loadData();
+                            } catch (e: any) {
+                              console.error("Payment Error: ", e);
+                              toast({ title: "Error", description: e.message, variant: "destructive" });
+                            }
+                          }}
+                        />
+                        <div className="mt-4 text-center">
+                          <p className="text-xs text-muted-foreground">
+                            <ShieldCheck className="w-3 h-3 inline mr-1" />
+                            {t('dashboard.billing_section.secure_note')}
+                          </p>
+                        </div>
                       </div>
-                    </div>
+                    </TabsContent>
 
-                    <div className="p-4 bg-purple-50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-800 rounded-xl">
-                      <h4 className="font-bold flex items-center gap-2 mb-3">
-                        <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-fuchsia-500 rounded-lg flex items-center justify-center text-white text-[10px]">Y/P</div>
-                        Yape o Plin
-                      </h4>
-                      <div className="space-y-1 text-xs">
-                        <div className="flex justify-between"><span>Número:</span> <span className="font-medium text-lg">902 105 668</span></div>
-                        <div className="flex justify-between"><span>Titular:</span> <span className="font-medium">Kenneth Herrera</span></div>
+                    {/* Local Payment Tab */}
+                    <TabsContent value="local" className="space-y-6 animate-in fade-in slide-in-from-top-2">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="p-4 bg-sky-50 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-800 rounded-xl">
+                          <h4 className="font-bold flex items-center gap-2 mb-3">
+                            <div className="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center text-white text-[10px]">Scotia</div>
+                            {t('dashboard.billing_section.local_transfer_title')}
+                          </h4>
+                          <div className="space-y-1 text-xs">
+                            <div className="flex justify-between"><span>Soles:</span> <span className="font-medium">0997561105</span></div>
+                            <div className="flex justify-between"><span>CCI:</span> <span className="font-medium">00926320099756110553</span></div>
+                            <div className="flex justify-between mt-1"><span>Titular:</span> <span className="font-medium">Kenneth Herrera</span></div>
+                          </div>
+                        </div>
+
+                        <div className="p-4 bg-purple-50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-800 rounded-xl">
+                          <h4 className="font-bold flex items-center gap-2 mb-3">
+                            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-fuchsia-500 rounded-lg flex items-center justify-center text-white text-[10px]">Y/P</div>
+                            {t('dashboard.billing_section.local_yape_title')}
+                          </h4>
+                          <div className="space-y-1 text-xs">
+                            <div className="flex justify-between"><span>Número:</span> <span className="font-medium text-lg">902 105 668</span></div>
+                            <div className="flex justify-between"><span>Titular:</span> <span className="font-medium">Kenneth Herrera</span></div>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
 
-                  <div className="p-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900 text-center space-y-4">
-                    <div className="w-16 h-16 bg-white dark:bg-slate-800 rounded-full shadow-sm flex items-center justify-center mx-auto mb-2 border border-slate-100 dark:border-slate-700">
-                      <MessageCircle className="w-8 h-8 text-primary/40" />
-                    </div>
-                    <div>
-                      <p className="font-bold mb-1">Reportar Pago Realizado</p>
-                      <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-4">
-                        Ingresa el número de operación o el nombre del titular del pago para que podamos validarlo.
-                      </p>
-                    </div>
+                      <div className="p-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900 text-center space-y-4">
+                        <div className="w-16 h-16 bg-white dark:bg-slate-800 rounded-full shadow-sm flex items-center justify-center mx-auto mb-2 border border-slate-100 dark:border-slate-700">
+                          <MessageCircle className="w-8 h-8 text-primary/40" />
+                        </div>
+                        <div>
+                          <p className="font-bold mb-1">{t('dashboard.billing_section.report_payment_title')}</p>
+                          <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-4">
+                            {t('dashboard.billing_section.report_payment_desc')}
+                          </p>
+                        </div>
 
-                    <div className="max-w-xs mx-auto space-y-3">
-                      <Input
-                        placeholder="Nro de Operación o Nombre"
-                        id="payment-ref"
-                        className="text-center font-bold h-12 border-primary/20 focus:ring-primary"
-                      />
-                      <Button
-                        className="w-full h-12 font-bold text-lg"
-                        onClick={async () => {
-                          const refInput = document.getElementById('payment-ref') as HTMLInputElement;
-                          const reference = refInput?.value;
-                          if (!reference || reference.trim().length < 3) {
-                            toast({ title: 'Dato requerido', description: 'Por favor ingresa una referencia válida.', variant: 'destructive' });
-                            return;
-                          }
+                        <div className="max-w-xs mx-auto space-y-3">
+                          <Input
+                            placeholder="Nro de Operación o Nombre"
+                            id="payment-ref"
+                            className="text-center font-bold h-12 border-primary/20 focus:ring-primary"
+                          />
+                          <Button
+                            className="w-full h-12 font-bold text-lg"
+                            onClick={async () => {
+                              const refInput = document.getElementById('payment-ref') as HTMLInputElement;
+                              const reference = refInput?.value;
+                              if (!reference || reference.trim().length < 3) {
+                                toast({ title: 'Dato requerido', description: 'Por favor ingresa una referencia válida.', variant: 'destructive' });
+                                return;
+                              }
 
-                          setUploading(true);
-                          try {
-                            await addDoc(collection(db, 'payments'), {
-                              user_id: user.uid,
-                              amount: 30,
-                              payment_method: 'Yape/Plin/BCP',
-                              description: 'Plan Mensual Lead Widget',
-                              operation_ref: reference, // Using text reference instead of file
-                              status: 'pending',
-                              created_at: new Date().toISOString()
-                            });
+                              setUploading(true);
+                              try {
+                                await addDoc(collection(db, 'payments'), {
+                                  user_id: user?.uid,
+                                  amount: 30,
+                                  payment_method: 'Yape/Plin/BCP',
+                                  description: 'Plan Mensual Lead Widget',
+                                  operation_ref: reference,
+                                  status: 'pending',
+                                  created_at: new Date().toISOString()
+                                });
 
-                            toast({
-                              title: '¡Pago reportado!',
-                              description: 'Lo validaremos en unos minutos.',
-                            });
+                                toast({
+                                  title: '¡Pago reportado!',
+                                  description: 'Lo validaremos en unos minutos.',
+                                });
 
-                            if (refInput) refInput.value = '';
-                            loadData();
-                          } catch (e: any) {
-                            toast({ title: 'Error', description: 'No se pudo reportar el pago.', variant: 'destructive' });
-                          } finally {
-                            setUploading(false);
-                          }
-                        }}
-                        disabled={uploading}
-                      >
-                        {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Reportar y Activar'}
-                      </Button>
+                                if (refInput) refInput.value = '';
+                                loadData();
+                              } catch (e: any) {
+                                toast({ title: 'Error', description: 'No se pudo reportar el pago.', variant: 'destructive' });
+                              } finally {
+                                setUploading(false);
+                              }
+                            }}
+                            disabled={uploading}
+                          >
+                            {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : t('dashboard.billing_section.report_btn')}
+                          </Button>
 
-                      <p className="text-[10px] text-muted-foreground mt-2">
-                        * Si tienes la captura, puedes enviarla a nuestro <a href="https://wa.me/51902105668" target="_blank" className="underline text-primary">WhatsApp</a> para acelerar el proceso.
-                      </p>
-                    </div>
-                  </div>
+                          <p className="text-[10px] text-muted-foreground mt-2">
+                            * Si tienes la captura, envíala a <a href="https://wa.me/51902105668" target="_blank" className="underline text-primary">WhatsApp</a>.
+                          </p>
+                        </div>
+                      </div>
+                    </TabsContent>
+                  </Tabs>
                 </CardContent>
               </Card>
             </div>

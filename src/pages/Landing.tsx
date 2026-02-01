@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { Button } from '@/components/ui/button';
 import { SalesWidget } from '@/components/SalesWidget';
 import { SocialProofToast } from '@/components/SocialProofToast';
@@ -48,6 +50,7 @@ const stats = [
 ];
 
 export default function Landing() {
+  const { t } = useTranslation();
   const [activeTemplate, setActiveTemplate] = useState('inmobiliaria');
   const [showExitPopup, setShowExitPopup] = useState(false);
   const [hasShownExit, setHasShownExit] = useState(false);
@@ -92,14 +95,15 @@ export default function Landing() {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-4">
+            <LanguageSwitcher />
             <Link to="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-              Iniciar Sesión
+              {t('nav.login')}
             </Link>
             <div className="flex items-center gap-2 pl-2 border-l border-border">
               <Link to="/register">
                 <Button className="font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all btn-iridescent text-white">
-                  Probar Gratis <ArrowRight className="w-4 h-4 ml-2" />
+                  {t('nav.try_free')} <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </Link>
             </div>
@@ -107,9 +111,10 @@ export default function Landing() {
 
           {/* Mobile Nav */}
           <div className="md:hidden flex items-center gap-2">
+            <LanguageSwitcher />
             <Link to="/register">
               <Button size="sm" className="font-bold">
-                Probar
+                {t('nav.try')}
               </Button>
             </Link>
             <Sheet>
@@ -127,8 +132,8 @@ export default function Landing() {
                     <span className="font-bold text-lg">Lead Widget</span>
                   </Link>
                   <div className="grid gap-3">
-                    <Link to="/login"><Button variant="outline" className="w-full justify-start">Iniciar Sesión</Button></Link>
-                    <Link to="/register"><Button className="w-full justify-start">Crear Cuenta Gratis</Button></Link>
+                    <Link to="/login"><Button variant="outline" className="w-full justify-start">{t('nav.login')}</Button></Link>
+                    <Link to="/register"><Button className="w-full justify-start">{t('nav.create_account')}</Button></Link>
                   </div>
                 </div>
               </SheetContent>
@@ -152,25 +157,24 @@ export default function Landing() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                 </span>
-                Sistema IA 2026 • <span>124 usuarios online hoy</span>
+                {t('hero.system_badge')} • <span>{t('hero.users_online', { count: 124 })}</span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] text-balance">
-                Ventas en Piloto <br className="hidden lg:block" />
+                {t('hero.title_1')} <br className="hidden lg:block" />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-600 dark:to-emerald-400">
-                  Automático con IA
+                  {t('hero.title_2')}
                 </span>
               </h1>
 
               <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-2xl mx-auto lg:mx-0 text-pretty">
-                El único widget que <strong className="text-foreground">filtra curiosos, asegura ventas reales</strong> y envía leads 100% listos para comprar
-                <strong className="text-foreground"> directo a tu WhatsApp</strong>.
+                <Trans i18nKey="hero.subtitle" components={[<strong className="text-foreground" key="0" />, <strong className="text-foreground" key="1" />]} />
               </p>
 
               <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start w-full sm:w-auto">
                 <Link to="/register" className="w-full sm:w-auto">
                   <Button size="xl" className="w-full sm:w-auto text-lg font-bold h-14 px-8 shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-1 transition-all btn-iridescent text-white">
-                    Empezar Gratis
+                    {t('hero.cta_primary')}
                   </Button>
                 </Link>
                 <Button
@@ -180,17 +184,23 @@ export default function Landing() {
                   onClick={() => window.dispatchEvent(new Event('open-lead-widget'))}
                 >
                   <Play className="w-4 h-4 mr-2 fill-current opacity-50 group-hover:opacity-100 transition-opacity" />
-                  Ver Demo en Vivo
+                  {t('hero.cta_secondary')}
                 </Button>
               </div>
 
               <div className="pt-4 lg:pt-8 flex flex-wrap justify-center lg:justify-start gap-8 lg:gap-12 opacity-80">
-                {stats.map(s => (
-                  <div key={s.label} className="text-center lg:text-left">
-                    <p className="text-2xl font-bold text-foreground">{s.value}</p>
-                    <p className="text-xs text-muted-foreground uppercase tracking-wide">{s.label}</p>
-                  </div>
-                ))}
+                <div className="text-center lg:text-left">
+                  <p className="text-2xl font-bold text-foreground">22%</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('hero.stats.conversion')}</p>
+                </div>
+                <div className="text-center lg:text-left">
+                  <p className="text-2xl font-bold text-foreground">+500</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('hero.stats.leads')}</p>
+                </div>
+                <div className="text-center lg:text-left">
+                  <p className="text-2xl font-bold text-foreground">2min</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">{t('hero.stats.time')}</p>
+                </div>
               </div>
             </div>
 
@@ -226,7 +236,7 @@ export default function Landing() {
           <div className="text-center mb-10 max-w-xs mx-auto md:max-w-none">
             <div className="h-px w-12 bg-primary mx-auto mb-4 opacity-50" />
             <p className="text-[10px] sm:text-xs font-black text-muted-foreground uppercase tracking-[0.3em] mb-2 px-6">
-              Funciona con cualquier ecosistema
+              {t('trust_badge.title')}
             </p>
           </div>
 
@@ -263,18 +273,17 @@ export default function Landing() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div className="order-2 lg:order-1">
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-6 leading-tight text-balance">
-                ¿Tu web tiene visitas pero <span className="text-primary italic">pocas ventas</span>?
+                <Trans i18nKey="pain_points.title" components={[<span className="text-primary italic" key="0" />]} />
               </h2>
               <p className="text-slate-400 text-base sm:text-lg mb-8 leading-relaxed text-pretty">
-                El problema no es tu tráfico, es la fricción. Los formularios largos matan la conversión.
-                Lead Widget elimina esa barrera conectando al cliente instantáneamente contigo.
+                {t('pain_points.description')}
               </p>
 
               <div className="space-y-4">
                 {[
-                  "Pierdes clientes porque no respondes al instante.",
-                  "Tus formularios de contacto terminan en SPAM.",
-                  "No sabes qué producto le interesa a tu visitante.",
+                  t('pain_points.point_1'),
+                  t('pain_points.point_2'),
+                  t('pain_points.point_3'),
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-4 p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors">
                     <div className="w-6 h-6 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -294,15 +303,15 @@ export default function Landing() {
                     <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-base sm:text-lg">La Solución Lead Widget</h3>
-                    <p className="text-slate-400 text-xs sm:text-sm">Automatización inteligente</p>
+                    <h3 className="font-bold text-base sm:text-lg">{t('pain_points.solution_title')}</h3>
+                    <p className="text-slate-400 text-xs sm:text-sm">{t('pain_points.solution_subtitle')}</p>
                   </div>
                 </div>
                 <div className="space-y-4">
                   {[
-                    { t: "Detección de Interés", d: "El widget aparece justo cuando el cliente duda." },
-                    { t: "Pre-calificación", d: "La IA hace las preguntas clave por ti." },
-                    { t: "Conexión Directa", d: "Recibes el lead limpio y listo para cerrar en WhatsApp." },
+                    { t: t('pain_points.step_1_title'), d: t('pain_points.step_1_desc') },
+                    { t: t('pain_points.step_2_title'), d: t('pain_points.step_2_desc') },
+                    { t: t('pain_points.step_3_title'), d: t('pain_points.step_3_desc') },
                   ].map((step, idx) => (
                     <div key={idx} className="flex gap-4">
                       <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-primary font-bold flex items-center justify-center text-sm border border-primary/20 flex-shrink-0">
@@ -325,18 +334,18 @@ export default function Landing() {
       <section className="py-16 lg:py-24 px-4 bg-background" id="features">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12 lg:mb-16 max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-balance">Todo lo que necesitas para escalar</h2>
-            <p className="text-base sm:text-lg text-muted-foreground text-pretty px-4">Más que un botón de WhatsApp, es un sistema completo de captura y cualificación.</p>
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 text-balance">{t('features.title')}</h2>
+            <p className="text-base sm:text-lg text-muted-foreground text-pretty px-4">{t('features.subtitle')}</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 relative z-10">
             {[
-              { icon: Bot, t: "IA Predictiva", d: "La IA no solo responde, cualifica al cliente detectando su urgencia y capacidad de compra antes de avisarte.", color: "emerald" },
-              { icon: Zap, t: "Auto-Redirección", d: "Elimina la fricción. La IA transfiere al cliente a WhatsApp con un resumen completo de su pedido automáticamente.", color: "blue" },
-              { icon: ShieldCheck, t: "Escudo Anti-Abuso", d: "Protección contra jailbreaks e inyecciones de prompt. Bloqueo de IP automático para salvar tus créditos.", color: "red" },
-              { icon: MousePointer2, t: "Triggers de Conversión", d: "Intención de salida, retraso de tiempo y vibración háptica sincronizada para capturar la atención.", color: "orange" },
-              { icon: BarChart3, t: "Dashboard en Tiempo Real", d: "Gestiona leads, visualiza analíticas detalladas y controla la seguridad de tus widgets desde un solo lugar.", color: "purple" },
-              { icon: Smartphone, t: "Optimización Móvil", d: "Diseñado para la experiencia de WhatsApp. Interfaz premium que parece parte de tu marca.", color: "pink" },
+              { icon: Bot, t: t('features.predictive_ai_title'), d: t('features.predictive_ai_desc'), color: "emerald" },
+              { icon: Zap, t: t('features.auto_redirect_title'), d: t('features.auto_redirect_desc'), color: "blue" },
+              { icon: ShieldCheck, t: t('features.anti_abuse_title'), d: t('features.anti_abuse_desc'), color: "red" },
+              { icon: MousePointer2, t: t('features.triggers_title'), d: t('features.triggers_desc'), color: "orange" },
+              { icon: BarChart3, t: t('features.dashboard_title'), d: t('features.dashboard_desc'), color: "purple" },
+              { icon: Smartphone, t: t('features.mobile_title'), d: t('features.mobile_desc'), color: "pink" },
             ].map((f, i) => (
               <div key={i} className="group p-6 sm:p-8 rounded-3xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 hover:shadow-[0_0_30px_-10px_rgba(0,193,133,0.2)] transition-all duration-500">
                 <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500`}>
@@ -356,26 +365,26 @@ export default function Landing() {
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-wide mb-4">
               <ShieldCheck className="w-3 h-3" />
-              Privacidad y Confianza
+              {t('data_safety.badge')}
             </div>
             <h2 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white mb-6">
-              Tus datos, en la bóveda de <span className="text-blue-600">Google</span>
+              <Trans i18nKey="data_safety.title" components={[<span className="text-blue-600" key="0" />]} />
             </h2>
             <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              No alojamos tus datos en servidores baratos. Utilizamos la misma infraestructura que potencia a Gmail y YouTube para garantizar seguridad total.
+              {t('data_safety.description')}
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
             {/* Card 1 */}
             <div className="bg-white dark:bg-slate-950 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none relative overflow-hidden group hover:-translate-y-1 transition-transform duration-300">
               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 dark:bg-blue-900/20 rounded-bl-[100px] -mr-8 -mt-8 transition-transform group-hover:scale-110" />
               <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/50 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 mb-6 relative z-10">
                 <Cloud className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 relative z-10">Infraestructura Google Cloud</h3>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 relative z-10">{t('data_safety.card_1_title')}</h3>
               <p className="text-slate-500 dark:text-slate-400 leading-relaxed relative z-10 text-sm">
-                Tu información vive en los centros de datos más seguros del mundo. 99.9% de uptime garantizado y copias de seguridad automáticas.
+                {t('data_safety.card_1_desc')}
               </p>
             </div>
 
@@ -385,9 +394,9 @@ export default function Landing() {
               <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/50 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-6 relative z-10">
                 <Lock className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 relative z-10">Encriptación Militar</h3>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 relative z-10">{t('data_safety.card_2_title')}</h3>
               <p className="text-slate-500 dark:text-slate-400 leading-relaxed relative z-10 text-sm">
-                Todos los datos viajan encriptados (SSL/TLS) y se almacenan con cifrado AES-256. Nadie sin autorización puede leer tus leads.
+                {t('data_safety.card_2_desc')}
               </p>
             </div>
 
@@ -397,9 +406,9 @@ export default function Landing() {
               <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/50 rounded-2xl flex items-center justify-center text-purple-600 dark:text-purple-400 mb-6 relative z-10">
                 <Database className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 relative z-10">Base de Datos Aislada</h3>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 relative z-10">{t('data_safety.card_3_title')}</h3>
               <p className="text-slate-500 dark:text-slate-400 leading-relaxed relative z-10 text-sm">
-                Utilizamos Firebase (Google) para mantener tus registros aislados y privados. Tú eres el único dueño de tu información.
+                {t('data_safety.card_3_desc')}
               </p>
             </div>
           </div>
@@ -432,19 +441,18 @@ export default function Landing() {
                 <ShieldCheck className="w-4 h-4" /> SEGURIDAD DE GRADO MILITAR
               </div>
               <h2 className="text-4xl lg:text-6xl font-black text-white leading-tight">
-                Tu presupuesto <br />
-                <span className="text-red-500">está blindado</span>
+                <Trans i18nKey="data_safety.security_shield_title" components={[<span className="text-red-500" key="0" />]} />
               </h2>
               <p className="text-slate-400 text-lg sm:text-xl leading-relaxed max-w-xl mx-auto lg:mx-0">
-                No permitas que usuarios malintencionados agoten tu API Key con "jailbreaks" o spam. Nuestro motor de IA corta ataques antes de que te cuesten dinero.
+                {t('data_safety.security_shield_desc')}
               </p>
 
               <div className="grid sm:grid-cols-2 gap-4 text-left">
                 {[
-                  { t: "Filtro de Palabras Clave", d: "Detección inmediata de términos de ataque." },
-                  { t: "Bloqueo de IP Automático", d: "Un intento de hackeo = Adiós al acceso." },
-                  { t: "Análisis de Refusal", d: "Si la IA detecta peligro, bloquea la sesión." },
-                  { t: "Gestión en Dashboard", d: "Controla y desbloquea IPs manualmente." },
+                  { t: t('data_safety.shield_features.keyword_filter'), d: t('data_safety.shield_features.keyword_filter_desc') },
+                  { t: t('data_safety.shield_features.ip_block'), d: t('data_safety.shield_features.ip_block_desc') },
+                  { t: t('data_safety.shield_features.refusal_analysis'), d: t('data_safety.shield_features.refusal_analysis_desc') },
+                  { t: t('data_safety.shield_features.dashboard_mgmt'), d: t('data_safety.shield_features.dashboard_mgmt_desc') },
                 ].map((item, i) => (
                   <div key={i} className="p-4 rounded-2xl bg-white/5 border border-white/10">
                     <Check className="w-5 h-5 text-red-500 mb-2" />
@@ -481,8 +489,10 @@ export default function Landing() {
       < section className="py-20 lg:py-32 bg-background relative overflow-hidden" >
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16 lg:mb-24">
-            <h2 className="text-4xl lg:text-5xl font-black mb-6">El flujo de venta <span className="text-primary">perfecto</span></h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">Así es como Lead Widget trabaja por ti mientras tú duermes o atiendes otros clientes.</p>
+            <h2 className="text-4xl lg:text-5xl font-black mb-6">
+              <Trans i18nKey="sales_flow.title" components={[<span className="text-primary" key="0" />]} />
+            </h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">{t('sales_flow.subtitle')}</p>
           </div>
 
           <div className="grid md:grid-cols-4 gap-8 relative">
@@ -492,27 +502,27 @@ export default function Landing() {
             {[
               {
                 icon: MousePointer2,
-                t: "1. Activación",
-                d: "El widget detecta intención de salida o interés y aparece con un mensaje personalizado.",
-                badge: "Proactivo"
+                t: t('sales_flow.step_1_title'),
+                d: t('sales_flow.step_1_desc'),
+                badge: t('sales_flow.step_1_badge')
               },
               {
                 icon: Bot,
-                t: "2. Cualificación",
-                d: "La IA pregunta nombre, necesidad y datos clave. Si detecta un ataque, bloquea al usuario.",
-                badge: "Seguro"
+                t: t('sales_flow.step_2_title'),
+                d: t('sales_flow.step_2_desc'),
+                badge: t('sales_flow.step_2_badge')
               },
               {
                 icon: Sparkles,
-                t: "3. Resumen IA",
-                d: "La IA genera un resumen exacto de lo que el cliente quiere para que no pierdas tiempo.",
-                badge: "Eficiente"
+                t: t('sales_flow.step_3_title'),
+                d: t('sales_flow.step_3_desc'),
+                badge: t('sales_flow.step_3_badge')
               },
               {
                 icon: MessageCircle,
-                t: "4. Cierre en WA",
-                d: "Redirección automática a WhatsApp con todo el pedido listo. ¡Tú solo cierras el trato!",
-                badge: "Conversión"
+                t: t('sales_flow.step_4_title'),
+                d: t('sales_flow.step_4_desc'),
+                badge: t('sales_flow.step_4_badge')
               }
             ].map((step, i) => (
               <div key={i} className="group flex flex-col items-center text-center p-6 rounded-3xl hover:bg-muted/50 transition-all duration-300">
@@ -625,8 +635,8 @@ export default function Landing() {
       < section className="py-16 lg:py-24 px-4 bg-slate-950 text-white" id="pricing" >
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-10 lg:mb-12">
-            <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">Precio Justo y Simple</h2>
-            <p className="text-lg sm:text-xl text-slate-400">Sin comisiones por venta. Sin contratos forzosos.</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold mb-4">{t('pricing.title')}</h2>
+            <p className="text-lg sm:text-xl text-slate-400">{t('pricing.subtitle')}</p>
           </div>
 
           <div className="relative max-w-md mx-auto md:max-w-none">
@@ -646,18 +656,18 @@ export default function Landing() {
 
                 {/* Left: Price & Features */}
                 <div className="flex-1 w-full text-center md:text-left mt-6 md:mt-0">
-                  <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-2">Plan Mensual</p>
+                  <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-2">{t('pricing.plan_name')}</p>
                   <div className="flex items-baseline justify-center md:justify-start gap-1 mb-8">
-                    <span className="text-5xl sm:text-7xl font-black tracking-tighter text-foreground">S/30</span>
-                    <span className="text-lg text-muted-foreground font-medium">/mes</span>
+                    <span className="text-5xl sm:text-7xl font-black tracking-tighter text-foreground">{t('pricing.price')}</span>
+                    <span className="text-lg text-muted-foreground font-medium">{t('pricing.period')}</span>
                   </div>
 
                   <div className="space-y-4 mb-8 text-left max-w-xs mx-auto md:mx-0">
                     {[
-                      "Widget Proactivo Ilimitado",
-                      "Captura de Leads Ilimitada",
-                      "Acceso al Dashboard",
-                      "Soporte Prioritario WhatsApp"
+                      t('pricing.feature_1'),
+                      t('pricing.feature_2'),
+                      t('pricing.feature_3'),
+                      t('pricing.feature_4')
                     ].map((f, i) => (
                       <div key={i} className="flex items-start gap-3">
                         <div className="rounded-full bg-primary/10 p-1 mt-0.5">
@@ -670,7 +680,7 @@ export default function Landing() {
 
                   <Link to="/register" className="block w-full">
                     <Button size="lg" className="w-full font-bold text-base sm:text-lg h-12 sm:h-14 btn-iridescent text-white shadow-lg sm:shadow-xl shadow-primary/20 rounded-xl hover:scale-[1.02] transition-transform">
-                      Comenzar Prueba Gratis
+                      {t('pricing.cta')}
                     </Button>
                   </Link>
                   <p className="text-center text-xs text-muted-foreground mt-3">No requiere tarjeta de crédito</p>
@@ -712,24 +722,24 @@ export default function Landing() {
       {/* --- FAQ --- */}
       < section className="py-16 lg:py-24 px-4 bg-slate-950 text-white border-t border-white/5" >
         <div className="container mx-auto max-w-3xl">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12">Preguntas Frecuentes</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12">{t('faq.title')}</h2>
           <Accordion type="single" collapsible className="w-full">
             {[
               {
-                q: "¿Cómo protege mis créditos de la IA?",
-                a: "Nuestro sistema tiene un motor de seguridad de doble capa. El primer filtro detiene intentos de jailbreak conocidos instantáneamente sin consultar a OpenAI. El segundo analiza las respuestas de la IA; si detecta una violación, bloquea la IP del usuario permanentemente."
+                q: t('faq.q1'),
+                a: t('faq.a1')
               },
               {
-                q: "¿La redirección a WhatsApp es realmente automática?",
-                a: "Sí. Una vez que la IA cualifica al lead y obtiene su confirmación, el navegador abre WhatsApp automáticamente con un mensaje pre-llenado que contiene el nombre del cliente y su pedido. Tú no tienes que copiar ni pegar nada."
+                q: t('faq.q2'),
+                a: t('faq.a2')
               },
               {
-                q: "¿Qué pasa si bloqueo a un cliente por error?",
-                a: "En tu Dashboard tienes una pestaña de 'Seguridad' donde puedes ver el historial de IPs bloqueadas y el motivo. Con un solo click puedes desbloquear a cualquier usuario."
+                q: t('faq.q3'),
+                a: t('faq.a3')
               },
               {
-                q: "¿Es compatible con mi sitio web?",
-                a: "Es 100% compatible. Solo necesitas copiar una línea de código <script> antes de cerrar el </body> de tu web. Funciona en WordPress (Elementor/Divi), Shopify, Wix, React y HTML puro."
+                q: t('faq.q4'),
+                a: t('faq.a4')
               }
             ].map((faq, i) => (
               <AccordionItem key={i} value={`item-${i}`} className="border-white/10">
@@ -751,17 +761,17 @@ export default function Landing() {
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[100px]" />
 
             <h2 className="text-3xl md:text-5xl font-black text-white mb-6 relative z-10 text-balance">
-              Deja de perder ventas hoy mismo
+              {t('cta_bottom.title')}
             </h2>
             <p className="text-slate-400 text-base sm:text-lg mb-8 sm:mb-10 max-w-2xl mx-auto relative z-10 text-pretty">
-              Tu competencia ya está automatizando. Adelántate y captura esos leads antes que ellos.
+              {t('cta_bottom.subtitle')}
             </p>
             <Link to="/register" className="relative z-10 w-full sm:w-auto block sm:inline-block">
               <Button size="xl" className="btn-iridescent text-white hover:scale-105 font-bold h-14 sm:h-16 px-8 sm:px-12 text-base sm:text-lg shadow-xl hover:shadow-2xl transition-all border-none w-full sm:w-auto">
-                Crear Cuenta Gratis
+                {t('cta_bottom.btn')}
               </Button>
             </Link>
-            <p className="text-slate-500 text-xs sm:text-sm mt-6 relative z-10">Hecho en Lima, Perú 🇵🇪</p>
+            <p className="text-slate-500 text-xs sm:text-sm mt-6 relative z-10">{t('cta_bottom.made_in')}</p>
           </div>
         </div>
       </section >
@@ -778,39 +788,38 @@ export default function Landing() {
                 <span className="font-black text-xl tracking-tight">Lead Widget</span>
               </div>
               <p className="text-sm text-slate-400 leading-relaxed">
-                El widget inteligente que revoluciona la captura de leads en Perú y Latinoamérica.
-                Convierte cada visita en una oportunidad real.
+                {t('footer.description')}
               </p>
             </div>
             <div>
-              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-white">Producto</h4>
+              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-white">{t('footer.product')}</h4>
               <ul className="space-y-4 text-sm text-slate-400">
-                <li><button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-primary transition-colors">Características</button></li>
-                <li><button onClick={() => document.getElementById('templates')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-primary transition-colors">Plantillas</button></li>
-                <li><button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-primary transition-colors">Integraciones</button></li>
-                <li><button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-primary transition-colors">Precios</button></li>
+                <li><button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-primary transition-colors">{t('footer.features')}</button></li>
+                <li><button onClick={() => document.getElementById('templates')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-primary transition-colors">{t('footer.templates')}</button></li>
+                <li><button onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-primary transition-colors">{t('footer.integrations')}</button></li>
+                <li><button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="hover:text-primary transition-colors">{t('footer.pricing')}</button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-white">Compañía</h4>
+              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-white">{t('footer.company')}</h4>
               <ul className="space-y-4 text-sm text-slate-400">
-                <li><button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-primary transition-colors">Sobre Nosotros</button></li>
-                <li><button className="hover:text-primary transition-colors opacity-50 cursor-not-allowed">Casos de Éxito</button></li>
-                <li><button className="hover:text-primary transition-colors opacity-50 cursor-not-allowed">Blog</button></li>
-                <li><button onClick={() => window.dispatchEvent(new Event('open-lead-widget'))} className="hover:text-primary transition-colors">Soporte</button></li>
+                <li><button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-primary transition-colors">{t('footer.about')}</button></li>
+                <li><button className="hover:text-primary transition-colors opacity-50 cursor-not-allowed">{t('footer.success_stories')}</button></li>
+                <li><button className="hover:text-primary transition-colors opacity-50 cursor-not-allowed">{t('footer.blog')}</button></li>
+                <li><button onClick={() => window.dispatchEvent(new Event('open-lead-widget'))} className="hover:text-primary transition-colors">{t('footer.support')}</button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-white">Legal</h4>
+              <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-white">{t('footer.legal')}</h4>
               <ul className="space-y-4 text-sm text-slate-400">
-                <li className="hover:text-primary transition-colors cursor-pointer">Privacidad</li>
-                <li className="hover:text-primary transition-colors cursor-pointer">Términos de servicio</li>
-                <li className="hover:text-primary transition-colors cursor-pointer">Libro de reclamaciones</li>
+                <li className="hover:text-primary transition-colors cursor-pointer">{t('footer.privacy')}</li>
+                <li className="hover:text-primary transition-colors cursor-pointer">{t('footer.terms')}</li>
+                <li className="hover:text-primary transition-colors cursor-pointer">{t('footer.claims')}</li>
               </ul>
             </div>
           </div>
           <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-500">
-            <p>&copy; 2026 Lead Widget. Todos los derechos reservados. Hecho con ❤️ en Lima, Perú.</p>
+            <p>{t('footer.rights')}</p>
             <div className="flex gap-6">
               <span className="hover:text-primary transition-colors cursor-pointer">Instagram</span>
               <span className="hover:text-primary transition-colors cursor-pointer">LinkedIn</span>
