@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { MessageCircle, X, Send, Bot, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -10,32 +11,57 @@ interface Message {
 }
 
 export function SalesWidget() {
+    const { t, i18n } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
 
-    // Configuration (Static / Simple)
+    // Configuration (Dynamic with i18n)
     const config = {
         primaryColor: '#00C185',
         businessName: 'IA LeadWidget',
-        welcomeMessage: '👋 ¡Hola! Soy la IA de LeadWidget. Estoy aquí para ayudarte a convertir más visitas en clientes. ¿En qué te puedo ayudar hoy?',
-        teaserMessages: [
-            '¿Cómo puedo ayudarte con tu negocio? 👋',
-            '¿Aún tienes dudas sobre cómo capturar leads? 👋',
-            '¡Hola! Estamos en línea para atenderte 🚀',
-            '¿Quieres ver cómo aumentamos tus ventas? ✨'
-        ],
-        quickReplies: [
-            "¿Cómo funciona?",
-            "Quiero una demo",
-            "Ver precios"
-        ]
+        // Now using t() for initial strings. 
+        // Note: The updates below will handle the dynamic re-rendering of these values.
     };
+
+    const teaserMessages = [
+        t('demo_widget.teaser_1'),
+        t('demo_widget.teaser_2'),
+        t('demo_widget.teaser_3'),
+        t('demo_widget.teaser_4')
+    ];
+
+    const quickReplies = [
+        t('demo_widget.quick_1'),
+        t('demo_widget.quick_2'),
+        t('demo_widget.quick_3')
+    ];
 
     // Static ID for Demo
     const MY_WIDGET_ID = "demo-landing";
 
-    const [messages, setMessages] = useState<Message[]>([
-        { role: 'assistant', content: config.welcomeMessage }
-    ]);
+    const [messages, setMessages] = useState<Message[]>([]);
+
+    // Initialize/Update welcome message when language changes
+    useEffect(() => {
+        // Only reset if it's the very first load or if we want to force update the welcome message
+        // Ideally we just update the first message if it's still the welcome message
+        setMessages(prev => {
+            if (prev.length === 0) {
+                return [{ role: 'assistant', content: t('demo_widget.welcome') }];
+            }
+            // Optional: Update the first message if it matches the OLD welcome message? 
+            // For simplicity, we won't mutate history to avoid confusion, 
+            // BUT for a fresher feel on lang switch, we could.
+            // Let's just ensure init is correct.
+            return prev;
+        });
+    }, [t]);
+
+    // Force welcome message on mount if empty (handled above, but double check)
+    useEffect(() => {
+        if (messages.length === 0) {
+            setMessages([{ role: 'assistant', content: t('demo_widget.welcome') }]);
+        }
+    }, []);
     const [inputText, setInputText] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isIdle, setIsIdle] = useState(false);
@@ -192,7 +218,7 @@ export function SalesWidget() {
     const handleClose = () => {
         setIsOpen(false);
         setHasBeenClosedOnce(true);
-        const randomMsg = config.teaserMessages[Math.floor(Math.random() * config.teaserMessages.length)];
+        const randomMsg = teaserMessages[Math.floor(Math.random() * teaserMessages.length)];
         setActiveTeaser(randomMsg);
     };
 
@@ -228,7 +254,7 @@ export function SalesWidget() {
                     </span>
                     {/* Hover tooltip */}
                     <div className="absolute right-20 bg-slate-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                        Chatea con nuestra IA
+                        {t('demo_widget.chat_tooltip')}
                     </div>
                 </button>
             </div>
@@ -247,7 +273,7 @@ export function SalesWidget() {
                         </div>
                         <div>
                             <h3 className="font-bold text-sm">{config.businessName}</h3>
-                            <p className="text-[10px] opacity-90 text-white/90">Responde al instante con IA</p>
+                            <p className="text-[10px] opacity-90 text-white/90">{t('demo_widget.subtitle')}</p>
                         </div>
                     </div>
                     {/* Desktop Close Button */}
@@ -301,7 +327,7 @@ export function SalesWidget() {
                                     <span className="w-1.5 h-1.5 rounded-full animate-bounce delay-300" style={{ backgroundColor: config.primaryColor }}></span>
                                 </div>
                                 <span className="text-[10px] text-slate-400 font-medium">
-                                    {isLoading ? 'Escribiendo...' : 'El asistente tiene algo para ti...'}
+                                    {isLoading ? t('demo_widget.writing') : t('demo_widget.hint_message')}
                                 </span>
                             </div>
                         </div>
@@ -314,7 +340,7 @@ export function SalesWidget() {
                     {/* Quick Actions */}
                     {messages.length < 3 && (
                         <div className="flex flex-wrap gap-2 mb-2">
-                            {config.quickReplies.map((text, i) => (
+                            {quickReplies.map((text, i) => (
                                 <button
                                     key={i}
                                     onClick={() => {
@@ -338,7 +364,7 @@ export function SalesWidget() {
                         <div className="text-center animate-bounce-subtle">
                             <span className="text-[11px] bg-primary/10 text-primary px-3 py-1 rounded-full font-semibold border border-primary/20"
                                 style={{ backgroundColor: `${config.primaryColor}20`, color: config.primaryColor }}>
-                                ¿Tienes alguna duda sobre el servicio? ✨
+                                {t('demo_widget.teaser_2')}
                             </span>
                         </div>
                     )}
@@ -353,7 +379,7 @@ export function SalesWidget() {
                             value={inputText}
                             onChange={(e) => setInputText(e.target.value)}
                             onFocus={() => setIsIdle(false)}
-                            placeholder={isBlocked ? "Chat bloqueado" : "Escribe tu consulta aquí..."}
+                            placeholder={isBlocked ? t('demo_widget.blocked_placeholder') : t('demo_widget.placeholder')}
                             className={`flex-1 bg-slate-50 text-slate-900 border-slate-200 focus-visible:ring-[#00C185] h-12 shadow-inner transition-all ${isIdle ? 'ring-2 ring-primary/30 border-primary/50' : ''} ${isBlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
                             disabled={isLoading || isBlocked}
                         />
@@ -370,7 +396,7 @@ export function SalesWidget() {
                     <div className="text-center flex justify-center items-center gap-1">
                         <div className="w-1 h-1 rounded-full" style={{ backgroundColor: config.primaryColor }}></div>
                         <p className="text-[9px] text-slate-400 font-medium uppercase tracking-wider">
-                            Atención 24/7 con Inteligencia Artificial
+                            {t('demo_widget.powered_by')}
                         </p>
                         <div className="w-1 h-1 rounded-full" style={{ backgroundColor: config.primaryColor }}></div>
                     </div>

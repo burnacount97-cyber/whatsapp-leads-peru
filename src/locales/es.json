@@ -174,5 +174,22 @@
         "widget_language_desc": "Define el idioma de la interfaz del chat.",
         "lang_es": "Español",
         "lang_en": "Inglés"
+    },
+    "demo_widget": {
+        "welcome": "👋 ¡Hola! Soy la IA de LeadWidget. Estoy aquí para ayudarte a convertir más visitas en clientes. ¿En qué te puedo ayudar hoy?",
+        "teaser_1": "¿Cómo puedo ayudarte con tu negocio? 👋",
+        "teaser_2": "¿Aún tienes dudas sobre cómo capturar leads? 👋",
+        "teaser_3": "¡Hola! Estamos en línea para atenderte 🚀",
+        "teaser_4": "¿Quieres ver cómo aumentamos tus ventas? ✨",
+        "quick_1": "¿Cómo funciona?",
+        "quick_2": "Quiero una demo",
+        "quick_3": "Ver precios",
+        "placeholder": "Escribe tu consulta aquí...",
+        "blocked_placeholder": "Chat bloqueado",
+        "writing": "Escribiendo...",
+        "hint_message": "El asistente tiene algo para ti...",
+        "powered_by": "Atención 24/7 con Inteligencia Artificial",
+        "chat_tooltip": "Chatea con nuestra IA",
+        "subtitle": "Responde al instante con IA"
     }
 }

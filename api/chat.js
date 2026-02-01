@@ -242,7 +242,7 @@ When you have the user's data (Name and interest) and they confirm they want to 
         const fullSystemPrompt =
             businessContext +
             (aiConfig.ai_system_prompt || 'Eres un asistente amable.') +
-            "\n\n" + t.lang_instruction +
+            "\n\n" + (widgetId === 'demo-landing' ? "IMPORTANTE: DETECTA EL IDIOMA DEL USUARIO (Inglés o Español) y responde SIEMPRE en ese mismo idioma. Si es inglés, usa inglés. Si es español, usa español." : t.lang_instruction) +
             "\nIMPORTANTE: Sé breve (2-3 oraciones)." +
             redirectInstruction;
 
