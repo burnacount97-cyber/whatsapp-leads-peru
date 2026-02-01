@@ -240,27 +240,59 @@ export default function Landing() {
             </p>
           </div>
 
-          <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-8 md:gap-24">
-            {[
-              { name: 'WordPress', icon: Globe },
-              { name: 'Shopify', icon: Globe },
-              { name: 'Wix', icon: Globe },
-              { name: 'React', icon: Globe },
-              { name: 'Webflow', icon: Globe },
-              { name: 'Carrd', icon: Globe }
-            ].map((p, i) => (
-              <div
-                key={p.name}
-                className="flex items-center gap-2 group cursor-pointer transition-all hover:scale-110"
-              >
-                <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-                  <p.icon className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                </div>
-                <span className="font-bold text-sm sm:text-base text-muted-foreground group-hover:text-foreground tracking-tight transition-colors">
-                  {p.name}
-                </span>
+          <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-10 md:gap-20 opacity-90">
+            {/* WordPress */}
+            <div className="flex flex-col items-center gap-3 transition-all duration-300 hover:-translate-y-1 group">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10 text-slate-400 group-hover:text-[#21759b] transition-colors">
+                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 0 1-8-8c0-1.8.6-3.5 1.6-4.8L17 19a7.9 7.9 0 0 1-5 1zm6.9-3.1L13.8 9h-.8l-3.3 9.4a8 8 0 0 1-2.8-5.7c0-2.3 1-4.4 2.6-5.9l5.6 13.1c1.2-1 2.2-2.3 2.8-3.8z" />
+              </svg>
+              <span className="text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors">WordPress</span>
+            </div>
+
+            {/* Shopify */}
+            <div className="flex flex-col items-center gap-3 transition-all duration-300 hover:-translate-y-1 group">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10 text-slate-400 group-hover:text-[#95BF47] transition-colors">
+                <path d="M19.5 6h-2.9c-.3-1.6-1.6-2.5-1.6-2.5S14.3.4 12 .4s-3 3.1-3 3.1-1.3.9-1.6 2.5H4.5L2.8 23.6h18.4L19.5 6zM12 2.4c1.2 0 1.9 2.1 2 3.6H10c.1-1.5.8-3.6 2-3.6z" />
+              </svg>
+              <span className="text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors">Shopify</span>
+            </div>
+
+            {/* React */}
+            <div className="flex flex-col items-center gap-3 transition-all duration-300 hover:-translate-y-1 group">
+              <svg viewBox="-11.5 -10.23174 23 20.46348" fill="currentColor" className="w-10 h-10 text-slate-400 group-hover:text-[#61DAFB] transition-colors">
+                <circle cx="0" cy="0" r="2.05" />
+                <g stroke="currentColor" strokeWidth="1" fill="none">
+                  <ellipse rx="11" ry="4.2" />
+                  <ellipse rx="11" ry="4.2" transform="rotate(60)" />
+                  <ellipse rx="11" ry="4.2" transform="rotate(120)" />
+                </g>
+              </svg>
+              <span className="text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors">React / Next.js</span>
+            </div>
+
+            {/* Wix */}
+            <div className="flex flex-col items-center gap-3 transition-all duration-300 hover:-translate-y-1 group">
+              <svg viewBox="0 0 40 20" fill="currentColor" className="w-12 h-8 text-slate-400 group-hover:text-foreground transition-colors">
+                <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontSize="16" fontWeight="900" fontFamily="sans-serif">WiX</text>
+              </svg>
+              <span className="text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors">Wix</span>
+            </div>
+
+            {/* Webflow */}
+            <div className="flex flex-col items-center gap-3 transition-all duration-300 hover:-translate-y-1 group">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10 text-slate-400 group-hover:text-[#4353FF] transition-colors">
+                <path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.5 13.5l-2.2-6.5h-1.6l-1.5 5-1.5-5H9l-2.2 6.5h1.7l1.1-3.5 1.5 4.8h1.6l1.5-4.8 1.1 3.5h1.7z" />
+              </svg>
+              <span className="text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors">Webflow</span>
+            </div>
+
+            {/* Carrd */}
+            <div className="flex flex-col items-center gap-3 transition-all duration-300 hover:-translate-y-1 group">
+              <div className="w-10 h-10 rounded-lg border-2 border-slate-400 group-hover:border-slate-800 dark:group-hover:border-slate-200 flex items-center justify-center transition-colors">
+                <span className="font-black text-[10px] text-slate-400 group-hover:text-foreground">CARRD</span>
               </div>
-            ))}
+              <span className="text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors">Carrd</span>
+            </div>
           </div>
         </div>
       </section>
