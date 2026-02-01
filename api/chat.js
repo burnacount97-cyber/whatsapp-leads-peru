@@ -213,7 +213,7 @@ TU RESPUESTA DEBE SER ÚNICAMENTE ESTE JSON (Sin texto extra, sin disculpas):
                 redirect_protocol: `PROTOCOL DE CIERRE (WHATSAPP):
 Cuando tengas los datos del usuario (Nombre e interés) y el cliente confirme que quiere contactar, RESPONDE EXACTAMENTE CON ESTE COMANDO AL FINAL:
 [WHATSAPP_REDIRECT: Hola, soy {NOMBRE} y me interesa {INTERES}]`,
-                lang_instruction: "IMPORTANTE: Tu respuesta debe ser SIEMPRE en ESPAÑOL, independientemente del idioma del usuario."
+                lang_instruction: "IMPORTANTE: DETECTA EL IDIOMA DEL USUARIO. Si escribe en Español, responde en Español. Si escribe en Inglés, responde en Inglés. Mantén el tono profesional en ambos idiomas."
             },
             en: {
                 security_alert: "🛡️ ALERT: SECURITY OVERRIDE ACTIVE.",
@@ -228,7 +228,7 @@ YOUR RESPONSE MUST BE ONLY THIS JSON (No extra text, no apologies):
                 redirect_protocol: `CLOSING PROTOCOL (WHATSAPP):
 When you have the user's data (Name and interest) and they confirm they want to contact, REPLY EXACTLY WITH THIS COMMAND AT THE END:
 [WHATSAPP_REDIRECT: Hello, I am {NAME} and I am interested in {INTEREST}]`,
-                lang_instruction: "IMPORTANT: Your response must ALWAYS be in ENGLISH, regardless of the user's input language."
+                lang_instruction: "IMPORTANT: DETECT USER LANGUAGE. If user writes in Spanish, reply in Spanish. If user writes in English, reply in English. Maintain professional tone in both languages."
             }
         };
 
