@@ -151,11 +151,44 @@ REGLAS DE COMPORTAMIENTO:
                 return res.status(404).json({ error: 'Widget not found' });
             }
 
-            const widgetData = { id: q.docs[0].id, ...q.docs[0].data() };
+            dbWidgetConfig = widgetData;
+
+            // --- SUBSCRIPTION ENFORCEMENT ---
             const profileDoc = await db.collection('profiles').doc(widgetData.user_id).get();
             const profileData = profileDoc.exists ? profileDoc.data() : {};
 
-            dbWidgetConfig = widgetData;
+            const subStatus = profileData.subscription_status || 'trial';
+            const trialEnds = profileData.trial_ends_at ? new Date(profileData.trial_ends_at) : null;
+            const now = new Date();
+
+            // Define active statuses
+            const isActive = ['active', 'pro', 'verified'].includes(subStatus);
+
+            // Check trial validity
+            let isTrialValid = false;
+            // If explicit trial status
+            if (subStatus === 'trial') {
+                // If has date, check it
+                if (trialEnds) {
+                    isTrialValid = now < trialEnds;
+                } else {
+                    // Legacy/Safety: If no date but status is trial, we might want to allow 
+                    // or block. For now, let's allow but prompt upgrade in dashboard.
+                    // Or strictly: if no date, it's valid (new user logic might be missing)
+                    isTrialValid = true;
+                }
+            }
+
+            if (!isActive && !isTrialValid) {
+                const lang = (dbWidgetConfig?.language || 'es');
+                const msg = lang === 'en'
+                    ? "⚠️ SERVICE PAUSED: The free trial has ended. Please upgrade your plan in the dashboard to continue."
+                    : "⚠️ SERVICIO PAUSADO: El periodo de prueba ha finalizado. Por favor, realiza el pago en tu panel para reactivar el chat.";
+
+                return res.status(200).json({ response: msg });
+            }
+            // ---------------------------------
+
             aiConfig = {
                 ...profileData,
                 business_name: profileData.business_name || 'Negocio'

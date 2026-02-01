@@ -2044,9 +2044,28 @@ export default function Dashboard() {
 
                               // Reload to update UI
                               loadData();
+
+                              // Show Beautiful Success Confirmation
+                              const Swal = (await import('sweetalert2')).default;
+                              Swal.fire({
+                                title: '¡Pago Exitoso!',
+                                text: 'Tu suscripción PRO ha sido activada correctamente.',
+                                icon: 'success',
+                                confirmButtonText: 'Genial',
+                                confirmButtonColor: '#00C185',
+                                background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#fff',
+                                color: document.documentElement.classList.contains('dark') ? '#fff' : '#000'
+                              });
+
                             } catch (e: any) {
                               console.error("Payment Error: ", e);
-                              toast({ title: "Error", description: e.message, variant: "destructive" });
+                              const Swal = (await import('sweetalert2')).default;
+                              Swal.fire({
+                                title: 'Error en el pago',
+                                text: 'Hubo un problema al procesar tu suscripción. ' + e.message,
+                                icon: 'error',
+                                confirmButtonText: 'Entendido'
+                              });
                             }
                           }}
                         />
@@ -2185,7 +2204,9 @@ export default function Dashboard() {
                               <div className="font-bold text-slate-900 dark:text-slate-100">{p.description || 'Suscripción Lead Widget'}</div>
                               <div className="text-[10px] text-muted-foreground font-mono">ID: {p.id.substring(0, 8)}</div>
                             </td>
-                            <td className="py-4 px-6 font-bold text-slate-700 dark:text-slate-300">S/ {Number(p.amount).toFixed(2)}</td>
+                            <td className="py-4 px-6 font-bold text-slate-700 dark:text-slate-300">
+                              {p.currency === 'USD' ? '$' : 'S/'} {Number(p.amount).toFixed(2)}
+                            </td>
                             <td className="py-4 px-6 text-muted-foreground">{new Date(p.created_at).toLocaleDateString('es-PE')}</td>
                             <td className="py-4 px-6">
                               <span className="text-xs font-medium px-2 py-1 bg-slate-100 rounded text-slate-600 uppercase tracking-tighter">{p.payment_method || 'Varios'}</span>

@@ -30,6 +30,7 @@ export function PayPalPaymentButton({ amount, currency = "USD", onSuccess }: Pay
                         height: 50
                     }}
                     createOrder={(data, actions) => {
+                        console.log("PayPal: Creating Order...", data);
                         return actions.order.create({
                             intent: "CAPTURE",
                             purchase_units: [
@@ -44,14 +45,20 @@ export function PayPalPaymentButton({ amount, currency = "USD", onSuccess }: Pay
                         });
                     }}
                     onApprove={async (data, actions) => {
+                        console.log("PayPal: Payment Approved!", data);
                         if (actions.order) {
-                            const details = await actions.order.capture();
-                            onSuccess(details);
+                            try {
+                                const details = await actions.order.capture();
+                                console.log("PayPal: Capture Success:", details);
+                                onSuccess(details);
+                            } catch (err) {
+                                console.error("PayPal Capture Error:", err);
+                            }
                         }
                     }}
                     onError={(err) => {
                         console.error("PayPal Error:", err);
-                        // You might want to show a toast here
+                        alert("Hubo un error con PayPal. Revisa la consola.");
                     }}
                 />
             </PayPalScriptProvider>
