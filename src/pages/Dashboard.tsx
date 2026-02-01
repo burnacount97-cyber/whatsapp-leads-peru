@@ -1975,7 +1975,7 @@ export default function Dashboard() {
                     <div className="space-y-3 py-4 border-t border-slate-200 mt-4">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Precio:</span>
-                        <span className="font-bold text-slate-900 dark:text-white">$9.90 USD / mes</span>
+                        <span className="font-bold text-slate-900 dark:text-white">$11.90 USD <span className="text-xs text-muted-foreground font-medium">( o S/ 30.00 )</span> / mes</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Siguiente Pago:</span>
@@ -1994,16 +1994,16 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <Tabs defaultValue="paypal" className="w-full">
-                    <TabsList className="w-full h-auto p-1 bg-slate-100 dark:bg-slate-800 rounded-full grid grid-cols-2 mb-8">
+                    <TabsList className="w-full h-auto min-h-[52px] p-1.5 bg-slate-100 dark:bg-slate-800 rounded-full grid grid-cols-2 mb-8">
                       <TabsTrigger
                         value="paypal"
-                        className="rounded-full py-3 text-sm font-medium transition-all data-[state=active]:bg-slate-900 data-[state=active]:text-white dark:data-[state=active]:bg-slate-200 dark:data-[state=active]:text-slate-900 data-[state=inactive]:text-slate-500 data-[state=inactive]:hover:bg-transparent"
+                        className="rounded-full py-2.5 text-xs sm:text-sm font-medium transition-all data-[state=active]:bg-slate-900 data-[state=active]:text-white dark:data-[state=active]:bg-slate-200 dark:data-[state=active]:text-slate-900 data-[state=inactive]:text-slate-500 data-[state=inactive]:hover:bg-transparent whitespace-normal h-full leading-tight flex items-center justify-center px-2"
                       >
                         {t('dashboard.billing_section.tab_paypal')}
                       </TabsTrigger>
                       <TabsTrigger
                         value="local"
-                        className="rounded-full py-3 text-sm font-medium transition-all data-[state=active]:bg-slate-900 data-[state=active]:text-white dark:data-[state=active]:bg-slate-200 dark:data-[state=active]:text-slate-900 data-[state=inactive]:text-slate-500 data-[state=inactive]:hover:bg-transparent"
+                        className="rounded-full py-2.5 text-xs sm:text-sm font-medium transition-all data-[state=active]:bg-slate-900 data-[state=active]:text-white dark:data-[state=active]:bg-slate-200 dark:data-[state=active]:text-slate-900 data-[state=inactive]:text-slate-500 data-[state=inactive]:hover:bg-transparent whitespace-normal h-full leading-tight flex items-center justify-center px-2"
                       >
                         {t('dashboard.billing_section.tab_local')}
                       </TabsTrigger>
@@ -2013,13 +2013,13 @@ export default function Dashboard() {
                     <TabsContent value="paypal" className="space-y-4">
                       <div className="max-w-md mx-auto py-4">
                         <PayPalPaymentButton
-                          amount="9.90"
+                          amount="11.90"
                           currency="USD"
                           onSuccess={async (details) => {
                             try {
                               await addDoc(collection(db, 'payments'), {
                                 user_id: user?.uid,
-                                amount: 9.90,
+                                amount: 11.90,
                                 currency: 'USD',
                                 payment_method: 'PayPal',
                                 description: 'Lead Widget Pro Subscription',
