@@ -171,7 +171,7 @@
             "report_btn": "Report and Activate"
         },
         "widget_language": "Widget Language",
-        "widget_language_desc": "Define the chat interface language.",
+        "widget_language_desc": "Defines the chat visual language. AI will automatically reply in the user's language.",
         "lang_es": "Spanish 🇪🇸",
         "lang_en": "English 🇺🇸"
     },
