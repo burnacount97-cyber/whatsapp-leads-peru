@@ -879,9 +879,9 @@ export default function Landing() {
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="text-3xl font-black tracking-tight">¡Vaya, no te vayas!</h3>
+                  <h3 className="text-3xl font-black tracking-tight">{t('exit_popup.title')}</h3>
                   <p className="text-muted-foreground text-lg text-balance">
-                    Estás a un click de ver cómo la IA puede <span className="text-primary font-bold">duplicar tus ventas</span>. Prueba la demo sin compromiso.
+                    {t('exit_popup.subtitle')}
                   </p>
                 </div>
 
@@ -891,13 +891,13 @@ export default function Landing() {
                     className="w-full font-bold h-14 text-lg btn-iridescent text-white shadow-xl shadow-primary/30 rounded-xl"
                     size="lg"
                   >
-                    Probar Demo Gratis Ahora
+                    {t('exit_popup.cta')}
                   </Button>
                   <button
                     onClick={() => setShowExitPopup(false)}
                     className="mt-4 text-sm text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
                   >
-                    No, prefiero seguir perdiendo clientes
+                    {t('exit_popup.dismiss')}
                   </button>
                 </div>
               </div>

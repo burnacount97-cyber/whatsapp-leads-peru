@@ -33,7 +33,7 @@ import {
   ShieldCheck, ShieldAlert, TrendingUp, Info, MessageCircle, Copy, Check, Download,
   ExternalLink, Settings, History, Lock, AlertCircle, LogOut, Loader2, Sparkles,
   Layout, Palette, Code, BarChart as BarChartIcon, BarChart3, Users, CreditCard,
-  Eye, Target, Upload, Clock, Bot, Key, Shield, X, Smartphone, EyeOff, MoreHorizontal
+  Eye, Target, Upload, Clock, Bot, Key, Shield, X, Smartphone, EyeOff, MoreHorizontal, Globe
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -1460,6 +1460,17 @@ export default function Dashboard() {
                         <div>
                           <p className="font-semibold">Pégala aquí arriba</p>
                           <p className="text-muted-foreground">Copia la API Key (empieza con <code className="bg-slate-200 px-1 rounded">sk-...</code>) y pégala en el campo de arriba. ¡Listo!</p>
+                        </div>
+                      </div>
+
+                      {/* Multilingual Badge */}
+                      <div className="mt-4 p-3 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg border border-indigo-200 dark:border-indigo-800 flex items-center gap-3">
+                        <div className="bg-indigo-600 text-white p-2 rounded-full">
+                          <Globe className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-indigo-900 dark:text-indigo-100 text-xs uppercase tracking-wider">Nuevo: Soporte Multilingüe</p>
+                          <p className="text-xs text-indigo-700 dark:text-indigo-300">Tu IA detecta y responde automáticamente en Inglés 🇺🇸 o Español 🇪🇸 según el cliente. ¡Sin configurar nada!</p>
                         </div>
                       </div>
                     </div>

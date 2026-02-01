@@ -191,5 +191,11 @@
         "powered_by": "24/7 Support with Artificial Intelligence",
         "chat_tooltip": "Chat with our AI",
         "subtitle": "Replies instantly with AI"
+    },
+    "exit_popup": {
+        "title": "Wait!",
+        "subtitle": "Leaving without seeing how AI can double your sales?",
+        "cta": "Try Free Demo Now",
+        "dismiss": "No, I prefer losing customers"
     }
 }

@@ -191,5 +191,11 @@
         "powered_by": "Atención 24/7 con Inteligencia Artificial",
         "chat_tooltip": "Chatea con nuestra IA",
         "subtitle": "Responde al instante con IA"
+    },
+    "exit_popup": {
+        "title": "¡Espera!",
+        "subtitle": "¿Te vas sin probar cómo la IA puede duplicar tus ventas?",
+        "cta": "Probar Demo Gratis Ahora",
+        "dismiss": "No, prefiero seguir perdiendo clientes"
     }
 }
