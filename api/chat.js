@@ -273,7 +273,11 @@ When you have the user's data (Name and interest) and they confirm they want to 
         // 2. User defined Prompt (or default)
         // 3. Language Constraint
         // 4. Redirect Protocol
+        const userTz = req.body.userTimezone || 'America/Lima';
+        const currentDateTime = new Date().toLocaleString('es-PE', { timeZone: userTz });
+
         const fullSystemPrompt =
+            `FECHA Y HORA ACTUAL PARA EL USUARIO: ${currentDateTime} (Zona Horaria: ${userTz})\n\n` +
             businessContext +
             (aiConfig.ai_system_prompt || 'Eres un asistente amable.') +
             "\n\n" + (widgetId === 'demo-landing' ? "IMPORTANTE: DETECTA EL IDIOMA DEL USUARIO (Inglés o Español) y responde SIEMPRE en ese mismo idioma. Si es inglés, usa inglés. Si es español, usa español." : t.lang_instruction) +

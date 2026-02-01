@@ -142,7 +142,8 @@ export function SalesWidget() {
                 body: JSON.stringify({
                     message: userMsg,
                     history: historyToSend,
-                    widgetId: MY_WIDGET_ID
+                    widgetId: MY_WIDGET_ID,
+                    userTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone
                 })
             });
 
