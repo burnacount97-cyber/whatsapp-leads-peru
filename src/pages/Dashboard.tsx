@@ -1994,9 +1994,19 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <Tabs defaultValue="paypal" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 mb-6">
-                      <TabsTrigger value="paypal">{t('dashboard.billing_section.tab_paypal')}</TabsTrigger>
-                      <TabsTrigger value="local">{t('dashboard.billing_section.tab_local')}</TabsTrigger>
+                    <TabsList className="w-full h-auto p-1 bg-slate-100 dark:bg-slate-800 rounded-full grid grid-cols-2 mb-8">
+                      <TabsTrigger
+                        value="paypal"
+                        className="rounded-full py-3 text-sm font-medium transition-all data-[state=active]:bg-slate-900 data-[state=active]:text-white dark:data-[state=active]:bg-slate-200 dark:data-[state=active]:text-slate-900 data-[state=inactive]:text-slate-500 data-[state=inactive]:hover:bg-transparent"
+                      >
+                        {t('dashboard.billing_section.tab_paypal')}
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="local"
+                        className="rounded-full py-3 text-sm font-medium transition-all data-[state=active]:bg-slate-900 data-[state=active]:text-white dark:data-[state=active]:bg-slate-200 dark:data-[state=active]:text-slate-900 data-[state=inactive]:text-slate-500 data-[state=inactive]:hover:bg-transparent"
+                      >
+                        {t('dashboard.billing_section.tab_local')}
+                      </TabsTrigger>
                     </TabsList>
 
                     {/* PayPal Tab */}

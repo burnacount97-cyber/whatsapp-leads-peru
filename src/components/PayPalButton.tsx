@@ -24,9 +24,10 @@ export function PayPalPaymentButton({ amount, currency = "USD", onSuccess }: Pay
                 <PayPalButtons
                     style={{
                         layout: "vertical",
-                        color: theme === 'dark' ? 'gold' : 'blue',
+                        color: "gold",
                         shape: "rect",
-                        label: "subscribe"
+                        label: "subscribe",
+                        height: 50
                     }}
                     createOrder={(data, actions) => {
                         return actions.order.create({
