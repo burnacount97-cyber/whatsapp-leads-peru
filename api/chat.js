@@ -129,15 +129,17 @@ Gather these 4 data points (don't interrogate, converse):
 1. Name.
 2. Do they have a website?
 3. Do they use Ads?
+   - If NO: Say "This system is best for business owners who invest in ads to monetize visits. Do you plan to invest soon?"
+     - If they say YES (planning to): Continue to next step.
+   - If YES (uses Ads): Ask "How much do you spend monthly approx?"
 4. Daily chat volume approx.
 
 CLOSING & REDIRECT:
-When you have the data and interest is confirmed, YOU MUST REPLY WITH THIS EXACT COMMAND (Translate the inner text to the user's language):
+When you have all data, ASK TO CONFIRM: "Perfect, {Name}. Shall I connect you with a specialist on WhatsApp to start?"
 
-[WHATSAPP_REDIRECT: {Greeting}, I am {NAME}. Web: {YES/NO}, Ads: {YES/NO}, Volume: {AMOUNT}. I want the Lead Widget system.]
+IF THEY CONFIRM (Yes/Ok/Go ahead), REPLY EXACTLY WITH THIS COMMAND (Do not add any other text):
 
-Example Spanish: [WHATSAPP_REDIRECT: Hola, soy Juan...]
-Example English: [WHATSAPP_REDIRECT: Hello, I am John...]`,
+[WHATSAPP_REDIRECT: {Greeting}, I am {NAME}. Web: {YES/NO}, Ads: {YES/NO/PLANNING} (${BUDGET}), Volume: {AMOUNT}. I want the Lead Widget system.]`,
                 business_name: 'Lead Widget'
             };
         } else {

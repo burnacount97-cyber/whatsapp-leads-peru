@@ -161,20 +161,23 @@ export function SalesWidget() {
             if (data.error) throw new Error(data.error);
 
             // Check for lead collection action in AI response
+            // 1. Check for standard JSON action (Client Widgets)
             const jsonMatch = data.response.match(/\{"action":\s*"collect_lead"[^}]*\}/);
 
+            // 2. Check for redirect tag (Demo Widget)
+            const redirectMatch = data.response.match(/\[WHATSAPP_REDIRECT:(.*?)\]/);
+
             if (jsonMatch) {
+                // ... Existing Client Logic ...
                 let capturedData = { name: 'Cliente', interest: 'LeadWidget', budget: 'No mencionado' };
                 try {
                     const leadPayload = JSON.parse(jsonMatch[0]);
                     if (leadPayload.data) capturedData = { ...capturedData, ...leadPayload.data };
-                } catch (e) {
-                    console.error('Data parse error:', e);
-                }
+                } catch (e) { console.error('Data parse error:', e); }
 
                 const cleanResponse = data.response.replace(jsonMatch[0], '').trim();
 
-                // Construct dynamic message based on actual captured keys
+                // ... Construction logic ...
                 let messageBody = `¡Hola! Vengo del chat de demo.\n\n`;
                 const emojis = ["👤", "🎯", "💰", "🏠", "📍", "🩺", "🔧", "⏰"];
                 let emojiIdx = 0;
@@ -188,21 +191,35 @@ export function SalesWidget() {
 
                 const waUrl = `https://wa.me/51924464410?text=${encodeURIComponent(messageBody)}`;
 
-                if (cleanResponse) {
-                    setMessages(prev => [...prev, { role: 'assistant', content: cleanResponse }]);
-                }
+                if (cleanResponse) setMessages(prev => [...prev, { role: 'assistant', content: cleanResponse }]);
 
-                // Add System Message with Button
                 setMessages(prev => [...prev, {
                     role: 'system',
                     content: '✅ ¡Entendido! Te estamos conectando con WhatsApp...',
                     actionUrl: waUrl
                 }]);
 
-                // Try auto-redirect
-                setTimeout(() => {
-                    window.open(waUrl, '_blank');
-                }, 4000);
+                setTimeout(() => window.open(waUrl, '_blank'), 4000);
+
+            } else if (redirectMatch) {
+                // --- NEW DEMO LOGIC ---
+                const contentBody = redirectMatch[1].trim(); // The content inside: "Hola, soy Juan..."
+                const cleanResponse = data.response.replace(redirectMatch[0], '').trim(); // Remove the tag from UI
+
+                const waUrl = `https://wa.me/51924464410?text=${encodeURIComponent(contentBody)}`;
+
+                // Show the conversational part if any
+                if (cleanResponse) {
+                    setMessages(prev => [...prev, { role: 'assistant', content: cleanResponse }]);
+                }
+
+                setMessages(prev => [...prev, {
+                    role: 'system',
+                    content: '✅ Opening WhatsApp...', // Simple universal message or use t()
+                    actionUrl: waUrl
+                }]);
+
+                setTimeout(() => window.open(waUrl, '_blank'), 3000);
 
             } else {
                 setMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
