@@ -257,17 +257,12 @@ export default function Landing() {
               <span className="text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors">Shopify</span>
             </div>
 
-            {/* React */}
+            {/* Squarespace */}
             <div className="flex flex-col items-center gap-3 transition-all duration-300 hover:-translate-y-1 group">
-              <svg viewBox="-11.5 -10.23174 23 20.46348" fill="currentColor" className="w-10 h-10 text-slate-400 group-hover:text-[#61DAFB] transition-colors">
-                <circle cx="0" cy="0" r="2.05" />
-                <g stroke="currentColor" strokeWidth="1" fill="none">
-                  <ellipse rx="11" ry="4.2" />
-                  <ellipse rx="11" ry="4.2" transform="rotate(60)" />
-                  <ellipse rx="11" ry="4.2" transform="rotate(120)" />
-                </g>
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10 text-slate-400 group-hover:text-foreground transition-colors">
+                <path d="M12.9 13.2c0-2.6 2.1-4.7 4.7-4.7 2.9 0 4.7 2.2 4.7 5.5 0 2.6-2.1 4.7-4.7 4.7-3 0-4.7-2.3-4.7-5.5zM1.7 10.8c0 2.6 2.1 4.7 4.7 4.7 2.9 0 4.7-2.2 4.7-5.5 0-2.6-2.1-4.7-4.7-4.7-2.9 0-4.7 2.2-4.7 5.5z" />
               </svg>
-              <span className="text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors">React / Next.js</span>
+              <span className="text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors">Squarespace</span>
             </div>
 
             {/* Wix */}
