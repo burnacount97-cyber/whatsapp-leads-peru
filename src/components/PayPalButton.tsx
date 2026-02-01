@@ -13,7 +13,7 @@ export function PayPalPaymentButton({ amount, currency = "USD", onSuccess }: Pay
     const [isLoaded, setIsLoaded] = useState(false);
 
     const initialOptions = {
-        clientId: "test", // Replace with your actual Live Client ID when ready
+        clientId: "Adg0jXfrfQT_IriG0V41WYFKeSemBAWouh6rkqrYXgmai4cfTavtGj0JzsIgeP_HLD2KH-gEAinFHKJ-", // Sandbox Client ID
         currency: currency,
         intent: "capture",
     };
