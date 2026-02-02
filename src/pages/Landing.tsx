@@ -714,30 +714,54 @@ export default function Landing() {
                 </div>
 
                 {/* Right: Payment Methods */}
+                {/* Right: Payment Methods */}
                 <div className="w-full md:w-80 bg-muted/30 rounded-3xl p-6 border border-border/50 text-center">
-                  <h4 className="font-bold mb-4 text-sm text-muted-foreground uppercase tracking-wide">Pagos Locales Flexibles</h4>
-                  <div className="grid grid-cols-2 gap-3">
-                    {/* YAPE */}
-                    <div className="bg-background p-3 rounded-xl border shadow-sm flex flex-col items-center gap-2 hover:border-[#742284] transition-colors group">
-                      <div className="w-10 h-10 rounded-lg bg-[#742284] flex items-center justify-center text-white font-black italic text-[10px] transform -rotate-3 group-hover:scale-110 transition-transform">
-                        Yape
-                      </div>
-                      <span className="text-[10px] font-bold text-muted-foreground">Yape</span>
-                    </div>
+                  <h4 className="font-bold mb-4 text-sm text-muted-foreground uppercase tracking-wide">
+                    {i18n.language === 'es' ? 'Pagos Locales Flexibles' : 'Secure Payment'}
+                  </h4>
 
-                    {/* PLIN */}
-                    <div className="bg-background p-3 rounded-xl border shadow-sm flex flex-col items-center gap-2 hover:border-[#00D1D1] transition-colors group">
-                      <div className="w-10 h-10 rounded-lg bg-[#00D1D1] flex items-center justify-center text-white font-bold text-[10px] group-hover:scale-110 transition-transform">
-                        Plin
+                  {i18n.language === 'es' ? (
+                    // Spanish: Local Payments (Yape/Plin/Transfers)
+                    <div className="grid grid-cols-2 gap-3">
+                      {/* YAPE */}
+                      <div className="bg-background p-3 rounded-xl border shadow-sm flex flex-col items-center gap-2 hover:border-[#742284] transition-colors group cursor-default">
+                        <div className="w-10 h-10 rounded-lg bg-[#742284] flex items-center justify-center text-white font-black italic text-[10px] transform -rotate-3 group-hover:scale-110 transition-transform">
+                          Yape
+                        </div>
+                        <span className="text-[10px] font-bold text-muted-foreground">Yape</span>
                       </div>
-                      <span className="text-[10px] font-bold text-muted-foreground">Plin</span>
-                    </div>
 
-                    {/* BCP */}
-                    <div className="col-span-2 bg-background p-3 rounded-xl border shadow-sm flex items-center justify-center gap-2 hover:border-primary/50 transition-colors">
-                      <span className="text-[10px] font-semibold text-muted-foreground">Transferencias BCP / Interbank</span>
+                      {/* PLIN */}
+                      <div className="bg-background p-3 rounded-xl border shadow-sm flex flex-col items-center gap-2 hover:border-[#00D1D1] transition-colors group cursor-default">
+                        <div className="w-10 h-10 rounded-lg bg-[#00D1D1] flex items-center justify-center text-white font-bold text-[10px] group-hover:scale-110 transition-transform">
+                          Plin
+                        </div>
+                        <span className="text-[10px] font-bold text-muted-foreground">Plin</span>
+                      </div>
+
+                      {/* BCP */}
+                      <div className="col-span-2 bg-background p-3 rounded-xl border shadow-sm flex items-center justify-center gap-2 hover:border-primary/50 transition-colors cursor-default">
+                        <span className="text-[10px] font-semibold text-muted-foreground">Transferencias BCP / Interbank</span>
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    // English/Other: PayPal Only
+                    <div className="flex flex-col items-center justify-center h-full py-2 space-y-4">
+                      <div className="bg-background w-full p-4 rounded-xl border shadow-sm flex flex-col items-center gap-3 hover:border-blue-500 transition-colors group cursor-default">
+                        <div className="w-14 h-14 rounded-full bg-[#0070BA]/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          {/* PayPal Logo SVGr or Icon */}
+                          <CreditCard className="w-7 h-7 text-[#0070BA]" />
+                        </div>
+                        <div className="text-center">
+                          <span className="block text-sm font-bold text-[#002f86]">PayPal</span>
+                          <span className="text-[10px] text-muted-foreground">International Cards Accepted</span>
+                        </div>
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">
+                        Securely processed by PayPal. Cancel anytime.
+                      </div>
+                    </div>
+                  )}
                 </div>
 
               </div>
