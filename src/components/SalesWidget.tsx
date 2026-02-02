@@ -208,9 +208,16 @@ export function SalesWidget() {
 
                 const waUrl = `https://wa.me/51924464410?text=${encodeURIComponent(contentBody)}`;
 
-                // Show the conversational part if any
                 if (cleanResponse) {
                     setMessages(prev => [...prev, { role: 'assistant', content: cleanResponse }]);
+                }
+
+                // FIRE PIXEL LEAD EVENT
+                // @ts-ignore
+                if (window.fbq) {
+                    // @ts-ignore
+                    window.fbq('track', 'Lead');
+                    console.log('Pixel Event Fired: Lead (WhatsApp Redirect)');
                 }
 
                 setMessages(prev => [...prev, {
