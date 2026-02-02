@@ -245,7 +245,14 @@ export function SalesWidget() {
             <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3 translate-y-0 animate-in slide-in-from-bottom-5 duration-500 font-sans">
                 {hasBeenClosedOnce && (
                     <div
-                        onClick={() => setIsOpen(true)}
+                        onClick={() => {
+                            setIsOpen(true);
+                            // @ts-ignore
+                            if (window.fbq) {
+                                // @ts-ignore
+                                window.fbq('trackCustom', 'WidgetInteraction');
+                            }
+                        }}
                         className="bg-white px-4 py-2 rounded-2xl shadow-xl border border-slate-100 cursor-pointer animate-in fade-in slide-in-from-right-4 duration-300 relative group max-w-[220px]"
                     >
                         <p className="text-xs font-semibold text-slate-800 leading-tight">
@@ -261,6 +268,11 @@ export function SalesWidget() {
                     onClick={() => {
                         setIsOpen(true);
                         setHasBeenClosedOnce(false);
+                        // @ts-ignore
+                        if (window.fbq) {
+                            // @ts-ignore
+                            window.fbq('trackCustom', 'WidgetInteraction');
+                        }
                     }}
                     className="w-16 h-16 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center relative group"
                     style={{ backgroundColor: config.primaryColor }}
