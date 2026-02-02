@@ -20,8 +20,9 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Missing orderID or user_id' });
     }
 
-    const PAYPAL_CLIENT_ID = "AQ5hjLAKkJBn0slvYmWGg3Sr9jqtOhhLFFT_ZeNsF4c9JUUP3VOcCXG7LgvsyEIK6TI30rIpgBbuqcIV";
-    const PAYPAL_CLIENT_SECRET = "EDCmPTTCJFbDf9m0ZFHPMQl-pszKk35OQPKPSXoXBl2LvkB2T2DUG4Vq8iy5u8BhEwsIfsqlM4vW9ogM";
+    // Environment Variables (Best Practice)
+    const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || "AQ5hjLAKkJBn0slvYmWGg3Sr9jqtOhhLFFT_ZeNsF4c9JUUP3VOcCXG7LgvsyEIK6TI30rIpgBbuqcIV";
+    const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET || "EDCmPTTCJFbDf9m0ZFHPMQl-pszKk35OQPKPSXoXBl2LvkB2T2DUG4Vq8iy5u8BhEwsIfsqlM4vW9ogM";
     const PAYPAL_API = "https://api-m.paypal.com"; // Change to sandbox if testing: https://api-m.sandbox.paypal.com
 
     try {
