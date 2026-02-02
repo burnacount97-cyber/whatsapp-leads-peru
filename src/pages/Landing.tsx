@@ -75,18 +75,28 @@ export default function Landing() {
     let viewContentTriggered = false;
 
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + window.innerHeight;
+      const scrollTop = window.scrollY;
+      const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
-      const scrollPercent = (scrollPosition / documentHeight) * 100;
+
+      // Calculate percentage scrolled
+      const scrollPercent = ((scrollTop + windowHeight) / documentHeight) * 100;
+
+      // Debugging: Uncomment to see scroll % in console
+      // console.log('Scroll %:', Math.round(scrollPercent));
 
       if (scrollPercent >= 50 && !viewContentTriggered) {
+        // Safe Pixel Event Dispatch
         // @ts-ignore
-        if (typeof window.fbq === 'function') {
+        if (window.fbq) {
           // @ts-ignore
           window.fbq('track', 'ViewContent');
+          console.log('Pixel Event Fired: ViewContent (Scroll > 50%)');
+        } else {
+          console.warn('Facebook Pixel not found (fbq is undefined)');
         }
+
         viewContentTriggered = true;
-        // Optimization: remove listener once triggered
         window.removeEventListener('scroll', handleScroll);
       }
     };
