@@ -2028,24 +2028,20 @@ export default function Dashboard() {
                           currency="USD"
                           onSuccess={async (details) => {
                             try {
-                              await addDoc(collection(db, 'payments'), {
-                                user_id: user?.uid,
-                                amount: 11.90,
-                                currency: 'USD',
-                                payment_method: 'PayPal',
-                                description: 'Lead Widget Pro Subscription',
-                                status: 'completed',
-                                paypal_order_id: details.id,
-                                payer_email: details.payer.email_address,
-                                created_at: new Date().toISOString()
+                              // Call Server-Side Verification
+                              const verifyResponse = await fetch('/api/verify-payment', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  orderID: details.id,
+                                  user_id: user?.uid
+                                })
                               });
 
-                              if (user?.uid) {
-                                await updateDoc(doc(db, 'profiles', user.uid), {
-                                  subscription_status: 'active',
-                                  plan_type: 'pro',
-                                  trial_ends_at: null
-                                });
+                              const verifyData = await verifyResponse.json();
+
+                              if (!verifyResponse.ok) {
+                                throw new Error(verifyData.error || 'Verification Failed');
                               }
 
                               toast({
@@ -2060,7 +2056,7 @@ export default function Dashboard() {
                               const Swal = (await import('sweetalert2')).default;
                               Swal.fire({
                                 title: '¡Pago Exitoso!',
-                                text: 'Tu suscripción PRO ha sido activada correctamente.',
+                                text: 'Tu suscripción PRO ha sido activada y verificada correctamente.',
                                 icon: 'success',
                                 confirmButtonText: 'Genial',
                                 confirmButtonColor: '#00C185',
@@ -2069,11 +2065,11 @@ export default function Dashboard() {
                               });
 
                             } catch (e: any) {
-                              console.error("Payment Error: ", e);
+                              console.error("Payment Verification Error: ", e);
                               const Swal = (await import('sweetalert2')).default;
                               Swal.fire({
-                                title: 'Error en el pago',
-                                text: 'Hubo un problema al procesar tu suscripción. ' + e.message,
+                                title: 'Error en la verificación',
+                                text: 'El pago se procesó, pero hubo un error activando la cuenta. Contacta a soporte con el ID: ' + details.id,
                                 icon: 'error',
                                 confirmButtonText: 'Entendido'
                               });
