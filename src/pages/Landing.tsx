@@ -29,7 +29,11 @@ import {
   Cloud,
   Database,
   Lock,
-  Server
+  Server,
+  Code2,
+  Cpu,
+  Fingerprint,
+  CreditCard
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -50,7 +54,7 @@ const stats = [
 ];
 
 export default function Landing() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeTemplate, setActiveTemplate] = useState('inmobiliaria');
   const [showExitPopup, setShowExitPopup] = useState(false);
   const [hasShownExit, setHasShownExit] = useState(false);
@@ -739,9 +743,9 @@ export default function Landing() {
                         <span className="text-[10px] font-bold text-muted-foreground">Plin</span>
                       </div>
 
-                      {/* BCP */}
-                      <div className="col-span-2 bg-background p-3 rounded-xl border shadow-sm flex items-center justify-center gap-2 hover:border-primary/50 transition-colors cursor-default">
-                        <span className="text-[10px] font-semibold text-muted-foreground">Transferencias BCP / Interbank</span>
+                      {/* Scotiabank */}
+                      <div className="col-span-2 bg-background p-3 rounded-xl border shadow-sm flex items-center justify-center gap-2 hover:border-red-500 transition-colors cursor-default">
+                        <span className="text-[10px] font-semibold text-muted-foreground">Transferencias Scotiabank</span>
                       </div>
                     </div>
                   ) : (
