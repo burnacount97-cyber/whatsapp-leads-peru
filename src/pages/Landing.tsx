@@ -718,67 +718,78 @@ export default function Landing() {
                 </div>
 
                 {/* Right: Payment Methods */}
-                {/* Right: Payment Methods - Premium Redesign */}
+                {/* Right: Payment Methods - Ultra Premium Redesign */}
                 <div className="w-full md:w-80 relative group/card">
-                  {/* Background Gradient Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 rounded-3xl blur-xl opacity-50" />
+                  {/* Cinematic Glow Background */}
+                  <div className="absolute -inset-1 bg-gradient-to-br from-primary/30 to-purple-500/30 rounded-[2rem] blur-2xl opacity-20 group-hover/card:opacity-40 transition-opacity duration-1000" />
 
-                  <div className="relative bg-black/40 backdrop-blur-md rounded-3xl p-6 border border-white/10 text-center shadow-2xl">
-                    <h4 className="font-bold mb-6 text-xs text-white/40 uppercase tracking-widest">
-                      {i18n.language === 'es' ? 'Pagos Locales Flexibles' : 'Secure Payment'}
+                  <div className="relative bg-[#0A0A0A]/90 backdrop-blur-xl rounded-3xl p-6 border border-white/5 shadow-2xl overflow-hidden">
+                    {/* Subtle Grid Pattern Overlay */}
+                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay"></div>
+
+                    <h4 className="relative font-bold mb-6 text-[10px] text-white/30 uppercase tracking-[0.2em] text-center">
+                      {i18n.language?.startsWith('es') ? 'Pagos Locales' : 'Secure Checkout'}
                     </h4>
 
-                    {i18n.language === 'es' ? (
-                      // Spanish: Local Payments PREMIUM
-                      <div className="grid grid-cols-2 gap-3">
-                        {/* YAPE */}
-                        <div className="relative group cursor-default">
-                          <div className="absolute inset-0 bg-[#742284] rounded-2xl blur opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
-                          <div className="relative bg-white/5 border border-white/10 p-4 rounded-2xl flex flex-col items-center gap-2 hover:border-[#742284]/50 transition-colors">
-                            <div className="w-10 h-10 rounded-lg bg-[#742284] flex items-center justify-center text-white font-black italic text-[10px] transform -rotate-3 group-hover:scale-110 transition-transform shadow-lg shadow-[#742284]/20">
-                              Yape
-                            </div>
-                            <span className="text-[10px] font-bold text-white/60 group-hover:text-white transition-colors">Yape</span>
+                    {i18n.language?.startsWith('es') ? (
+                      // Spanish: Local Payments PREMIUM GRID
+                      <div className="relative grid grid-cols-2 gap-4">
+                        {/* YAPE - Neobrutalism Pop */}
+                        <div className="group cursor-default relative">
+                          <div className="absolute inset-0 bg-[#742284] rounded-2xl blur-md opacity-0 group-hover:opacity-40 transition-opacity duration-500" />
+                          <div className="relative h-28 bg-[#1a1a1a] border border-white/5 rounded-2xl flex flex-col items-center justify-center gap-3 hover:border-[#742284]/50 hover:-translate-y-1 transition-all duration-300">
+                            <div className="w-12 h-12 rounded-xl bg-[#742284] flex items-center justify-center text-white font-black italic text-xs shadow-lg shadow-[#742284]/30">Yape</div>
+                            <span className="text-[10px] font-bold text-white/50 tracking-wider">INSTANT</span>
                           </div>
                         </div>
 
                         {/* PLIN */}
-                        <div className="relative group cursor-default">
-                          <div className="absolute inset-0 bg-[#00D1D1] rounded-2xl blur opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
-                          <div className="relative bg-white/5 border border-white/10 p-4 rounded-2xl flex flex-col items-center gap-2 hover:border-[#00D1D1]/50 transition-colors">
-                            <div className="w-10 h-10 rounded-lg bg-[#00D1D1] flex items-center justify-center text-white font-bold text-[10px] group-hover:scale-110 transition-transform shadow-lg shadow-[#00D1D1]/20">
-                              Plin
-                            </div>
-                            <span className="text-[10px] font-bold text-white/60 group-hover:text-white transition-colors">Plin</span>
+                        <div className="group cursor-default relative">
+                          <div className="absolute inset-0 bg-[#00D1D1] rounded-2xl blur-md opacity-0 group-hover:opacity-40 transition-opacity duration-500" />
+                          <div className="relative h-28 bg-[#1a1a1a] border border-white/5 rounded-2xl flex flex-col items-center justify-center gap-3 hover:border-[#00D1D1]/50 hover:-translate-y-1 transition-all duration-300">
+                            <div className="w-12 h-12 rounded-xl bg-[#00D1D1] flex items-center justify-center text-white font-bold text-xs shadow-lg shadow-[#00D1D1]/30">Plin</div>
+                            <span className="text-[10px] font-bold text-white/50 tracking-wider">INSTANT</span>
                           </div>
                         </div>
 
-                        {/* Scotiabank */}
-                        <div className="col-span-2 relative group cursor-default mt-1">
-                          <div className="bg-white/5 border border-white/10 p-3 rounded-xl flex items-center justify-center gap-2 hover:bg-red-600/10 hover:border-red-500/50 transition-all">
-                            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                            <span className="text-[10px] font-medium text-white/50 group-hover:text-red-400 transition-colors tracking-wide">Transferencias Scotiabank</span>
+                        {/* Scotiabank - Sleek Strip */}
+                        <div className="col-span-2 relative group cursor-default">
+                          <div className="bg-[#1a1a1a] border border-white/5 p-3 rounded-xl flex items-center justify-center gap-3 hover:bg-red-500/5 hover:border-red-500/30 transition-all">
+                            <div className="flex space-x-1">
+                              <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                              <div className="w-1.5 h-1.5 rounded-full bg-red-500/50" />
+                            </div>
+                            <span className="text-[10px] font-medium text-white/60 group-hover:text-red-400 transition-colors tracking-widest uppercase">Transferencias Scotiabank</span>
                           </div>
                         </div>
                       </div>
                     ) : (
-                      // English: PayPal PREMIUM
-                      <div className="flex flex-col items-center justify-center h-full py-2 space-y-4">
-                        <div className="w-full relative group cursor-default">
-                          <div className="absolute inset-0 bg-[#0070BA] rounded-2xl blur opacity-0 group-hover:opacity-10 transition-opacity duration-500" />
-                          <div className="relative bg-white/5 border border-white/10 p-5 rounded-2xl flex flex-col items-center gap-3 hover:border-[#0070BA]/50 transition-all">
-                            <div className="w-14 h-14 rounded-full bg-[#0070BA]/20 flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-[#0070BA]/20 border border-[#0070BA]/30">
-                              <CreditCard className="w-6 h-6 text-[#0070BA]" />
+                      // English: PayPal PREMIUM CARD
+                      <div className="relative flex flex-col items-center justify-center h-full space-y-5">
+                        <div className="w-full relative group cursor-pointer overflow-hidden rounded-2xl">
+                          <div className="absolute inset-0 bg-gradient-to-r from-[#0070BA] to-[#1546A0] opacity-10 group-hover:opacity-20 transition-opacity duration-500" />
+                          <div className="relative bg-[#1a1a1a] border border-white/5 p-6 rounded-2xl flex flex-col items-center gap-4 hover:border-[#0070BA]/50 transition-all duration-300 group-hover:shadow-[0_0_30px_-5px_rgba(0,112,186,0.3)]">
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-full bg-[#0070BA] flex items-center justify-center text-white shadow-lg">
+                                <span className="font-bold italic text-xs">P</span>
+                              </div>
+                              <span className="text-lg font-bold text-white tracking-tight">PayPal</span>
                             </div>
-                            <div className="text-center">
-                              <span className="block text-sm font-bold text-white/90 mb-1 group-hover:text-[#0070BA] transition-colors">PayPal</span>
-                              <span className="text-[10px] text-white/40 uppercase tracking-wider">International Cards</span>
+
+                            {/* Card Pills */}
+                            <div className="flex items-center gap-2 opacity-60 grayscale group-hover:grayscale-0 transition-all duration-500">
+                              <div className="h-5 w-8 rounded bg-white/10 flex items-center justify-center border border-white/5"><div className="w-3 h-3 rounded-full bg-red-400/80" /></div>
+                              <div className="h-5 w-8 rounded bg-white/10 flex items-center justify-center border border-white/5"><div className="w-3 h-3 rounded-full bg-orange-400/80" /></div>
+                              <div className="h-5 w-8 rounded bg-white/10 flex items-center justify-center border border-white/5"><div className="w-3 h-3 rounded-full bg-blue-400/80" /></div>
                             </div>
+
+                            <span className="text-[10px] text-white/30 uppercase tracking-widest mt-1">World Class Security</span>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1.5 text-[10px] text-white/30 justify-center">
-                          <div className="w-1 h-1 rounded-full bg-green-500" />
-                          Securely processed. Cancel anytime.
+
+                        <div className="flex items-center gap-2 text-[9px] text-white/20 uppercase tracking-widest">
+                          <ShieldCheck className="w-3 h-3" />
+                          256-bit SSL Encrypted
                         </div>
                       </div>
                     )}
