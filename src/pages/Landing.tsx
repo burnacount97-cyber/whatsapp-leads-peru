@@ -718,54 +718,71 @@ export default function Landing() {
                 </div>
 
                 {/* Right: Payment Methods */}
-                {/* Right: Payment Methods */}
-                <div className="w-full md:w-80 bg-muted/30 rounded-3xl p-6 border border-border/50 text-center">
-                  <h4 className="font-bold mb-4 text-sm text-muted-foreground uppercase tracking-wide">
-                    {i18n.language === 'es' ? 'Pagos Locales Flexibles' : 'Secure Payment'}
-                  </h4>
+                {/* Right: Payment Methods - Premium Redesign */}
+                <div className="w-full md:w-80 relative group/card">
+                  {/* Background Gradient Effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-primary/5 rounded-3xl blur-xl opacity-50" />
 
-                  {i18n.language === 'es' ? (
-                    // Spanish: Local Payments (Yape/Plin/Transfers)
-                    <div className="grid grid-cols-2 gap-3">
-                      {/* YAPE */}
-                      <div className="bg-background p-3 rounded-xl border shadow-sm flex flex-col items-center gap-2 hover:border-[#742284] transition-colors group cursor-default">
-                        <div className="w-10 h-10 rounded-lg bg-[#742284] flex items-center justify-center text-white font-black italic text-[10px] transform -rotate-3 group-hover:scale-110 transition-transform">
-                          Yape
-                        </div>
-                        <span className="text-[10px] font-bold text-muted-foreground">Yape</span>
-                      </div>
+                  <div className="relative bg-black/40 backdrop-blur-md rounded-3xl p-6 border border-white/10 text-center shadow-2xl">
+                    <h4 className="font-bold mb-6 text-xs text-white/40 uppercase tracking-widest">
+                      {i18n.language === 'es' ? 'Pagos Locales Flexibles' : 'Secure Payment'}
+                    </h4>
 
-                      {/* PLIN */}
-                      <div className="bg-background p-3 rounded-xl border shadow-sm flex flex-col items-center gap-2 hover:border-[#00D1D1] transition-colors group cursor-default">
-                        <div className="w-10 h-10 rounded-lg bg-[#00D1D1] flex items-center justify-center text-white font-bold text-[10px] group-hover:scale-110 transition-transform">
-                          Plin
+                    {i18n.language === 'es' ? (
+                      // Spanish: Local Payments PREMIUM
+                      <div className="grid grid-cols-2 gap-3">
+                        {/* YAPE */}
+                        <div className="relative group cursor-default">
+                          <div className="absolute inset-0 bg-[#742284] rounded-2xl blur opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
+                          <div className="relative bg-white/5 border border-white/10 p-4 rounded-2xl flex flex-col items-center gap-2 hover:border-[#742284]/50 transition-colors">
+                            <div className="w-10 h-10 rounded-lg bg-[#742284] flex items-center justify-center text-white font-black italic text-[10px] transform -rotate-3 group-hover:scale-110 transition-transform shadow-lg shadow-[#742284]/20">
+                              Yape
+                            </div>
+                            <span className="text-[10px] font-bold text-white/60 group-hover:text-white transition-colors">Yape</span>
+                          </div>
                         </div>
-                        <span className="text-[10px] font-bold text-muted-foreground">Plin</span>
-                      </div>
 
-                      {/* Scotiabank */}
-                      <div className="col-span-2 bg-background p-3 rounded-xl border shadow-sm flex items-center justify-center gap-2 hover:border-red-500 transition-colors cursor-default">
-                        <span className="text-[10px] font-semibold text-muted-foreground">Transferencias Scotiabank</span>
-                      </div>
-                    </div>
-                  ) : (
-                    // English/Other: PayPal Only
-                    <div className="flex flex-col items-center justify-center h-full py-2 space-y-4">
-                      <div className="bg-background w-full p-4 rounded-xl border shadow-sm flex flex-col items-center gap-3 hover:border-blue-500 transition-colors group cursor-default">
-                        <div className="w-14 h-14 rounded-full bg-[#0070BA]/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                          {/* PayPal Logo SVGr or Icon */}
-                          <CreditCard className="w-7 h-7 text-[#0070BA]" />
+                        {/* PLIN */}
+                        <div className="relative group cursor-default">
+                          <div className="absolute inset-0 bg-[#00D1D1] rounded-2xl blur opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
+                          <div className="relative bg-white/5 border border-white/10 p-4 rounded-2xl flex flex-col items-center gap-2 hover:border-[#00D1D1]/50 transition-colors">
+                            <div className="w-10 h-10 rounded-lg bg-[#00D1D1] flex items-center justify-center text-white font-bold text-[10px] group-hover:scale-110 transition-transform shadow-lg shadow-[#00D1D1]/20">
+                              Plin
+                            </div>
+                            <span className="text-[10px] font-bold text-white/60 group-hover:text-white transition-colors">Plin</span>
+                          </div>
                         </div>
-                        <div className="text-center">
-                          <span className="block text-sm font-bold text-[#002f86]">PayPal</span>
-                          <span className="text-[10px] text-muted-foreground">International Cards Accepted</span>
+
+                        {/* Scotiabank */}
+                        <div className="col-span-2 relative group cursor-default mt-1">
+                          <div className="bg-white/5 border border-white/10 p-3 rounded-xl flex items-center justify-center gap-2 hover:bg-red-600/10 hover:border-red-500/50 transition-all">
+                            <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                            <span className="text-[10px] font-medium text-white/50 group-hover:text-red-400 transition-colors tracking-wide">Transferencias Scotiabank</span>
+                          </div>
                         </div>
                       </div>
-                      <div className="text-[10px] text-muted-foreground">
-                        Securely processed by PayPal. Cancel anytime.
+                    ) : (
+                      // English: PayPal PREMIUM
+                      <div className="flex flex-col items-center justify-center h-full py-2 space-y-4">
+                        <div className="w-full relative group cursor-default">
+                          <div className="absolute inset-0 bg-[#0070BA] rounded-2xl blur opacity-0 group-hover:opacity-10 transition-opacity duration-500" />
+                          <div className="relative bg-white/5 border border-white/10 p-5 rounded-2xl flex flex-col items-center gap-3 hover:border-[#0070BA]/50 transition-all">
+                            <div className="w-14 h-14 rounded-full bg-[#0070BA]/20 flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-[#0070BA]/20 border border-[#0070BA]/30">
+                              <CreditCard className="w-6 h-6 text-[#0070BA]" />
+                            </div>
+                            <div className="text-center">
+                              <span className="block text-sm font-bold text-white/90 mb-1 group-hover:text-[#0070BA] transition-colors">PayPal</span>
+                              <span className="text-[10px] text-white/40 uppercase tracking-wider">International Cards</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[10px] text-white/30 justify-center">
+                          <div className="w-1 h-1 rounded-full bg-green-500" />
+                          Securely processed. Cancel anytime.
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
 
               </div>
