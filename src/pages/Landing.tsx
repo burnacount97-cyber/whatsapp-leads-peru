@@ -70,6 +70,31 @@ export default function Landing() {
     return () => document.removeEventListener('mouseleave', handleMouseLeave);
   }, [hasShownExit]);
 
+  // ViewContent 50% Scroll Tracker
+  useEffect(() => {
+    let viewContentTriggered = false;
+
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const scrollPercent = (scrollPosition / documentHeight) * 100;
+
+      if (scrollPercent >= 50 && !viewContentTriggered) {
+        // @ts-ignore
+        if (typeof window.fbq === 'function') {
+          // @ts-ignore
+          window.fbq('track', 'ViewContent');
+        }
+        viewContentTriggered = true;
+        // Optimization: remove listener once triggered
+        window.removeEventListener('scroll', handleScroll);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const handleOpenDemoFromPopup = () => {
     setShowExitPopup(false);
     setTimeout(() => {
