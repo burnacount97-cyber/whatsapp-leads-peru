@@ -369,17 +369,18 @@ When you have the user's data (Name and interest) and they confirm they want to 
     } catch (error) {
         console.error('API Chat Error:', error);
 
-        // Detailed error for common failures
-        let userMessage = "Lo siento, tuve un error de conexión con mi cerebro artificial. ¿Puedes intentar de nuevo?";
+        // DEBUG MODE: Return actual error to UI to see what's failing in Vercel
+        const technicalDetails = error.message || 'Error desconocido';
+        let userMessage = `Lo siento, error técnico: ${technicalDetails}`;
 
         if (error.message?.includes('JSON at position')) {
-            userMessage = "Error de configuración: El archivo de cuenta de servicio (service_account) en Vercel no es un JSON válido.";
+            userMessage = `Error de configuración: El archivo de cuenta de servicio (service_account) en Vercel no es un JSON válido. Info: ${technicalDetails}`;
         } else if (error.message?.includes('api_key') || error.message?.includes('401')) {
-            userMessage = "Configuración incompleta: La clave de API de OpenAI no es válida o ha expirado.";
+            userMessage = `Configuración incompleta: La clave de API de OpenAI no es válida o ha expirado. Info: ${technicalDetails}`;
         } else if (error.message?.includes('Widget not found')) {
             userMessage = `Error: No pude encontrar la configuración para el widget ID: ${widgetId}.`;
         } else if (error.message?.includes('quota') || error.message?.includes('429')) {
-            userMessage = "Aviso: He alcanzado mi límite de uso de OpenAI. Por favor, verifica el crédito de tu cuenta.";
+            userMessage = `Aviso: He alcanzado mi límite de uso o cuota de OpenAI. Info: ${technicalDetails}`;
         }
 
         return res.status(200).json({ response: userMessage });
