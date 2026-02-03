@@ -141,7 +141,7 @@ When you have all data, ASK TO CONFIRM: "Perfect, {Name}. Shall I connect you wi
 
 IF THEY CONFIRM (Yes/Ok/Go ahead), REPLY EXACTLY WITH THIS COMMAND (Do not add any other text):
 
-[WHATSAPP_REDIRECT: {Greeting}, I am {NAME}. Web: {YES/NO}, Ads: {YES/NO/PLANNING} (${BUDGET}), Volume: {AMOUNT}. I want the Lead Widget system.]`,
+[WHATSAPP_REDIRECT: {Greeting}, I am {NAME}. Web: {YES/NO}, Ads: {YES/NO/PLANNING} (\$${BUDGET}), Volume: {AMOUNT}. I want the Lead Widget system.]`,
                 business_name: 'Lead Widget'
             };
         } else {
@@ -369,18 +369,17 @@ When you have the user's data (Name and interest) and they confirm they want to 
     } catch (error) {
         console.error('API Chat Error:', error);
 
-        // DEBUG MODE: Return actual error to UI to see what's failing in Vercel
-        const technicalDetails = error.message || 'Error desconocido';
-        let userMessage = `Lo siento, error técnico: ${technicalDetails}`;
+        // Detailed error for common failures
+        let userMessage = "Lo siento, tuve un error de conexión con mi cerebro artificial. ¿Puedes intentar de nuevo?";
 
         if (error.message?.includes('JSON at position')) {
-            userMessage = `Error de configuración: El archivo de cuenta de servicio (service_account) en Vercel no es un JSON válido. Info: ${technicalDetails}`;
+            userMessage = "Error de configuración: El archivo de cuenta de servicio (service_account) en Vercel no es un JSON válido.";
         } else if (error.message?.includes('api_key') || error.message?.includes('401')) {
-            userMessage = `Configuración incompleta: La clave de API de OpenAI no es válida o ha expirado. Info: ${technicalDetails}`;
+            userMessage = "Configuración incompleta: La clave de API de OpenAI no es válida o ha expirado.";
         } else if (error.message?.includes('Widget not found')) {
             userMessage = `Error: No pude encontrar la configuración para el widget ID: ${widgetId}.`;
         } else if (error.message?.includes('quota') || error.message?.includes('429')) {
-            userMessage = `Aviso: He alcanzado mi límite de uso o cuota de OpenAI. Info: ${technicalDetails}`;
+            userMessage = "Aviso: He alcanzado mi límite de uso de OpenAI. Por favor, verifica el crédito de tu cuenta.";
         }
 
         return res.status(200).json({ response: userMessage });
