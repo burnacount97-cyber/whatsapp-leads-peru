@@ -567,19 +567,19 @@ export default function Landing() {
 
             {[
               {
-                icon: MousePointer2,
+                icon: Zap,
                 t: t('sales_flow.step_1_title'),
                 d: t('sales_flow.step_1_desc'),
                 badge: t('sales_flow.step_1_badge')
               },
               {
-                icon: Bot,
+                icon: MousePointer2,
                 t: t('sales_flow.step_2_title'),
                 d: t('sales_flow.step_2_desc'),
                 badge: t('sales_flow.step_2_badge')
               },
               {
-                icon: Sparkles,
+                icon: Bot,
                 t: t('sales_flow.step_3_title'),
                 d: t('sales_flow.step_3_desc'),
                 badge: t('sales_flow.step_3_badge')

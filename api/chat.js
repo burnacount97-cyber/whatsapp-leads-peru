@@ -90,13 +90,15 @@ export default async function handler(req, res) {
             console.error('Non-critical: Rate limit check failed (possibly missing index):', rateError.message);
         }
 
-        // Track message attempt (non-blocking)
-        db.collection('analytics').add({
-            widget_id: widgetId,
-            event_type: 'message_sent',
-            ip: clientIp,
-            created_at: new Date().toISOString()
-        }).catch(e => console.error('Track error:', e.message));
+        // Track message attempt (non-blocking) - Use optional chaining for db if it might be null
+        if (db) {
+            db.collection('analytics').add({
+                widget_id: widgetId,
+                event_type: 'message_sent',
+                ip: clientIp,
+                created_at: new Date().toISOString()
+            }).catch(e => console.error('Track error:', e.message));
+        }
 
         let aiConfig = {};
         let dbWidgetConfig = null;
@@ -143,6 +145,11 @@ IF THEY CONFIRM (Yes/Ok/Go ahead), REPLY EXACTLY WITH THIS COMMAND (Do not add a
                 business_name: 'Lead Widget'
             };
         } else {
+            if (!db) {
+                console.error('[Error] DB not initialized for non-demo widget');
+                return res.status(500).json({ error: 'Database connection failed' });
+            }
+
             // Widget lookup: Try both widget_id and user_id (since clientId can be user.uid)
             let q = await db.collection('widget_configs').where('widget_id', '==', widgetId).limit(1).get();
 
@@ -178,9 +185,6 @@ IF THEY CONFIRM (Yes/Ok/Go ahead), REPLY EXACTLY WITH THIS COMMAND (Do not add a
                 if (trialEnds) {
                     isTrialValid = now < trialEnds;
                 } else {
-                    // Legacy/Safety: If no date but status is trial, we might want to allow 
-                    // or block. For now, let's allow but prompt upgrade in dashboard.
-                    // Or strictly: if no date, it's valid (new user logic might be missing)
                     isTrialValid = true;
                 }
             }
@@ -274,10 +278,6 @@ When you have the user's data (Name and interest) and they confirm they want to 
         const businessContext = aiConfig.business_description ? `CONTEXTO DEL NEGOCIO:\n${aiConfig.business_description}\n\n` : '';
 
         // Construct System Prompt
-        // 1. Business Context
-        // 2. User defined Prompt (or default)
-        // 3. Language Constraint
-        // 4. Redirect Protocol
         const userTz = req.body.userTimezone || 'America/Lima';
         const currentDateTime = new Date().toLocaleString('en-US', { timeZone: userTz });
 
@@ -307,6 +307,10 @@ When you have the user's data (Name and interest) and they confirm they want to 
 
         const aiResponse = completion.choices[0].message.content;
 
+        if (!aiResponse) {
+            throw new Error('Emply response from OpenAI');
+        }
+
         // --- SAFE ENFORCEMENT ---
         // 1. Check for BLOCK action or AI Red-Flags
         const shouldBlock =
@@ -322,7 +326,7 @@ When you have the user's data (Name and interest) and they confirm they want to 
             aiResponse.includes('I cannot help with that') ||
             aiResponse.includes('I cannot fulfill this');
 
-        if (shouldBlock) {
+        if (shouldBlock && db) {
             try {
                 // Permanent IP block
                 const targetWidgetId = widgetId === 'demo-landing' ? 'demo-landing' : (dbWidgetConfig?.id || widgetId);
@@ -343,7 +347,7 @@ When you have the user's data (Name and interest) and they confirm they want to 
         }
 
         // 2. Save Lead (Safe parsing)
-        if (aiResponse.includes('collect_lead') && widgetId !== 'demo-landing' && dbWidgetConfig) {
+        if (aiResponse.includes('collect_lead') && widgetId !== 'demo-landing' && dbWidgetConfig && db) {
             try {
                 const leadMatch = aiResponse.match(/\{"action":\s*"collect_lead"[^}]*\}/);
                 if (leadMatch) {
@@ -370,11 +374,11 @@ When you have the user's data (Name and interest) and they confirm they want to 
 
         if (error.message?.includes('JSON at position')) {
             userMessage = "Error de configuración: El archivo de cuenta de servicio (service_account) en Vercel no es un JSON válido.";
-        } else if (error.message?.includes('api_key')) {
+        } else if (error.message?.includes('api_key') || error.message?.includes('401')) {
             userMessage = "Configuración incompleta: La clave de API de OpenAI no es válida o ha expirado.";
         } else if (error.message?.includes('Widget not found')) {
             userMessage = `Error: No pude encontrar la configuración para el widget ID: ${widgetId}.`;
-        } else if (error.message?.includes('quota')) {
+        } else if (error.message?.includes('quota') || error.message?.includes('429')) {
             userMessage = "Aviso: He alcanzado mi límite de uso de OpenAI. Por favor, verifica el crédito de tu cuenta.";
         }
 
