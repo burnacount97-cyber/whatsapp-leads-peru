@@ -22,6 +22,56 @@
     "trust_badge": {
         "title": "Funciona con cualquier ecosistema"
     },
+    "templates_section": {
+        "title": "Plantillas por Industria",
+        "subtitle": "La IA ya está entrenada para tu nicho. Elige una para ver la demo.",
+        "industries": {
+            "real_estate": {
+                "name": "Inmobiliarias",
+                "desc": "Captura distrito y habitaciones"
+            },
+            "clinics": {
+                "name": "Clínicas",
+                "desc": "Especialidad y urgencia"
+            },
+            "workshops": {
+                "name": "Talleres",
+                "desc": "Tipo de vehículo y problema"
+            },
+            "delivery": {
+                "name": "Delivery",
+                "desc": "Dirección de entrega"
+            },
+            "ecommerce": {
+                "name": "Ecommerce",
+                "desc": "Dudas de stock y cupones"
+            },
+            "general": {
+                "name": "General",
+                "desc": "Personalizable para cualquier negocio"
+            }
+        },
+        "features": {
+            "preconfigured": "Preguntas pre-configuradas",
+            "tone": "Tono de voz adaptado",
+            "capture": "Campos de captura específicos"
+        },
+        "demo": {
+            "assistant_role": "IA Asistente",
+            "status": "En línea",
+            "client_label": "El cliente responde...",
+            "typing": "Escribiendo...",
+            "input_placeholder": "Escribe algo...",
+            "messages": {
+                "real_estate": "👋 ¡Hola! ¿Buscas comprar o alquilar? Tengo opciones en Miraflores y San Isidro.",
+                "clinics": "👋 Hola, soy el asistente médico. ¿Qué especialidad necesitas consultar hoy?",
+                "workshops": "👋 ¡Hola! ¿Qué problema tiene tu vehículo? Podemos agendar una revisión.",
+                "delivery": "👋 ¡Hola! ¿A qué dirección enviamos tu pedido hoy?",
+                "ecommerce": "👋 ¡Hola! ¿Tienes dudas con algún producto o con tu cupón de descuento?",
+                "general": "👋 ¡Hola! ¿En qué podemos ayudarte el día de hoy?"
+            }
+        }
+    },
     "pain_points": {
         "title": "¿Tu web tiene visitas pero <0>pocas ventas</0>?",
         "description": "El problema no es tu tráfico, es la fricción. Los formularios largos matan la conversión. Lead Widget elimina esa barrera conectando al cliente instantáneamente contigo.",

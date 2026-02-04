@@ -38,14 +38,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
-const nicheTemplates = [
-  { name: 'Inmobiliarias', emoji: '🏠', desc: 'Captura distrito y habitaciones' },
-  { name: 'Clínicas', emoji: '🏥', desc: 'Especialidad y urgencia' },
-  { name: 'Talleres', emoji: '🔧', desc: 'Tipo de vehículo y problema' },
-  { name: 'Delivery', emoji: '🛵', desc: 'Dirección de entrega' },
-  { name: 'Ecommerce', emoji: '🛍️', desc: 'Dudas de stock y cupones' },
-  { name: 'General', emoji: '💼', desc: 'Personalizable para cualquier negocio' },
-];
+
 
 const stats = [
   { value: '22%', label: 'Tasa de conversión promedio' },
@@ -55,7 +48,7 @@ const stats = [
 
 export default function Landing() {
   const { t, i18n } = useTranslation();
-  const [activeTemplate, setActiveTemplate] = useState('inmobiliaria');
+  const [activeTemplate, setActiveTemplate] = useState('real_estate');
   const [showExitPopup, setShowExitPopup] = useState(false);
   const [hasShownExit, setHasShownExit] = useState(false);
 
@@ -607,24 +600,31 @@ export default function Landing() {
       </section >
 
       {/* --- TEMPLATES SHOWCASE --- */}
-      < section className="py-16 lg:py-24 px-4 bg-slate-950 text-white relative border-y border-white/5" id="templates" >
+      <section className="py-16 lg:py-24 px-4 bg-slate-950 text-white relative border-y border-white/5" id="templates">
         <div className="container mx-auto max-w-5xl">
           <div className="mb-8 md:mb-12">
             <div className="text-left mb-6">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-2">Plantillas por Industria</h2>
-              <p className="text-slate-400 text-sm sm:text-base">La IA ya está entrenada para tu nicho. Elige una para ver la demo.</p>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-2">{t('templates_section.title')}</h2>
+              <p className="text-slate-400 text-sm sm:text-base">{t('templates_section.subtitle')}</p>
             </div>
             <div className="flex flex-wrap gap-3 w-full overflow-x-auto pb-2 no-scrollbar">
-              {nicheTemplates.map(t => (
+              {[
+                { key: 'real_estate', emoji: '🏠' },
+                { key: 'clinics', emoji: '🏥' },
+                { key: 'workshops', emoji: '🔧' },
+                { key: 'delivery', emoji: '🛵' },
+                { key: 'ecommerce', emoji: '🛍️' },
+                { key: 'general', emoji: '💼' },
+              ].map(template => (
                 <button
-                  key={t.name}
-                  onClick={() => setActiveTemplate(t.name.toLowerCase())}
-                  className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-all border flex items-center gap-2 ${activeTemplate === t.name.toLowerCase()
+                  key={template.key}
+                  onClick={() => setActiveTemplate(template.key)}
+                  className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap transition-all border flex items-center gap-2 ${activeTemplate === template.key
                     ? 'bg-primary border-primary text-primary-foreground shadow-lg shadow-primary/20 scale-105'
                     : 'bg-slate-900 border-white/10 text-slate-400 hover:border-white/20 hover:text-white'
                     }`}
                 >
-                  <span className="text-lg">{t.emoji}</span> {t.name}
+                  <span className="text-lg">{template.emoji}</span> {t(`templates_section.industries.${template.key}.name`)}
                 </button>
               ))}
             </div>
@@ -633,13 +633,17 @@ export default function Landing() {
           <div className="bg-white/5 rounded-3xl p-6 md:p-8 border border-white/10 shadow-sm flex flex-col md:flex-row gap-8 items-center backdrop-blur-sm">
             <div className="flex-1 space-y-4 w-full">
               <h3 className="text-xl sm:text-2xl font-bold text-white">
-                {nicheTemplates.find(t => t.name.toLowerCase() === activeTemplate)?.name}
+                {t(`templates_section.industries.${activeTemplate}.name`)}
               </h3>
               <p className="text-base sm:text-lg text-slate-400">
-                {nicheTemplates.find(t => t.name.toLowerCase() === activeTemplate)?.desc}
+                {t(`templates_section.industries.${activeTemplate}.desc`)}
               </p>
               <ul className="space-y-3 pt-4">
-                {["Preguntas pre-configuradas", "Tono de voz adaptado", "Campos de captura específicos"].map((item, i) => (
+                {[
+                  t('templates_section.features.preconfigured'),
+                  t('templates_section.features.tone'),
+                  t('templates_section.features.capture')
+                ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3">
                     <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center flex-shrink-0">
                       <Check className="w-3 h-3" />
@@ -657,8 +661,8 @@ export default function Landing() {
                     <Bot className="w-4 h-4 text-white" />
                   </div>
                   <div className="text-left">
-                    <p className="text-[10px] font-bold text-white">IA Asistente</p>
-                    <p className="text-[8px] text-primary">En línea</p>
+                    <p className="text-[10px] font-bold text-white">{t('templates_section.demo.assistant_role')}</p>
+                    <p className="text-[8px] text-primary">{t('templates_section.demo.status')}</p>
                   </div>
                 </div>
               </div>
@@ -667,26 +671,21 @@ export default function Landing() {
               <div className="space-y-3 mb-4 flex-1">
                 <div className="bg-white/5 p-3 rounded-2xl rounded-bl-none max-w-[80%] text-left">
                   <p className="text-[11px] text-slate-300">
-                    {activeTemplate === 'inmobiliarias' && "👋 ¡Hola! ¿Buscas comprar o alquilar? Tengo opciones en Miraflores y San Isidro."}
-                    {activeTemplate === 'clínicas' && "👋 Hola, soy el asistente médico. ¿Qué especialidad necesitas consultar hoy?"}
-                    {activeTemplate === 'talleres' && "👋 ¡Hola! ¿Qué problema tiene tu vehículo? Podemos agendar una revisión."}
-                    {activeTemplate === 'delivery' && "👋 ¡Hola! ¿A qué dirección enviamos tu pedido hoy?"}
-                    {activeTemplate === 'ecommerce' && "👋 ¡Hola! ¿Tienes dudas con algún producto o con tu cupón de descuento?"}
-                    {activeTemplate === 'general' && "👋 ¡Hola! ¿En qué podemos ayudarte el día de hoy?"}
+                    {t(`templates_section.demo.messages.${activeTemplate}`)}
                   </p>
                 </div>
                 <div className="bg-primary/20 p-3 rounded-2xl rounded-br-none max-w-[80%] ml-auto text-right border border-primary/20">
-                  <p className="text-[11px] text-primary-foreground font-medium italic">El cliente responde...</p>
+                  <p className="text-[11px] text-primary-foreground font-medium italic">{t('templates_section.demo.client_label')}</p>
                 </div>
                 <div className="bg-white/5 p-3 rounded-2xl rounded-bl-none max-w-[80%] text-left animate-pulse">
-                  <p className="text-[11px] text-slate-400">Escribiendo...</p>
+                  <p className="text-[11px] text-slate-400">{t('templates_section.demo.typing')}</p>
                 </div>
               </div>
 
               {/* Input Area Simulation */}
               <div className="mt-auto flex gap-2">
                 <div className="h-8 flex-1 bg-white/5 rounded-full border border-white/10 px-3 flex items-center">
-                  <p className="text-[10px] text-slate-500">Escribe algo...</p>
+                  <p className="text-[10px] text-slate-500">{t('templates_section.demo.input_placeholder')}</p>
                 </div>
                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
                   <Send className="w-3.5 h-3.5 text-white" />
@@ -695,7 +694,7 @@ export default function Landing() {
             </div>
           </div>
         </div>
-      </section >
+      </section>
 
       {/* --- PRICING --- */}
       < section className="py-16 lg:py-24 px-4 bg-slate-950 text-white" id="pricing" >

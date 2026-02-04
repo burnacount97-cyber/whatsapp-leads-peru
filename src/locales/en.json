@@ -22,6 +22,56 @@
     "trust_badge": {
         "title": "Works with any ecosystem"
     },
+    "templates_section": {
+        "title": "Templates by Industry",
+        "subtitle": "AI is already trained for your niche. Choose one to see the demo.",
+        "industries": {
+            "real_estate": {
+                "name": "Real Estate",
+                "desc": "Capture district and rooms"
+            },
+            "clinics": {
+                "name": "Clinics",
+                "desc": "Specialty and urgency"
+            },
+            "workshops": {
+                "name": "Workshops",
+                "desc": "Vehicle type and issue"
+            },
+            "delivery": {
+                "name": "Delivery",
+                "desc": "Delivery address"
+            },
+            "ecommerce": {
+                "name": "Ecommerce",
+                "desc": "Stock queries and coupons"
+            },
+            "general": {
+                "name": "General",
+                "desc": "Customizable for any business"
+            }
+        },
+        "features": {
+            "preconfigured": "Pre-configured questions",
+            "tone": "Adapted tone of voice",
+            "capture": "Specific capture fields"
+        },
+        "demo": {
+            "assistant_role": "AI Assistant",
+            "status": "Online",
+            "client_label": "Client replies...",
+            "typing": "Typing...",
+            "input_placeholder": "Type something...",
+            "messages": {
+                "real_estate": "👋 Hi! Are you looking to buy or rent? I have options in Miraflores and San Isidro.",
+                "clinics": "👋 Hi, I'm the medical assistant. Which specialty do you need to consult today?",
+                "workshops": "👋 Hi! What issue does your vehicle have? We can schedule a checkup.",
+                "delivery": "👋 Hi! Where should we send your order today?",
+                "ecommerce": "👋 Hi! Do you have questions about any product or your discount coupon?",
+                "general": "👋 Hi! How can we help you today?"
+            }
+        }
+    },
     "pain_points": {
         "title": "Website with traffic but <0>few sales</0>?",
         "description": "The problem isn't your traffic, it's friction. Long forms kill conversion. Lead Widget removes that barrier by instantly connecting the client with you.",
