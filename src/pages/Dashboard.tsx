@@ -1624,28 +1624,28 @@ export default function Dashboard() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="bg-white/80 p-4 rounded-lg space-y-3 text-sm">
+                    <div className="bg-white/90 dark:bg-slate-900/60 p-4 rounded-lg space-y-3 text-sm border border-blue-100 dark:border-blue-900/50 shadow-sm">
                       <div className="flex items-start gap-3">
-                        <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0">1</div>
+                        <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 text-xs">1</div>
                         <div>
-                          <p className="font-semibold">Crea tu cuenta gratuita</p>
-                          <p className="text-muted-foreground">Ve a <a href="https://platform.openai.com/signup" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">platform.openai.com/signup</a> y regístrate con tu correo.</p>
+                          <p className="font-semibold text-slate-900 dark:text-slate-100">Crea tu cuenta gratuita</p>
+                          <p className="text-slate-600 dark:text-slate-300">Ve a <a href="https://platform.openai.com/signup" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">platform.openai.com/signup</a> y regístrate con tu correo.</p>
                         </div>
                       </div>
 
                       <div className="flex items-start gap-3">
-                        <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0">2</div>
+                        <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 text-xs">2</div>
                         <div>
-                          <p className="font-semibold">Genera tu API Key</p>
-                          <p className="text-muted-foreground">Accede a <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">platform.openai.com/api-keys</a> y haz clic en "Create new secret key". Cópiala inmediatamente.</p>
+                          <p className="font-semibold text-slate-900 dark:text-slate-100">Genera tu API Key</p>
+                          <p className="text-slate-600 dark:text-slate-300">Accede a <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">platform.openai.com/api-keys</a> y haz clic en "Create new secret key". Cópiala inmediatamente.</p>
                         </div>
                       </div>
 
                       <div className="flex items-start gap-3">
-                        <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0">3</div>
+                        <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 text-xs">3</div>
                         <div>
-                          <p className="font-semibold">Pégala aquí arriba</p>
-                          <p className="text-muted-foreground">Copia la API Key (empieza con <code className="bg-slate-200 px-1 rounded">sk-...</code>) y pégala en el campo de arriba. ¡Listo!</p>
+                          <p className="font-semibold text-slate-900 dark:text-slate-100">Pégala aquí arriba</p>
+                          <p className="text-slate-600 dark:text-slate-300">Copia la API Key (empieza con <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded text-slate-800 dark:text-slate-200">sk-...</code>) y pégala en el campo de arriba. ¡Listo!</p>
                         </div>
                       </div>
 
