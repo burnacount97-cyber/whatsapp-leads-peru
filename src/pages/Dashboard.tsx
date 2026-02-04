@@ -558,6 +558,7 @@ export default function Dashboard() {
         quick_replies: typeof formConfig.quick_replies === 'string'
           ? formConfig.quick_replies.split('\n').filter((m: string) => m.trim() !== '')
           : formConfig.quick_replies,
+        testimonials_json: JSON.stringify(testimonials)
       });
 
       // Update business name in profile
