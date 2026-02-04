@@ -86,7 +86,19 @@ interface WidgetConfig {
   ai_security_prompt?: string;
   language?: 'es' | 'en';
   testimonials_json?: string;
+  launcher_icon?: string;
 }
+
+const ANIMATED_ICONS = [
+  { id: 'default', label: 'Estático (Default)', url: '' },
+  { id: 'ecommerce', label: 'Ecommerce (Bolsa)', url: 'https://cdn.dribbble.com/users/115601/screenshots/5217462/media/601362e537482f3c75ab897e93d9a1f1.gif' },
+  { id: 'dental', label: 'Dental (Diente)', url: 'https://cdn.dribbble.com/users/77598/screenshots/5521477/media/1301938508e75a3407c030d507115ec4.gif' },
+  { id: 'clinic', label: 'Clínica (Cruz)', url: 'https://cdn.dribbble.com/users/2564256/screenshots/15449767/media/ccb10a2cd919b22416b76174a9b233a7.gif' },
+  { id: 'auto', label: 'Taller (Mecánico)', url: 'https://cdn.dribbble.com/users/230124/screenshots/12028606/media/58102606558661642287413661138883.gif' },
+  { id: 'real_estate', label: 'Inmobiliaria', url: 'https://cdn.dribbble.com/users/418188/screenshots/3102284/media/673855364673199c4c7951a70716c026.gif' },
+  { id: 'restaurant', label: 'Restaurante (Burger)', url: 'https://cdn.dribbble.com/users/31752/screenshots/3682976/media/e2540d99066601e38a44d75d35a3962d.gif' },
+  { id: 'robot', label: 'IA (Robot)', url: 'https://cdn.dribbble.com/users/729829/screenshots/4231940/media/1296c050075c3249052066f116670868.gif' }
+];
 
 interface Testimonial {
   id: string;
@@ -266,6 +278,7 @@ export default function Dashboard() {
     teaser_messages: '¿Cómo podemos ayudarte? 👋\n¿Tienes alguna duda sobre el servicio? ✨\n¡Hola! Estamos en línea para atenderte 🚀',
     // Quick Replies
     quick_replies: '¿Cómo funciona?\nQuiero más información\nVer precios',
+    launcher_icon: '',
   });
 
   const [showApiKey, setShowApiKey] = useState(false);
@@ -383,6 +396,7 @@ export default function Dashboard() {
           quick_replies: Array.isArray(configData.quick_replies)
             ? configData.quick_replies.join('\n')
             : (configData.quick_replies || '¿Cómo funciona?\nQuiero más información\nVer precios'),
+          launcher_icon: configData.launcher_icon || '',
         });
 
         if (configData.testimonials_json) {
@@ -558,7 +572,8 @@ export default function Dashboard() {
         quick_replies: typeof formConfig.quick_replies === 'string'
           ? formConfig.quick_replies.split('\n').filter((m: string) => m.trim() !== '')
           : formConfig.quick_replies,
-        testimonials_json: JSON.stringify(testimonials)
+        testimonials_json: JSON.stringify(testimonials),
+        launcher_icon: formConfig.launcher_icon || ''
       });
 
       // Update business name in profile
@@ -1176,8 +1191,39 @@ export default function Dashboard() {
                       <Input
                         value={formConfig.primary_color}
                         onChange={(e) => setFormConfig({ ...formConfig, primary_color: e.target.value })}
-                        className="flex-1"
+                        className="flex-1 font-mono"
                       />
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 pt-2 pb-2 border-y border-dashed">
+                    <Label className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-yellow-500" />
+                      Icono del Botón (Animado)
+                      <span className="text-[10px] bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-bold">NUEVO</span>
+                    </Label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {ANIMATED_ICONS.map((icon) => (
+                        <div
+                          key={icon.id}
+                          onClick={() => setFormConfig({ ...formConfig, launcher_icon: icon.url })}
+                          className={`
+                            border rounded-lg p-2 cursor-pointer transition-all hover:bg-slate-50 flex flex-col items-center gap-2
+                            ${formConfig.launcher_icon === icon.url ? 'ring-2 ring-primary bg-primary/5' : 'border-slate-200'}
+                          `}
+                        >
+                          <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden relative">
+                            {icon.url ? (
+                              <img src={icon.url} alt={icon.label} className="w-full h-full object-cover" />
+                            ) : (
+                              <MessageCircle className="w-5 h-5 text-slate-400" />
+                            )}
+                            {/* Preview bubble badge logic for realism */}
+                            <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+                          </div>
+                          <span className="text-[10px] text-center font-medium leading-tight">{icon.label}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
 

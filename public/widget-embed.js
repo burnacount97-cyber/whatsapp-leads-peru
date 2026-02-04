@@ -104,6 +104,7 @@
           quickReplies: quickReplies,
           teaserMessages: teaserMessages,
           testimonials: testimonials,
+          launcherIcon: fields.launcher_icon?.stringValue || '',
           vibrationIntensity: fields.vibration_intensity?.stringValue || 'soft',
           triggerDelay: parseInt(fields.trigger_delay?.integerValue) || 5,
           exitIntentEnabled: fields.trigger_exit_intent?.booleanValue !== false,
@@ -425,9 +426,10 @@
         
         <!-- Main Button -->
         <button id="lw-button">
+          ${config.launcherIcon ? `<img src="${config.launcherIcon}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" alt="Chat" />` : `
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          </svg>
+          </svg>`}
         </button>
 
         <!-- Teaser Bubble -->
@@ -850,7 +852,7 @@
         'primaryColor', 'businessName', 'welcomeMessage',
         'whatsappDestination', 'quickReplies', 'teaserMessages',
         'chatPlaceholder', 'exitIntentTitle', 'exitIntentDescription', 'exitIntentCta',
-        'vibrationIntensity', 'testimonials'
+        'vibrationIntensity', 'testimonials', 'launcherIcon'
       ];
 
       let hasVisualChanges = false;
