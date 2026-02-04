@@ -91,13 +91,13 @@ interface WidgetConfig {
 
 const ANIMATED_ICONS = [
   { id: 'default', label: 'Estático (Default)', url: '' },
-  { id: 'ecommerce', label: 'Ecommerce (Bolsa)', url: 'https://cdn.dribbble.com/users/115601/screenshots/5217462/media/601362e537482f3c75ab897e93d9a1f1.gif' },
-  { id: 'dental', label: 'Dental (Diente)', url: 'https://cdn.dribbble.com/users/77598/screenshots/5521477/media/1301938508e75a3407c030d507115ec4.gif' },
-  { id: 'clinic', label: 'Clínica (Cruz)', url: 'https://cdn.dribbble.com/users/2564256/screenshots/15449767/media/ccb10a2cd919b22416b76174a9b233a7.gif' },
-  { id: 'auto', label: 'Taller (Mecánico)', url: 'https://cdn.dribbble.com/users/230124/screenshots/12028606/media/58102606558661642287413661138883.gif' },
-  { id: 'real_estate', label: 'Inmobiliaria', url: 'https://cdn.dribbble.com/users/418188/screenshots/3102284/media/673855364673199c4c7951a70716c026.gif' },
-  { id: 'restaurant', label: 'Restaurante (Burger)', url: 'https://cdn.dribbble.com/users/31752/screenshots/3682976/media/e2540d99066601e38a44d75d35a3962d.gif' },
-  { id: 'robot', label: 'IA (Robot)', url: 'https://cdn.dribbble.com/users/729829/screenshots/4231940/media/1296c050075c3249052066f116670868.gif' }
+  { id: 'ecommerce', label: 'Ecommerce (Bolsa)', url: 'https://media.giphy.com/media/3o7TKR1bX7X6X6X6X6/giphy.gif' },
+  { id: 'dental', label: 'Dental (Diente)', url: 'https://media.giphy.com/media/3o7527pa7qs9kCG78A/giphy.gif' },
+  { id: 'clinic', label: 'Clínica (Cruz)', url: 'https://media.giphy.com/media/3o7qE1YN7aQfIqn4Bq/giphy.gif' },
+  { id: 'auto', label: 'Taller (Mecánico)', url: 'https://media.giphy.com/media/l0HlOaQcLJ2hHpYcw/giphy.gif' },
+  { id: 'real_estate', label: 'Inmobiliaria', url: 'https://media.giphy.com/media/3o6oztpGE67B7W7iTu/giphy.gif' },
+  { id: 'restaurant', label: 'Restaurante (Burger)', url: 'https://media.giphy.com/media/l4pTfx2qLszoacZRS/giphy.gif' },
+  { id: 'robot', label: 'IA (Robot)', url: 'https://media.giphy.com/media/26AHONQ79FdWZhAI0/giphy.gif' }
 ];
 
 interface Testimonial {
