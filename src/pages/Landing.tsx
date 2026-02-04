@@ -405,6 +405,7 @@ export default function Landing() {
               { icon: MousePointer2, t: t('features.triggers_title'), d: t('features.triggers_desc'), color: "orange" },
               { icon: BarChart3, t: t('features.dashboard_title'), d: t('features.dashboard_desc'), color: "purple" },
               { icon: Smartphone, t: t('features.mobile_title'), d: t('features.mobile_desc'), color: "pink" },
+              { icon: Star, t: t('features.social_proof_title'), d: t('features.social_proof_desc'), color: "yellow" },
             ].map((f, i) => (
               <div key={i} className="group p-6 sm:p-8 rounded-3xl bg-card/50 backdrop-blur-sm border border-border/50 hover:border-primary/50 hover:shadow-[0_0_30px_-10px_rgba(0,193,133,0.2)] transition-all duration-500">
                 <div className={`w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all duration-500`}>

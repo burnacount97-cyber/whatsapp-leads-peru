@@ -101,7 +101,9 @@
         "dashboard_title": "Dashboard en Tiempo Real",
         "dashboard_desc": "Gestiona leads, visualiza analíticas detalladas y controla la seguridad de tus widgets desde un solo lugar.",
         "mobile_title": "Optimización Móvil",
-        "mobile_desc": "Diseñado para la experiencia de WhatsApp. Interfaz premium que parece parte de tu marca."
+        "mobile_desc": "Diseñado para la experiencia de WhatsApp. Interfaz premium que parece parte de tu marca.",
+        "social_proof_title": "Prueba Social",
+        "social_proof_desc": "Muestra testimonios reales automáticamente en el chat para generar confianza inmediata y disparar ventas."
     },
     "data_safety": {
         "badge": "Privacidad y Confianza",
