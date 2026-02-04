@@ -34,6 +34,23 @@
   let configRefreshInterval = null;
   let vibrationInterval = null;
   let testimonialInterval = null;
+  let autoOpenTimeout = null;
+  let teaserStartTimeout = null;
+
+  // Cleanup all timers and listeners
+  function cleanupWidget() {
+    if (teaserInterval) clearInterval(teaserInterval);
+    if (vibrationInterval) clearInterval(vibrationInterval);
+    if (testimonialInterval) clearInterval(testimonialInterval);
+    if (autoOpenTimeout) clearTimeout(autoOpenTimeout);
+    if (teaserStartTimeout) clearTimeout(teaserStartTimeout);
+
+    teaserInterval = null;
+    vibrationInterval = null;
+    testimonialInterval = null;
+    autoOpenTimeout = null;
+    teaserStartTimeout = null;
+  }
 
   // Get widget config from Firestore
   async function getWidgetConfig(clientId) {
@@ -225,6 +242,9 @@
 
   // Render the widget
   function renderWidget() {
+    // Cleanup previous state to prevent conflicts
+    cleanupWidget();
+
     // Remove existing if present
     const existing = document.getElementById('lw-root');
     if (existing) existing.remove();
@@ -725,7 +745,8 @@
         hasBeenClosedOnce = true;
         startVibration();
         // Start teaser cycle after a short delay
-        setTimeout(() => {
+        // Start teaser cycle after a short delay
+        teaserStartTimeout = setTimeout(() => {
           startTeaserCycle();
         }, 2000);
 
@@ -842,12 +863,20 @@
     document.addEventListener('mouseleave', handleExitIntent);
 
     // Start vibration immediately
-    startVibration();
+    // Start vibration immediately (if closed)
+    if (!isOpen) startVibration();
 
-    // Auto-open after delay
-    setTimeout(() => {
-      if (!isOpen) togglePanel(true);
-    }, (config.triggerDelay || 5) * 1000);
+    // Restore teaser if it was running (re-render happened while closed)
+    if (hasBeenClosedOnce && !isOpen) {
+      teaserStartTimeout = setTimeout(() => startTeaserCycle(), 2000);
+    }
+
+    // Auto-open after delay (only if never closed and not open)
+    if (!hasBeenClosedOnce && !isOpen) {
+      autoOpenTimeout = setTimeout(() => {
+        if (!isOpen && !hasBeenClosedOnce) togglePanel(true);
+      }, (config.triggerDelay || 5) * 1000);
+    }
 
     // Render initial
     renderMessages();
