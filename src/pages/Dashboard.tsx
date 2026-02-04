@@ -1342,6 +1342,16 @@ export default function Dashboard() {
                       <Copy className="w-4 h-4 mr-2" />
                       Copiar código
                     </Button>
+                    <div className="mt-3 text-center">
+                      <Link
+                        to="/installation-guide"
+                        target="_blank"
+                        className="text-xs text-primary hover:underline inline-flex items-center gap-1 font-medium"
+                      >
+                        <Info className="w-3 h-3" />
+                        ¿No sabes cómo instalarlo? Pulsa aquí
+                      </Link>
+                    </div>
 
                     {/* Dynamic Domain Info Removed */}
                   </CardContent>
