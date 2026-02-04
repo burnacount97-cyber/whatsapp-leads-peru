@@ -91,13 +91,13 @@ interface WidgetConfig {
 
 const ANIMATED_ICONS = [
   { id: 'default', label: 'Estático (Default)', url: '' },
-  { id: 'ecommerce', label: 'Ecommerce (Bolsa)', url: 'https://media.giphy.com/media/3o7TKR1bX7X6X6X6X6/giphy.gif' },
-  { id: 'dental', label: 'Dental (Diente)', url: 'https://media.giphy.com/media/3o7527pa7qs9kCG78A/giphy.gif' },
-  { id: 'clinic', label: 'Clínica (Cruz)', url: 'https://media.giphy.com/media/3o7qE1YN7aQfIqn4Bq/giphy.gif' },
-  { id: 'auto', label: 'Taller (Mecánico)', url: 'https://media.giphy.com/media/l0HlOaQcLJ2hHpYcw/giphy.gif' },
-  { id: 'real_estate', label: 'Inmobiliaria', url: 'https://media.giphy.com/media/3o6oztpGE67B7W7iTu/giphy.gif' },
-  { id: 'restaurant', label: 'Restaurante (Burger)', url: 'https://media.giphy.com/media/l4pTfx2qLszoacZRS/giphy.gif' },
-  { id: 'robot', label: 'IA (Robot)', url: 'https://media.giphy.com/media/26AHONQ79FdWZhAI0/giphy.gif' }
+  { id: 'ecommerce', label: 'Ecommerce (Bolsa)', url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTJjMmQwOWQ5ZjA5ZmQ5ZjA5ZmQ5ZjA5ZmQ5ZjA5ZmQ/U4DSwrBzhFNsI/giphy.gif' },
+  { id: 'dental', label: 'Dental (Diente)', url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExODlhZmQ5ZjA5ZmQ5ZjA5ZmQ5ZjA5ZmQ5ZjA5ZmQ5ZmQ/l3vR16pQMjLxq/giphy.gif' },
+  { id: 'clinic', label: 'Clínica (Salud)', url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExODlhZmQ5ZjA5ZmQ5ZjA5ZmQ5ZjA5ZmQ5ZjA5ZmQ5ZmQ/l0HlUxcWRnDSt/giphy.gif' },
+  { id: 'auto', label: 'Taller (Auto)', url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExODlhZmQ5ZjA5ZmQ5ZjA5ZmQ5ZjA5ZmQ5ZjA5ZmQ5ZmQ/d31vTpVi1/giphy.gif' },
+  { id: 'real_estate', label: 'Inmobiliaria', url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExODlhZmQ5ZjA5ZmQ5ZjA5ZmQ5ZjA5ZmQ5ZjA5ZmQ5ZmQ/3o6Zt6/giphy.gif' },
+  { id: 'restaurant', label: 'Restaurante', url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExODlhZmQ5ZjA5ZmQ5ZjA5ZmQ5ZjA5ZmQ5ZjA5ZmQ5ZmQ/l2JdZz/giphy.gif' },
+  { id: 'robot', label: 'IA (Futuro)', url: 'https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExODlhZmQ5ZjA5ZmQ5ZjA5ZmQ5ZjA5ZmQ5ZjA5ZmQ5ZmQ/3oKIP/giphy.gif' }
 ];
 
 interface Testimonial {
@@ -1208,8 +1208,10 @@ export default function Dashboard() {
                           key={icon.id}
                           onClick={() => setFormConfig({ ...formConfig, launcher_icon: icon.url })}
                           className={`
-                            border rounded-lg p-2 cursor-pointer transition-all hover:bg-slate-50 flex flex-col items-center gap-2
-                            ${formConfig.launcher_icon === icon.url ? 'ring-2 ring-primary bg-primary/5' : 'border-slate-200'}
+                            border rounded-lg p-2 cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-800 flex flex-col items-center gap-2
+                            ${formConfig.launcher_icon === icon.url
+                              ? 'ring-2 ring-primary bg-primary/10'
+                              : 'border-slate-200 dark:border-slate-700 bg-transparent'}
                           `}
                         >
                           <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden relative">
