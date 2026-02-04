@@ -462,7 +462,7 @@
             </button>
           </div>
 
-          </div>
+
 
           <!-- Testimonial Rotator -->
           <div id="lw-testimonial-bar">
