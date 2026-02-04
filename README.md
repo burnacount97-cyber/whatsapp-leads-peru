@@ -47,8 +47,8 @@ Lead Widget es una plataforma SaaS de vanguardia que transforma sitios web está
 *   **Frontend:** React 18, TypeScript, Tailwind CSS, Vite.
 *   **Componentes:** shadcn/ui (Radix UI) para una estética premium.
 *   **Backend:** Vercel Edge & Serverless Functions (Node.js).
-*   **Base de Datos:** PostgreSQL con **Supabase**.
-*   **Autenticación:** Supabase Auth (con hooks para roles).
+*   **Base de Datos:** NoSQL con **Firebase Firestore**.
+*   **Autenticación:** **Firebase Auth** (con integración de roles y estados de suscripción).
 *   **IA:** Integración vía SDK oficial de OpenAI y fetch optimizado para otros proveedores.
 
 ---
@@ -66,7 +66,7 @@ Lead Widget es una plataforma SaaS de vanguardia que transforma sitios web está
 ## 🔒 Seguridad y Mejores Prácticas
 *   **CORS Strict:** La API solo responde a dominios autorizados.
 *   **IP Logging:** Rastreo de origen para prevención de spam.
-*   **Database RLS:** Políticas de Row Level Security en Supabase para que ningún cliente pueda ver los datos de otro.
+*   **Database Security:** Reglas de seguridad granulares en Firebase para garantizar el aislamiento de datos entre clientes.
 *   **Secret Management:** Claves de API gestionadas mediante variables de entorno en Vercel, nunca expuestas en el cliente.
 
 ---
