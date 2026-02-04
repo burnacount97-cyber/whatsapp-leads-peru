@@ -103,6 +103,7 @@
           chatPlaceholder: fields.chat_placeholder?.stringValue || defaultConfig.chatPlaceholder,
           quickReplies: quickReplies,
           teaserMessages: teaserMessages,
+          testimonials: testimonials,
           vibrationIntensity: fields.vibration_intensity?.stringValue || 'soft',
           triggerDelay: parseInt(fields.trigger_delay?.integerValue) || 5,
           exitIntentEnabled: fields.trigger_exit_intent?.booleanValue !== false,
