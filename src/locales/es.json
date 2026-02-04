@@ -247,5 +247,64 @@
         "subtitle": "¿Te vas sin probar cómo la IA puede duplicar tus ventas?",
         "cta": "Probar Demo Gratis Ahora",
         "dismiss": "No, prefiero seguir perdiendo clientes"
+    },
+    "auth_pages": {
+        "back_home": "Volver al inicio",
+        "login": {
+            "title": "Bienvenido de vuelta",
+            "subtitle": "Ingresa a tu dashboard para gestionar tus leads",
+            "email_label": "Correo electrónico",
+            "password_label": "Contraseña",
+            "placeholders": {
+                "email": "tu@empresa.pe",
+                "password": "••••••••"
+            },
+            "submit_btn": "Iniciar Sesión",
+            "no_account": "¿No tienes cuenta?",
+            "register_link": "Regístrate gratis",
+            "right_panel": {
+                "title": "Captura leads 24/7",
+                "desc": "Tu widget trabaja mientras duermes. Cada visita es una oportunidad de negocio que no puedes perder."
+            }
+        },
+        "register": {
+            "title": "Crea tu cuenta gratis",
+            "subtitle": "Empieza a capturar leads en minutos",
+            "business_label": "Nombre de tu negocio",
+            "email_label": "Correo electrónico",
+            "password_label": "Contraseña",
+            "placeholders": {
+                "business": "Mi Empresa SAC",
+                "email": "tu@empresa.pe",
+                "password": "Mínimo 6 caracteres"
+            },
+            "submit_btn": "Empezar Trial Gratis",
+            "has_account": "¿Ya tienes cuenta?",
+            "login_link": "Inicia sesión",
+            "terms": "Al registrarte aceptas nuestros términos de servicio y política de privacidad.",
+            "success": {
+                "title": "¡Casi listo!",
+                "subtitle": "Hemos enviado un enlace de confirmación a ",
+                "check_inbox": "Verifica tu bandeja de entrada",
+                "click_button": "Pulsa en el botón de confirmación",
+                "start_capture": "Comienza a capturar leads",
+                "go_login": "Ir al Inicio de Sesión",
+                "no_email": "¿No recibiste el correo? Revisa spam o",
+                "try_other": "intenta con otro correo"
+            },
+            "left_panel": {
+                "title": "3 días de prueba gratis",
+                "desc": "Sin tarjeta de crédito. Cancela cuando quieras. Acceso total a todas las funciones premium.",
+                "benefits": [
+                    "Widget proactivo ilimitado",
+                    "Leads directo a WhatsApp",
+                    "Analytics en tiempo real",
+                    "Soporte por WhatsApp"
+                ],
+                "testimonial": "En el primer mes conseguimos 45 leads nuevos. El widget se paga solo. La mejor inversión que hemos hecho.",
+                "testimonial_author": "María Fernández",
+                "testimonial_role": "Inmobiliaria MF"
+            }
+        }
     }
 }

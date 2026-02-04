@@ -247,5 +247,64 @@
         "subtitle": "Leaving without seeing how AI can double your sales?",
         "cta": "Try Free Demo Now",
         "dismiss": "No, I prefer losing customers"
+    },
+    "auth_pages": {
+        "back_home": "Back to home",
+        "login": {
+            "title": "Welcome back",
+            "subtitle": "Enter your dashboard to manage your leads",
+            "email_label": "Email address",
+            "password_label": "Password",
+            "placeholders": {
+                "email": "you@company.com",
+                "password": "••••••••"
+            },
+            "submit_btn": "Log In",
+            "no_account": "Don't have an account?",
+            "register_link": "Sign up for free",
+            "right_panel": {
+                "title": "Capture leads 24/7",
+                "desc": "Your widget works while you sleep. Every visit is a business opportunity you can't miss."
+            }
+        },
+        "register": {
+            "title": "Create your free account",
+            "subtitle": "Start capturing leads in minutes",
+            "business_label": "Business Name",
+            "email_label": "Email address",
+            "password_label": "Password",
+            "placeholders": {
+                "business": "My Company LLC",
+                "email": "you@company.com",
+                "password": "Minimum 6 characters"
+            },
+            "submit_btn": "Start Free Trial",
+            "has_account": "Already have an account?",
+            "login_link": "Log In",
+            "terms": "By registering you accept our terms of service and privacy policy.",
+            "success": {
+                "title": "Almost done!",
+                "subtitle": "We sent a confirmation link to ",
+                "check_inbox": "Check your inbox",
+                "click_button": "Click the confirmation button",
+                "start_capture": "Start capturing leads",
+                "go_login": "Go to Login",
+                "no_email": "Didn't receive the email? Check spam or",
+                "try_other": "try with another email"
+            },
+            "left_panel": {
+                "title": "3 days free trial",
+                "desc": "No credit card required. Cancel anytime. Full access to all premium features.",
+                "benefits": [
+                    "Unlimited proactive widget",
+                    "Leads straight to WhatsApp",
+                    "Real-time analytics",
+                    "WhatsApp support"
+                ],
+                "testimonial": "In the first month we got 45 new leads. The widget pays for itself. The best investment we've made.",
+                "testimonial_author": "Maria Fernandez",
+                "testimonial_role": "Real Estate Agent"
+            }
+        }
     }
 }

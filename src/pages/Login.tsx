@@ -6,8 +6,10 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/lib/auth';
 import { MessageCircle, Loader2, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 export default function Login() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [localLoading, setLocalLoading] = useState(false);
@@ -41,7 +43,7 @@ export default function Login() {
 
       if (error) {
         toast({
-          title: 'Error al iniciar sesión',
+          title: t('auth_pages.login.error_title') || 'Error',
           description: error.message,
           variant: 'destructive',
         });
@@ -68,7 +70,7 @@ export default function Login() {
           <div>
             <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-8">
               <ArrowLeft className="w-4 h-4" />
-              Volver al inicio
+              {t('auth_pages.back_home')}
             </Link>
 
             <div className="flex items-center gap-3 mb-2">
@@ -77,17 +79,17 @@ export default function Login() {
               </div>
               <span className="font-bold text-2xl tracking-tight">Lead <span className="text-primary">Widget</span></span>
             </div>
-            <h1 className="text-3xl font-bold mt-6 tracking-tight">Bienvenido de vuelta</h1>
-            <p className="text-muted-foreground mt-2">Ingresa a tu dashboard para gestionar tus leads</p>
+            <h1 className="text-3xl font-bold mt-6 tracking-tight">{t('auth_pages.login.title')}</h1>
+            <p className="text-muted-foreground mt-2">{t('auth_pages.login.subtitle')}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="email">Correo electrónico</Label>
+              <Label htmlFor="email">{t('auth_pages.login.email_label')}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="tu@empresa.pe"
+                placeholder={t('auth_pages.login.placeholders.email')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -96,12 +98,12 @@ export default function Login() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
+              <Label htmlFor="password">{t('auth_pages.login.password_label')}</Label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
+                  placeholder={t('auth_pages.login.placeholders.password')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -119,7 +121,7 @@ export default function Login() {
 
             <Button
               type="submit"
-              variant="default" // Changed from hero to default or a stronger variant
+              variant="default"
               size="lg"
               className="w-full h-12 text-lg font-bold btn-iridescent text-white"
               disabled={localLoading || authLoading}
@@ -127,15 +129,15 @@ export default function Login() {
               {localLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                'Iniciar Sesión'
+                t('auth_pages.login.submit_btn')
               )}
             </Button>
           </form>
 
           <p className="text-center text-muted-foreground">
-            ¿No tienes cuenta?{' '}
+            {t('auth_pages.login.no_account')}{' '}
             <Link to="/register" className="text-primary font-bold hover:underline">
-              Regístrate gratis
+              {t('auth_pages.login.register_link')}
             </Link>
           </p>
         </div>
@@ -150,9 +152,9 @@ export default function Login() {
           <div className="w-24 h-24 bg-white/10 rounded-2xl flex items-center justify-center mx-auto mb-8 backdrop-blur-sm shadow-xl">
             <MessageCircle className="w-12 h-12 text-white" />
           </div>
-          <h2 className="text-4xl font-bold mb-6 tracking-tight">Captura leads 24/7</h2>
+          <h2 className="text-4xl font-bold mb-6 tracking-tight">{t('auth_pages.login.right_panel.title')}</h2>
           <p className="text-lg opacity-90 leading-relaxed">
-            Tu widget trabaja mientras duermes. Cada visita es una oportunidad de negocio que no puedes perder.
+            {t('auth_pages.login.right_panel.desc')}
           </p>
         </div>
       </div>
