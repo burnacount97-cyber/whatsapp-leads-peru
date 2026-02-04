@@ -12,7 +12,10 @@ Lead Widget es una plataforma SaaS de vanguardia que transforma sitios web está
     *   **Retraso Temporal:** Saludo automático tras X segundos.
     *   **Scroll Profundo:** Se activa cuando el usuario lee el contenido.
     *   **Intento de Salida (Exit Intent):** Captura al usuario antes de que cierre la pestaña con ofertas irresistibles.
-*   **Personalización Visual:** Control total del color de marca, mensajes de bienvenida, placeholders de chat y vibraciones hápticas (Soft/Medium/Heavy).
+*   **Personalización Visual:** Control total del color de marca, mensajes de bienvenida y placeholders de chat.
+*   **Iconos de Nicho (NEW):** Lanzadores estáticos SVG de alta resolución optimizados para diversos sectores (Ecommerce, Dental/Salud, Talleres, Inmobiliaria, Restaurantes y Bots de IA).
+*   **Social Proof Integrado (NEW):** Carrusel rotador de testimonios reales configurables para aumentar la tasa de conversión mediante prueba social.
+*   **Vibración Háptica:** Intensidad de atención configurable (Desactivado/Soft/Strong).
 *   **Mensajes "Teaser":** Burbujas dinámicas que rotan mensajes para atraer la atención sin ser intrusivos.
 *   **Sistema de Avisos**: Posibilidad de publicar anuncios globales (mantenimiento, novedades) desde el panel de administración hacia todos los clientes.
 
@@ -56,7 +59,7 @@ Lead Widget es una plataforma SaaS de vanguardia que transforma sitios web está
 *   `api/w/[widgetId].js`: Script dinámico que inyecta el widget en cualquier sitio web mediante una sola línea de código.
 *   `src/pages/Dashboard.tsx`: El corazón de la gestión del cliente (Leads, Config, Seguridad).
 *   `src/pages/SuperAdmin.tsx`: Panel exclusivo de administración de la plataforma.
-*   `public/widget-embed.js`: Loader ultraligero que permite incrustar el sistema en sitios externos.
+*   `public/widget-embed.js`: Loader ultraligero que permite incrustar el sistema en sitios externos. Incluye lógica de limpieza de memoria (Memory Management) para evitar fugas de recursos y garantizar estabilidad.
 
 ---
 
