@@ -229,7 +229,7 @@ export default function InstallationGuide() {
                     <h3 className="font-semibold text-lg">¿Aún tienes problemas?</h3>
                     <p className="text-muted-foreground text-sm mb-4">Nuestro equipo de soporte puede ayudarte a instalarlo.</p>
                     <Button variant="outline" className="gap-2" asChild>
-                        <a href="https://wa.me/51902105668" target="_blank" rel="noopener noreferrer">
+                        <a href="https://wa.me/51924464410" target="_blank" rel="noopener noreferrer">
                             <ExternalLink className="w-4 h-4" />
                             Contactar Soporte
                         </a>
