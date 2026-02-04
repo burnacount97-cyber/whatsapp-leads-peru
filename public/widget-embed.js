@@ -254,14 +254,17 @@
       
       /* Button */
       #lw-button { 
-        position: fixed; bottom: 20px; right: 20px; z-index: 999998;
+        position: fixed; bottom: 20px; right: 20px; z-index: 2147483646;
         width: 60px; height: 60px; border-radius: 50%; border: none; cursor: pointer; 
         display: flex; align-items: center; justify-content: center; 
         transition: transform 0.2s, box-shadow 0.2s; 
         box-shadow: 0 4px 20px rgba(0,0,0,0.25); 
         background: linear-gradient(135deg, ${config.primaryColor} 0%, ${adjustColor(config.primaryColor, -30)} 100%);
+        -webkit-tap-highlight-color: transparent;
+        outline: none;
       }
       #lw-button:hover { transform: scale(1.08); }
+      #lw-button > * { pointer-events: none; } /* Critical: ensure clicks pass through icon to button */
       
       /* Vibration animations */
       @keyframes lw-vibrate-soft { 
@@ -840,8 +843,18 @@
     }
 
     // Event listeners
-    button.addEventListener('click', () => togglePanel(true));
-    closeBtn.addEventListener('click', () => togglePanel(false));
+    button.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log('LeadWidget: Launcher clicked');
+      togglePanel(true);
+    };
+
+    closeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      togglePanel(false);
+    });
     closeMobile.addEventListener('click', () => togglePanel(false));
     teaser.addEventListener('click', () => togglePanel(true));
     teaserClose.addEventListener('click', (e) => { e.stopPropagation(); teaser.style.display = 'none'; });
