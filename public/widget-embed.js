@@ -17,6 +17,7 @@
     exitIntentTitle: '¡Espera!',
     exitIntentDescription: '¿Tienes alguna pregunta antes de irte?',
     exitIntentCta: 'Chatear Ahora',
+    testimonials: [],
     projectId: 'whatsapp-leads-peru',
     apiKey: 'AIzaSyDoUHZtRvgEwhEUhZj6x4xEZvVmxliMCJo'
   };
@@ -32,6 +33,7 @@
   let exitIntentShown = false;
   let configRefreshInterval = null;
   let vibrationInterval = null;
+  let testimonialInterval = null;
 
   // Get widget config from Firestore
   async function getWidgetConfig(clientId) {
@@ -77,8 +79,26 @@
         let teaserMessages = defaultConfig.teaserMessages;
         if (fields.teaser_messages?.arrayValue?.values) {
           teaserMessages = fields.teaser_messages.arrayValue.values.map(v => v.stringValue);
-        } else if (fields.teaser_messages?.stringValue) {
           teaserMessages = fields.teaser_messages.stringValue.split('\n').filter(r => r.trim());
+        }
+
+        // Parse Testimonials
+        let testimonials = [];
+        if (fields.testimonials?.arrayValue?.values) {
+          try {
+            testimonials = fields.testimonials.arrayValue.values.map(v => {
+              // If stored as JSON string map, or if we change storage structure later
+              // For now assuming we store them as a JSON string in a list or maps
+              // Simplification: We will just store them as mapValue in Firestore
+              const m = v.mapValue.fields;
+              return {
+                name: m.name.stringValue,
+                text: m.text.stringValue,
+                stars: parseInt(m.stars.integerValue),
+                avatar_url: m.avatar_url?.stringValue
+              };
+            });
+          } catch (e) { console.warn('LeadWidget: Error parsing testimonials', e); }
         }
 
         // Extract AI configuration from widget_configs (since profiles has restricted access)
@@ -289,6 +309,28 @@
       .lw-msg-user { background: ${config.primaryColor}; color: white; border-bottom-right-radius: 4px; align-self: flex-end; }
       .lw-msg-system { background: #f1f5f9; color: #64748b; font-size: 12px; text-align: center; align-self: center; border-radius: 12px; padding: 8px 16px; }
 
+      /* Testimonial Rotator */
+      #lw-testimonial-bar { 
+          background: rgba(255,255,255,0.95); 
+          border-bottom: 1px solid #f0f0f0; 
+          padding: 8px 12px; 
+          display: none; /* Hidden by default if no testimonials */
+          align-items: center; 
+          gap: 10px;
+          animation: lw-slideDown 0.3s ease-out;
+      }
+      @keyframes lw-slideDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+      
+      .lw-t-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1px solid #e2e8f0; }
+      .lw-t-content { flex: 1; overflow: hidden; }
+      .lw-t-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+      .lw-t-name { font-size: 11px; font-weight: 700; color: #334155; }
+      .lw-t-stars { font-size: 9px; color: #fbbf24; letter-spacing: -1px; }
+      .lw-t-text { font-size: 11px; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      
+      .lw-fade-in { animation: lw-fadeInT 0.5s ease-in-out; }
+      @keyframes lw-fadeInT { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: translateY(0); } }
+
       /* Typing indicator */
       #lw-typing { display: flex; gap: 4px; padding: 12px 16px; background: white; border-radius: 18px; border: 1px solid #e2e8f0; align-self: flex-start; }
       .lw-dot { width: 6px; height: 6px; border-radius: 50%; background: ${config.primaryColor}; animation: lw-bounce 1.4s infinite ease-in-out both; }
@@ -431,6 +473,20 @@
             </button>
           </div>
 
+
+
+          <!-- Testimonial Rotator -->
+          <div id="lw-testimonial-bar">
+             <img id="lw-t-img" class="lw-t-avatar" src="" />
+             <div class="lw-t-content">
+                <div class="lw-t-header">
+                   <span id="lw-t-name" class="lw-t-name"></span>
+                   <span id="lw-t-stars" class="lw-t-stars"></span>
+                </div>
+                <div id="lw-t-text" class="lw-t-text"></div>
+             </div>
+          </div>
+
           <div id="lw-messages"></div>
 
           <div id="lw-input-area">
@@ -492,6 +548,14 @@
     const exitOverlay = document.getElementById('lw-exit-overlay');
     const exitCta = document.getElementById('lw-exit-cta');
     const exitClose = document.getElementById('lw-exit-close');
+
+    // Testimonial elements
+    const testimonialBar = document.getElementById('lw-testimonial-bar');
+    const tImg = document.getElementById('lw-t-img');
+    const tName = document.getElementById('lw-t-name');
+    const tStars = document.getElementById('lw-t-stars');
+    const tText = document.getElementById('lw-t-text');
+    const tContentDiv = document.querySelector('.lw-t-content');
 
     // Start vibration animation
     function startVibration() {
@@ -654,6 +718,7 @@
           messages.push({ role: 'assistant', content: config.welcomeMessage });
           renderMessages();
         }
+        startTestimonialRotator();
       } else {
         hasBeenClosedOnce = true;
         startVibration();
@@ -661,6 +726,47 @@
         setTimeout(() => {
           startTeaserCycle();
         }, 2000);
+
+        stopTestimonialRotator();
+      }
+    }
+
+    // Testimonial Rotator Logic
+    function startTestimonialRotator() {
+      if (!config.testimonials || config.testimonials.length === 0) {
+        testimonialBar.style.display = 'none';
+        return;
+      }
+
+      testimonialBar.style.display = 'flex';
+      let tIndex = 0;
+
+      const showTestimonial = () => {
+        const t = config.testimonials[tIndex];
+
+        // Animate out (if not first) - simplified to just fade in new content
+        tContentDiv.classList.remove('lw-fade-in');
+        void tContentDiv.offsetWidth; // trigger reflow
+        tContentDiv.classList.add('lw-fade-in');
+
+        tImg.src = t.avatar_url || `https://ui-avatars.com/api/?name=${t.name.replace(' ', '+')}&background=random`;
+        tName.textContent = t.name;
+        tStars.textContent = '★'.repeat(t.stars);
+        tText.textContent = `"${t.text}"`;
+
+        tIndex = (tIndex + 1) % config.testimonials.length;
+      };
+
+      showTestimonial(); // Show first immediately
+      if (config.testimonials.length > 1) {
+        testimonialInterval = setInterval(showTestimonial, 4000);
+      }
+    }
+
+    function stopTestimonialRotator() {
+      if (testimonialInterval) {
+        clearInterval(testimonialInterval);
+        testimonialInterval = null;
       }
     }
 

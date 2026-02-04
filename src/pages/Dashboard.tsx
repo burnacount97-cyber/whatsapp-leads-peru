@@ -85,6 +85,13 @@ interface WidgetConfig {
   created_at: string;
   ai_security_prompt?: string;
   language?: 'es' | 'en';
+  testimonials?: {
+    id: string;
+    name: string;
+    text: string;
+    stars: number;
+    avatar_url?: string;
+  }[];
 }
 
 interface Profile {
@@ -1257,6 +1264,121 @@ export default function Dashboard() {
                           </div>
                         </div>
                       )}
+                    </div>
+                  </div>
+
+                  {/* Testimonial Management Section */}
+                  <div className="space-y-4 pt-4 border-t">
+                    <h4 className="font-semibold text-sm flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      Testimonios de Clientes
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      Añade prueba social para aumentar la confianza. Se mostrarán aleatoriamente en el chat.
+                    </p>
+
+                    <div className="space-y-3">
+                      {(formConfig.testimonials || []).map((t, index) => (
+                        <div key={index} className="flex gap-2 items-start p-3 bg-slate-50 dark:bg-slate-900 border rounded-lg group">
+                          <img
+                            src={t.avatar_url || `https://ui-avatars.com/api/?name=${t.name.replace(' ', '+')}&background=random`}
+                            alt="Avatar"
+                            className="w-10 h-10 rounded-full bg-slate-200 object-cover"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-start">
+                              <p className="font-bold text-sm truncate">{t.name}</p>
+                              <div className="flex text-yellow-500 text-[10px]">
+                                {[...Array(t.stars)].map((_, i) => <span key={i}>★</span>)}
+                              </div>
+                            </div>
+                            <p className="text-xs text-muted-foreground line-clamp-2">{t.text}</p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-muted-foreground hover:text-red-500"
+                            onClick={() => {
+                              const newTestimonials = [...(formConfig.testimonials || [])];
+                              newTestimonials.splice(index, 1);
+                              setFormConfig({ ...formConfig, testimonials: newTestimonials });
+                            }}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      ))}
+
+                      {/* Add New Testimonial Form - Simple Inline */}
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm" className="w-full border-dashed">
+                            + Agregar Testimonio
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Nuevo Testimonio</DialogTitle>
+                            <DialogDescription>
+                              Agrega la opinión de un cliente satisfecho.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                              <Label>Nombre del Cliente</Label>
+                              <Input id="t-name" placeholder="Ej: Juan Pérez" />
+                            </div>
+                            <div className="space-y-2">
+                              <Label>Mensaje (Máx 80 caracteres)</Label>
+                              <Input id="t-text" maxLength={80} placeholder="Ej: Excelente servicio, muy rápido." />
+                            </div>
+                            <div className="space-y-2">
+                              <Label>Calificación (1-5)</Label>
+                              <Select defaultValue="5" onValueChange={(v) => document.getElementById('t-stars')?.setAttribute('data-value', v)}>
+                                <SelectTrigger id="t-stars" data-value="5">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="5">⭐⭐⭐⭐⭐ (5)</SelectItem>
+                                  <SelectItem value="4">⭐⭐⭐⭐ (4)</SelectItem>
+                                  <SelectItem value="3">⭐⭐⭐ (3)</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-2">
+                              <Label>URL de Foto (Opcional)</Label>
+                              <Input id="t-avatar" placeholder="https://..." />
+                              <p className="text-[10px] text-muted-foreground">Deja vacío para generar un avatar automático con las iniciales.</p>
+                            </div>
+                            <Button onClick={() => {
+                              const name = (document.getElementById('t-name') as HTMLInputElement).value;
+                              const text = (document.getElementById('t-text') as HTMLInputElement).value;
+                              const stars = parseInt((document.getElementById('t-stars') as HTMLElement).getAttribute('data-value') || '5');
+                              const avatar = (document.getElementById('t-avatar') as HTMLInputElement).value;
+
+                              if (!name || !text) return toast({ title: "Faltan datos", variant: "destructive" });
+
+                              const newTestimonial = {
+                                id: Date.now().toString(),
+                                name,
+                                text,
+                                stars,
+                                avatar_url: avatar || undefined
+                              };
+
+                              setFormConfig(prev => ({
+                                ...prev,
+                                testimonials: [...(prev.testimonials || []), newTestimonial]
+                              }));
+
+                              // Close dialog logic (hacky but works for this scope, better to use state)
+                              document.querySelector('[data-state="open"]')?.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
+                            }}>
+                              Agregar
+                            </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                     </div>
                   </div>
 
