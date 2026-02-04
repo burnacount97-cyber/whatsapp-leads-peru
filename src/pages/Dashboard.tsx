@@ -1193,1235 +1193,1236 @@ export default function Dashboard() {
                         onChange={(e) => setFormConfig({ ...formConfig, primary_color: e.target.value })}
                         className="flex-1 font-mono"
                       />
-                      <div className="space-y-3 pt-2 pb-2 border-y border-dashed">
-                        <Label className="flex items-center gap-2">
-                          <Palette className="w-4 h-4 text-purple-500" />
-                          Icono del Botón (Estilo del Nicho)
-                        </Label>
-                        <div className="grid grid-cols-4 gap-2">
-                          {STATIC_ICONS.map((item) => (
-                            <div
-                              key={item.id}
-                              onClick={() => setFormConfig({ ...formConfig, launcher_icon: item.value })}
-                              className={`
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 pt-2 pb-2 border-y border-dashed">
+                    <Label className="flex items-center gap-2">
+                      <Palette className="w-4 h-4 text-purple-500" />
+                      Icono del Botón (Estilo del Nicho)
+                    </Label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {STATIC_ICONS.map((item) => (
+                        <div
+                          key={item.id}
+                          onClick={() => setFormConfig({ ...formConfig, launcher_icon: item.value })}
+                          className={`
                             border rounded-lg p-2 cursor-pointer transition-all hover:bg-slate-50 dark:hover:bg-slate-800 flex flex-col items-center gap-2
                             ${formConfig.launcher_icon === item.value
-                                  ? 'ring-2 ring-primary bg-primary/10'
-                                  : 'border-slate-200 dark:border-slate-700 bg-transparent'}
+                              ? 'ring-2 ring-primary bg-primary/10'
+                              : 'border-slate-200 dark:border-slate-700 bg-transparent'}
                           `}
-                            >
-                              <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors
+                        >
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors
                             ${formConfig.launcher_icon === item.value ? 'bg-primary text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}
                           `}>
-                                <item.icon className="w-5 h-5" />
-                              </div>
-                              <span className="text-[10px] text-center font-medium leading-tight">{item.label}</span>
-                            </div>
-                          ))}
+                            <item.icon className="w-5 h-5" />
+                          </div>
+                          <span className="text-[10px] text-center font-medium leading-tight">{item.label}</span>
                         </div>
-                      </div>
+                      ))}
+                    </div>
+                  </div>
 
-                      <div className="space-y-2">
-                        <Label>Mensaje de bienvenida</Label>
-                        <Input
-                          value={formConfig.welcome_message}
-                          onChange={(e) => setFormConfig({ ...formConfig, welcome_message: e.target.value })}
+                  <div className="space-y-2">
+                    <Label>Mensaje de bienvenida</Label>
+                    <Input
+                      value={formConfig.welcome_message}
+                      onChange={(e) => setFormConfig({ ...formConfig, welcome_message: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Placeholder del chat (Sugerencia)</Label>
+                    <Input
+                      value={formConfig.chat_placeholder}
+                      onChange={(e) => setFormConfig({ ...formConfig, chat_placeholder: e.target.value })}
+                      placeholder="Ej: Escribe tu duda aquí..."
+                    />
+                    <p className="text-xs text-muted-foreground">Texto que invita al usuario a escribir en el chat.</p>
+                  </div>
+
+                  {/* Info box for Personalizado mode */}
+                  {formConfig.template === 'personalizado' && (
+                    <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4 animate-in fade-in slide-in-from-top-2">
+                      <h4 className="font-semibold text-blue-800 dark:text-blue-300 text-sm mb-1 flex items-center gap-2">
+                        <Sparkles className="w-4 h-4" /> Modo Personalizado Activo
+                      </h4>
+                      <p className="text-xs text-blue-600 dark:text-blue-400">
+                        Para configurar el comportamiento de tu asistente en modo personalizado, ve a la pestaña <strong>IA</strong> y completa la "Descripción del Negocio" y el "Prompt del Sistema".
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Campos exclusivos para modo personalizado - REMOVED LEGACY FIELDS */}
+
+                  {/* Logic update for template change handled in function */}
+
+                  <div className="space-y-2">
+                    <Label>WhatsApp destino (+51...)</Label>
+                    <Input
+                      value={formConfig.whatsapp_destination}
+                      onChange={(e) => setFormConfig({ ...formConfig, whatsapp_destination: e.target.value })}
+                      placeholder="+51 987 654 321"
+                    />
+                  </div>
+
+                  {/* Testimonial Management Section */}
+                  <div className="space-y-4 pt-4 border-t">
+                    <h4 className="font-semibold text-sm flex items-center gap-2">
+                      <Users className="w-4 h-4" />
+                      Testimonios de Clientes
+                    </h4>
+                    <p className="text-xs text-muted-foreground">
+                      Añade prueba social para aumentar la confianza. Se mostrarán aleatoriamente en el chat.
+                    </p>
+
+                    <div className="space-y-3">
+                      {testimonials.map((t, index) => (
+                        <div key={index} className="flex gap-2 items-start p-3 bg-slate-50 dark:bg-slate-900 border rounded-lg group">
+                          <img
+                            src={t.avatar_url || `https://ui-avatars.com/api/?name=${t.name.replace(' ', '+')}&background=random`}
+                            alt="Avatar"
+                            className="w-10 h-10 rounded-full bg-slate-200 object-cover"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-start">
+                              <p className="font-bold text-sm truncate">{t.name}</p>
+                              <div className="flex text-yellow-500 text-[10px]">
+                                {[...Array(t.stars)].map((_, i) => <span key={i}>★</span>)}
+                              </div>
+                            </div>
+                            <p className="text-xs text-muted-foreground line-clamp-2">{t.text}</p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-muted-foreground hover:text-red-500"
+                            onClick={() => {
+                              const newTestimonials = [...testimonials];
+                              newTestimonials.splice(index, 1);
+                              setTestimonials(newTestimonials);
+                            }}
+                          >
+                            <X className="w-3 h-3" />
+                          </Button>
+                        </div>
+                      ))}
+
+                      <Dialog open={isTestimonialDialogOpen} onOpenChange={setIsTestimonialDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm" className="w-full border-dashed">
+                            + Agregar Testimonio
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Nuevo Testimonio</DialogTitle>
+                            <DialogDescription>
+                              Agrega la opinión de un cliente satisfecho.
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-4 py-4">
+                            <div className="space-y-2">
+                              <Label>Nombre del Cliente</Label>
+                              <Input id="t-name" placeholder="Ej: Juan Pérez" />
+                            </div>
+                            <div className="space-y-2">
+                              <Label>Mensaje (Máx 80 caracteres)</Label>
+                              <Input id="t-text" maxLength={80} placeholder="Ej: Excelente servicio, muy rápido." />
+                            </div>
+                            <div className="space-y-2">
+                              <Label>Calificación (1-5)</Label>
+                              <Select defaultValue="5" onValueChange={(v) => document.getElementById('t-stars')?.setAttribute('data-value', v)}>
+                                <SelectTrigger id="t-stars" data-value="5">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="5">⭐⭐⭐⭐⭐ (5)</SelectItem>
+                                  <SelectItem value="4">⭐⭐⭐⭐ (4)</SelectItem>
+                                  <SelectItem value="3">⭐⭐⭐ (3)</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-2">
+                              <Label>URL de Foto (Opcional)</Label>
+                              <Input id="t-avatar" placeholder="https://..." />
+                              <p className="text-[10px] text-muted-foreground">Deja vacío para generar un avatar automático con las iniciales.</p>
+                            </div>
+                            <Button onClick={() => {
+                              const name = (document.getElementById('t-name') as HTMLInputElement).value;
+                              const text = (document.getElementById('t-text') as HTMLInputElement).value;
+                              const stars = parseInt((document.getElementById('t-stars') as HTMLElement).getAttribute('data-value') || '5');
+                              const avatar = (document.getElementById('t-avatar') as HTMLInputElement).value;
+
+                              if (!name || !text) return toast({ title: "Faltan datos", variant: "destructive" });
+
+                              const newTestimonial = {
+                                id: Date.now().toString(),
+                                name,
+                                text,
+                                stars,
+                                avatar_url: avatar || undefined
+                              };
+
+                              setTestimonials([...testimonials, newTestimonial]);
+                              setIsTestimonialDialogOpen(false);
+                            }}>
+                              Agregar
+                            </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 pt-4 border-t">
+                    <h4 className="font-semibold text-sm">Comportamiento Avanzado</h4>
+
+                    <div className="space-y-2">
+                      <Label>Intensidad del movimiento (Atención)</Label>
+                      <Select
+                        value={formConfig.vibration_intensity}
+                        onValueChange={(v) => setFormConfig({ ...formConfig, vibration_intensity: v })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Desactivado</SelectItem>
+                          <SelectItem value="soft">Suave (Recomendado)</SelectItem>
+                          <SelectItem value="strong">Fuerte</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">Define qué tan fuerte vibrará el widget para llamar la atención del usuario.</p>
+                    </div>
+
+                    <div className="space-y-4 p-4 bg-muted/50 rounded-xl border">
+                      <div className="flex items-center justify-between">
+                        <Label className="cursor-pointer" htmlFor="exit-intent">Activar Pop-up de Salida</Label>
+                        <Switch
+                          id="exit-intent"
+                          checked={formConfig.exit_intent_enabled}
+                          onCheckedChange={(checked) => setFormConfig({ ...formConfig, exit_intent_enabled: checked })}
                         />
                       </div>
 
-                      <div className="space-y-2">
-                        <Label>Placeholder del chat (Sugerencia)</Label>
-                        <Input
-                          value={formConfig.chat_placeholder}
-                          onChange={(e) => setFormConfig({ ...formConfig, chat_placeholder: e.target.value })}
-                          placeholder="Ej: Escribe tu duda aquí..."
-                        />
-                        <p className="text-xs text-muted-foreground">Texto que invita al usuario a escribir en el chat.</p>
-                      </div>
-
-                      {/* Info box for Personalizado mode */}
-                      {formConfig.template === 'personalizado' && (
-                        <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-4 animate-in fade-in slide-in-from-top-2">
-                          <h4 className="font-semibold text-blue-800 dark:text-blue-300 text-sm mb-1 flex items-center gap-2">
-                            <Sparkles className="w-4 h-4" /> Modo Personalizado Activo
-                          </h4>
-                          <p className="text-xs text-blue-600 dark:text-blue-400">
-                            Para configurar el comportamiento de tu asistente en modo personalizado, ve a la pestaña <strong>IA</strong> y completa la "Descripción del Negocio" y el "Prompt del Sistema".
-                          </p>
+                      {formConfig.exit_intent_enabled && (
+                        <div className="space-y-4 mt-4 animate-in fade-in slide-in-from-top-2">
+                          <div className="space-y-2">
+                            <Label className="text-xs">Título del Pop-up</Label>
+                            <Input
+                              value={formConfig.exit_intent_title}
+                              onChange={(e) => setFormConfig({ ...formConfig, exit_intent_title: e.target.value })}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-xs">Descripción</Label>
+                            <textarea
+                              value={formConfig.exit_intent_description}
+                              onChange={(e) => setFormConfig({ ...formConfig, exit_intent_description: e.target.value })}
+                              className="w-full p-2 text-xs border rounded-md bg-background min-h-[60px]"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label className="text-xs">Texto del Botón (CTA)</Label>
+                            <Input
+                              value={formConfig.exit_intent_cta}
+                              onChange={(e) => setFormConfig({ ...formConfig, exit_intent_cta: e.target.value })}
+                            />
+                          </div>
                         </div>
                       )}
+                    </div>
+                  </div>
 
-                      {/* Campos exclusivos para modo personalizado - REMOVED LEGACY FIELDS */}
+                  <Button onClick={saveWidgetConfig} disabled={saving} className="w-full">
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Guardar Cambios'}
+                  </Button>
+                </CardContent>
+              </Card>
 
-                      {/* Logic update for template change handled in function */}
-
-                      <div className="space-y-2">
-                        <Label>WhatsApp destino (+51...)</Label>
-                        <Input
-                          value={formConfig.whatsapp_destination}
-                          onChange={(e) => setFormConfig({ ...formConfig, whatsapp_destination: e.target.value })}
-                          placeholder="+51 987 654 321"
+              {/* Preview - Responsive */}
+              <div className="space-y-4 sm:space-y-6 lg:sticky lg:top-24 h-fit">
+                <Card>
+                  <CardHeader className="pb-2 sm:pb-6">
+                    <CardTitle className="text-base sm:text-lg">Vista Previa</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">Así se verá tu widget en tu sitio web</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4 sm:space-y-6">
+                    {/* Widget Preview Container - Responsive (View-only, no interactions) */}
+                    <div className="relative h-[350px] sm:h-[500px] bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden p-2 sm:p-6 flex justify-center items-center">
+                      <div className="w-full max-w-[280px] sm:max-w-[320px] h-full max-h-[320px] sm:max-h-[480px] shadow-2xl rounded-2xl overflow-hidden border border-slate-200 bg-white transform scale-[0.85] sm:scale-100 origin-center pointer-events-none select-none">
+                        <WidgetPreview
+                          primaryColor={formConfig.primary_color}
+                          welcomeMessage={formConfig.welcome_message}
+                          template={formConfig.template}
+                          businessName={formConfig.business_name}
+                          customPlaceholder={formConfig.custom_placeholder}
+                          customButtonText={formConfig.custom_button_text}
+                          customConfirmationMessage={formConfig.custom_confirmation_message}
+                          chatPlaceholder={formConfig.chat_placeholder}
+                          vibrationIntensity={formConfig.vibration_intensity as any}
+                          exitIntentEnabled={formConfig.exit_intent_enabled}
+                          exitIntentTitle={formConfig.exit_intent_title}
+                          exitIntentDescription={formConfig.exit_intent_description}
+                          exitIntentCTA={formConfig.exit_intent_cta}
+                          mode="dashboard"
+                          language={formConfig.language as 'es' | 'en'}
                         />
                       </div>
+                    </div>
 
-                      {/* Testimonial Management Section */}
-                      <div className="space-y-4 pt-4 border-t">
-                        <h4 className="font-semibold text-sm flex items-center gap-2">
-                          <Users className="w-4 h-4" />
-                          Testimonios de Clientes
-                        </h4>
-                        <p className="text-xs text-muted-foreground">
-                          Añade prueba social para aumentar la confianza. Se mostrarán aleatoriamente en el chat.
-                        </p>
-
-                        <div className="space-y-3">
-                          {testimonials.map((t, index) => (
-                            <div key={index} className="flex gap-2 items-start p-3 bg-slate-50 dark:bg-slate-900 border rounded-lg group">
-                              <img
-                                src={t.avatar_url || `https://ui-avatars.com/api/?name=${t.name.replace(' ', '+')}&background=random`}
-                                alt="Avatar"
-                                className="w-10 h-10 rounded-full bg-slate-200 object-cover"
-                              />
-                              <div className="flex-1 min-w-0">
-                                <div className="flex justify-between items-start">
-                                  <p className="font-bold text-sm truncate">{t.name}</p>
-                                  <div className="flex text-yellow-500 text-[10px]">
-                                    {[...Array(t.stars)].map((_, i) => <span key={i}>★</span>)}
-                                  </div>
-                                </div>
-                                <p className="text-xs text-muted-foreground line-clamp-2">{t.text}</p>
-                              </div>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6 text-muted-foreground hover:text-red-500"
-                                onClick={() => {
-                                  const newTestimonials = [...testimonials];
-                                  newTestimonials.splice(index, 1);
-                                  setTestimonials(newTestimonials);
-                                }}
-                              >
-                                <X className="w-3 h-3" />
-                              </Button>
-                            </div>
-                          ))}
-
-                          <Dialog open={isTestimonialDialogOpen} onOpenChange={setIsTestimonialDialogOpen}>
-                            <DialogTrigger asChild>
-                              <Button variant="outline" size="sm" className="w-full border-dashed">
-                                + Agregar Testimonio
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>Nuevo Testimonio</DialogTitle>
-                                <DialogDescription>
-                                  Agrega la opinión de un cliente satisfecho.
-                                </DialogDescription>
-                              </DialogHeader>
-                              <div className="space-y-4 py-4">
-                                <div className="space-y-2">
-                                  <Label>Nombre del Cliente</Label>
-                                  <Input id="t-name" placeholder="Ej: Juan Pérez" />
-                                </div>
-                                <div className="space-y-2">
-                                  <Label>Mensaje (Máx 80 caracteres)</Label>
-                                  <Input id="t-text" maxLength={80} placeholder="Ej: Excelente servicio, muy rápido." />
-                                </div>
-                                <div className="space-y-2">
-                                  <Label>Calificación (1-5)</Label>
-                                  <Select defaultValue="5" onValueChange={(v) => document.getElementById('t-stars')?.setAttribute('data-value', v)}>
-                                    <SelectTrigger id="t-stars" data-value="5">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="5">⭐⭐⭐⭐⭐ (5)</SelectItem>
-                                      <SelectItem value="4">⭐⭐⭐⭐ (4)</SelectItem>
-                                      <SelectItem value="3">⭐⭐⭐ (3)</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <div className="space-y-2">
-                                  <Label>URL de Foto (Opcional)</Label>
-                                  <Input id="t-avatar" placeholder="https://..." />
-                                  <p className="text-[10px] text-muted-foreground">Deja vacío para generar un avatar automático con las iniciales.</p>
-                                </div>
-                                <Button onClick={() => {
-                                  const name = (document.getElementById('t-name') as HTMLInputElement).value;
-                                  const text = (document.getElementById('t-text') as HTMLInputElement).value;
-                                  const stars = parseInt((document.getElementById('t-stars') as HTMLElement).getAttribute('data-value') || '5');
-                                  const avatar = (document.getElementById('t-avatar') as HTMLInputElement).value;
-
-                                  if (!name || !text) return toast({ title: "Faltan datos", variant: "destructive" });
-
-                                  const newTestimonial = {
-                                    id: Date.now().toString(),
-                                    name,
-                                    text,
-                                    stars,
-                                    avatar_url: avatar || undefined
-                                  };
-
-                                  setTestimonials([...testimonials, newTestimonial]);
-                                  setIsTestimonialDialogOpen(false);
-                                }}>
-                                  Agregar
-                                </Button>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                        </div>
+                    {/* Teaser Messages Editor */}
+                    <div className="space-y-3 p-4 bg-muted/50 rounded-xl border">
+                      <div>
+                        <Label>Mensajes de Recaptura (Teaser)</Label>
+                        <p className="text-[10px] text-muted-foreground mt-1">Se mostrarán aleatoriamente si el usuario cierra el chat.</p>
                       </div>
+                      <textarea
+                        value={formConfig.teaser_messages}
+                        onChange={(e) => setFormConfig({ ...formConfig, teaser_messages: e.target.value })}
+                        className="w-full p-3 text-xs border rounded-md bg-background min-h-[80px]"
+                        placeholder="Escribe un mensaje por línea..."
+                      />
+                      <p className="text-[10px] text-primary italic">💡 Pon un mensaje atractivo por cada línea.</p>
+                    </div>
 
-                      <div className="space-y-4 pt-4 border-t">
-                        <h4 className="font-semibold text-sm">Comportamiento Avanzado</h4>
-
-                        <div className="space-y-2">
-                          <Label>Intensidad del movimiento (Atención)</Label>
-                          <Select
-                            value={formConfig.vibration_intensity}
-                            onValueChange={(v) => setFormConfig({ ...formConfig, vibration_intensity: v })}
-                          >
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="none">Desactivado</SelectItem>
-                              <SelectItem value="soft">Suave (Recomendado)</SelectItem>
-                              <SelectItem value="strong">Fuerte</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <p className="text-xs text-muted-foreground">Define qué tan fuerte vibrará el widget para llamar la atención del usuario.</p>
-                        </div>
-
-                        <div className="space-y-4 p-4 bg-muted/50 rounded-xl border">
-                          <div className="flex items-center justify-between">
-                            <Label className="cursor-pointer" htmlFor="exit-intent">Activar Pop-up de Salida</Label>
-                            <Switch
-                              id="exit-intent"
-                              checked={formConfig.exit_intent_enabled}
-                              onCheckedChange={(checked) => setFormConfig({ ...formConfig, exit_intent_enabled: checked })}
-                            />
-                          </div>
-
-                          {formConfig.exit_intent_enabled && (
-                            <div className="space-y-4 mt-4 animate-in fade-in slide-in-from-top-2">
-                              <div className="space-y-2">
-                                <Label className="text-xs">Título del Pop-up</Label>
-                                <Input
-                                  value={formConfig.exit_intent_title}
-                                  onChange={(e) => setFormConfig({ ...formConfig, exit_intent_title: e.target.value })}
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <Label className="text-xs">Descripción</Label>
-                                <textarea
-                                  value={formConfig.exit_intent_description}
-                                  onChange={(e) => setFormConfig({ ...formConfig, exit_intent_description: e.target.value })}
-                                  className="w-full p-2 text-xs border rounded-md bg-background min-h-[60px]"
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <Label className="text-xs">Texto del Botón (CTA)</Label>
-                                <Input
-                                  value={formConfig.exit_intent_cta}
-                                  onChange={(e) => setFormConfig({ ...formConfig, exit_intent_cta: e.target.value })}
-                                />
-                              </div>
-                            </div>
-                          )}
-                        </div>
+                    {/* Quick Replies Editor */}
+                    <div className="space-y-3 p-4 bg-muted/50 rounded-xl border">
+                      <div>
+                        <Label>Atajos Rápidos (Quick Replies)</Label>
+                        <p className="text-[10px] text-muted-foreground mt-1">Botones de respuesta rápida que aparecen al inicio del chat.</p>
                       </div>
+                      <textarea
+                        value={formConfig.quick_replies}
+                        onChange={(e) => setFormConfig({ ...formConfig, quick_replies: e.target.value })}
+                        className="w-full p-3 text-xs border rounded-md bg-background min-h-[80px]"
+                        placeholder="Escribe un atajo por línea..."
+                      />
+                      <p className="text-[10px] text-primary italic">💡 Cada línea será un botón que el usuario puede pulsar para enviar automáticamente.</p>
+                    </div>
+                  </CardContent>
+                </Card>
 
-                      <Button onClick={saveWidgetConfig} disabled={saving} className="w-full">
-                        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Guardar Cambios'}
-                      </Button>
-                    </CardContent>
-                  </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Código de instalación</CardTitle>
+                    <CardDescription>Copia y pega antes de {'</body>'}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-muted rounded-lg p-4 font-mono text-sm break-all">
+                      {`<script src="${window.location.origin}/api/w/${widgetConfig?.widget_id}.js" async></script>`}
+                    </div>
+                    <Button onClick={copyEmbedCode} variant="outline" className="w-full mt-4">
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copiar código
+                    </Button>
+                    <div className="mt-3 text-center">
+                      <Link
+                        to="/installation-guide"
+                        target="_blank"
+                        className="text-xs text-primary hover:underline inline-flex items-center gap-1 font-medium"
+                      >
+                        <Info className="w-3 h-3" />
+                        ¿No sabes cómo instalarlo? Pulsa aquí
+                      </Link>
+                    </div>
 
-                  {/* Preview - Responsive */}
-                  <div className="space-y-4 sm:space-y-6 lg:sticky lg:top-24 h-fit">
-                    <Card>
-                      <CardHeader className="pb-2 sm:pb-6">
-                        <CardTitle className="text-base sm:text-lg">Vista Previa</CardTitle>
-                        <CardDescription className="text-xs sm:text-sm">Así se verá tu widget en tu sitio web</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4 sm:space-y-6">
-                        {/* Widget Preview Container - Responsive (View-only, no interactions) */}
-                        <div className="relative h-[350px] sm:h-[500px] bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden p-2 sm:p-6 flex justify-center items-center">
-                          <div className="w-full max-w-[280px] sm:max-w-[320px] h-full max-h-[320px] sm:max-h-[480px] shadow-2xl rounded-2xl overflow-hidden border border-slate-200 bg-white transform scale-[0.85] sm:scale-100 origin-center pointer-events-none select-none">
-                            <WidgetPreview
-                              primaryColor={formConfig.primary_color}
-                              welcomeMessage={formConfig.welcome_message}
-                              template={formConfig.template}
-                              businessName={formConfig.business_name}
-                              customPlaceholder={formConfig.custom_placeholder}
-                              customButtonText={formConfig.custom_button_text}
-                              customConfirmationMessage={formConfig.custom_confirmation_message}
-                              chatPlaceholder={formConfig.chat_placeholder}
-                              vibrationIntensity={formConfig.vibration_intensity as any}
-                              exitIntentEnabled={formConfig.exit_intent_enabled}
-                              exitIntentTitle={formConfig.exit_intent_title}
-                              exitIntentDescription={formConfig.exit_intent_description}
-                              exitIntentCTA={formConfig.exit_intent_cta}
-                              mode="dashboard"
-                              language={formConfig.language as 'es' | 'en'}
-                            />
-                          </div>
-                        </div>
+                    {/* Dynamic Domain Info Removed */}
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
 
-                        {/* Teaser Messages Editor */}
-                        <div className="space-y-3 p-4 bg-muted/50 rounded-xl border">
-                          <div>
-                            <Label>Mensajes de Recaptura (Teaser)</Label>
-                            <p className="text-[10px] text-muted-foreground mt-1">Se mostrarán aleatoriamente si el usuario cierra el chat.</p>
-                          </div>
-                          <textarea
-                            value={formConfig.teaser_messages}
-                            onChange={(e) => setFormConfig({ ...formConfig, teaser_messages: e.target.value })}
-                            className="w-full p-3 text-xs border rounded-md bg-background min-h-[80px]"
-                            placeholder="Escribe un mensaje por línea..."
-                          />
-                          <p className="text-[10px] text-primary italic">💡 Pon un mensaje atractivo por cada línea.</p>
-                        </div>
-
-                        {/* Quick Replies Editor */}
-                        <div className="space-y-3 p-4 bg-muted/50 rounded-xl border">
-                          <div>
-                            <Label>Atajos Rápidos (Quick Replies)</Label>
-                            <p className="text-[10px] text-muted-foreground mt-1">Botones de respuesta rápida que aparecen al inicio del chat.</p>
-                          </div>
-                          <textarea
-                            value={formConfig.quick_replies}
-                            onChange={(e) => setFormConfig({ ...formConfig, quick_replies: e.target.value })}
-                            className="w-full p-3 text-xs border rounded-md bg-background min-h-[80px]"
-                            placeholder="Escribe un atajo por línea..."
-                          />
-                          <p className="text-[10px] text-primary italic">💡 Cada línea será un botón que el usuario puede pulsar para enviar automáticamente.</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Código de instalación</CardTitle>
-                        <CardDescription>Copia y pega antes de {'</body>'}</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="bg-muted rounded-lg p-4 font-mono text-sm break-all">
-                          {`<script src="${window.location.origin}/api/w/${widgetConfig?.widget_id}.js" async></script>`}
-                        </div>
-                        <Button onClick={copyEmbedCode} variant="outline" className="w-full mt-4">
-                          <Copy className="w-4 h-4 mr-2" />
-                          Copiar código
-                        </Button>
-                        <div className="mt-3 text-center">
-                          <Link
-                            to="/installation-guide"
-                            target="_blank"
-                            className="text-xs text-primary hover:underline inline-flex items-center gap-1 font-medium"
-                          >
-                            <Info className="w-3 h-3" />
-                            ¿No sabes cómo instalarlo? Pulsa aquí
-                          </Link>
-                        </div>
-
-                        {/* Dynamic Domain Info Removed */}
-                      </CardContent>
-                    </Card>
+          {/* AI Configuration Tab */}
+          <TabsContent value="ai" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle>Configuración de IA</CardTitle>
+                    <CardDescription>Conecta tu chatbot con inteligencia artificial</CardDescription>
                   </div>
                 </div>
-              </TabsContent>
-
-              {/* AI Configuration Tab */}
-              <TabsContent value="ai" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-center gap-2">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                        <Sparkles className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <CardTitle>Configuración de IA</CardTitle>
-                        <CardDescription>Conecta tu chatbot con inteligencia artificial</CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
+              </CardHeader>
+              <CardContent className="space-y-6">
 
 
-                    {/* AI Provider */}
-                    <div className="space-y-2">
-                      <Label className="flex items-center gap-2">
-                        <Key className="w-4 h-4" />
-                        Proveedor de IA
-                      </Label>
-                      <Select value={aiConfig.ai_provider} onValueChange={(value) => setAiConfig({ ...aiConfig, ai_provider: value })}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {aiConfig.ai_provider === 'openai' && (
-                            <>
-                              <SelectItem value="openai">OpenAI (GPT-4, GPT-3.5)</SelectItem>
-                              <SelectItem value="anthropic">Anthropic (Claude)</SelectItem>
-                              <SelectItem value="google">Google (Gemini)</SelectItem>
-                            </>
-                          )}
-                          {aiConfig.ai_provider === 'anthropic' && (
-                            <>
-                              <SelectItem value="openai">OpenAI (GPT-4, GPT-3.5)</SelectItem>
-                              <SelectItem value="anthropic">Anthropic (Claude)</SelectItem>
-                              <SelectItem value="google">Google (Gemini)</SelectItem>
-                            </>
-                          )}
-                          {aiConfig.ai_provider === 'google' && (
-                            <>
-                              <SelectItem value="openai">OpenAI (GPT-4, GPT-3.5)</SelectItem>
-                              <SelectItem value="anthropic">Anthropic (Claude)</SelectItem>
-                              <SelectItem value="google">Google (Gemini)</SelectItem>
-                            </>
-                          )}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* API Key */}
-                    <div className="space-y-2">
-                      <Label>API Key</Label>
-                      <div className="relative">
-                        <Input
-                          type={showApiKey ? "text" : "password"}
-                          value={aiConfig.ai_api_key}
-                          onChange={(e) => setAiConfig({ ...aiConfig, ai_api_key: e.target.value })}
-                          placeholder="sk-..."
-                          className="pr-12"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowApiKey(!showApiKey)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
-                        >
-                          {showApiKey ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                        </button>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        {aiConfig.ai_provider === 'openai' && 'Obtén tu API key en platform.openai.com'}
-                        {aiConfig.ai_provider === 'anthropic' && 'Obtén tu API key en console.anthropic.com'}
-                        {aiConfig.ai_provider === 'google' && 'Obtén tu API key en makersuite.google.com'}
-                      </p>
-                    </div>
-
-                    {/* NUEVO: Guía de Autoservicio */}
-                    <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 dark:from-blue-950/30 dark:to-indigo-950/30 dark:border-blue-800 transition-colors">
-                      <CardHeader>
-                        <CardTitle className="text-base flex items-center gap-2">
-                          <ShieldCheck className="w-5 h-5 text-blue-600" />
-                          ¿Cómo obtener tu API Key de OpenAI? (Paso a Paso - 3 minutos)
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="bg-white/80 p-4 rounded-lg space-y-3 text-sm">
-                          <div className="flex items-start gap-3">
-                            <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0">1</div>
-                            <div>
-                              <p className="font-semibold">Crea tu cuenta gratuita</p>
-                              <p className="text-muted-foreground">Ve a <a href="https://platform.openai.com/signup" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">platform.openai.com/signup</a> y regístrate con tu correo.</p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-start gap-3">
-                            <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0">2</div>
-                            <div>
-                              <p className="font-semibold">Genera tu API Key</p>
-                              <p className="text-muted-foreground">Accede a <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">platform.openai.com/api-keys</a> y haz clic en "Create new secret key". Cópiala inmediatamente.</p>
-                            </div>
-                          </div>
-
-                          <div className="flex items-start gap-3">
-                            <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0">3</div>
-                            <div>
-                              <p className="font-semibold">Pégala aquí arriba</p>
-                              <p className="text-muted-foreground">Copia la API Key (empieza con <code className="bg-slate-200 px-1 rounded">sk-...</code>) y pégala en el campo de arriba. ¡Listo!</p>
-                            </div>
-                          </div>
-
-                          {/* Multilingual Badge */}
-                          <div className="mt-4 p-3 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg border border-indigo-200 dark:border-indigo-800 flex items-center gap-3">
-                            <div className="bg-indigo-600 text-white p-2 rounded-full">
-                              <Globe className="w-4 h-4" />
-                            </div>
-                            <div>
-                              <p className="font-bold text-indigo-900 dark:text-indigo-100 text-xs uppercase tracking-wider">Nuevo: Soporte Multilingüe</p>
-                              <p className="text-xs text-indigo-700 dark:text-indigo-300">Tu IA detecta y responde automáticamente en Inglés 🇺🇸 o Español 🇪🇸 según el cliente. ¡Sin configurar nada!</p>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="bg-amber-50 border border-amber-200 p-3 rounded-lg">
-                          <p className="text-xs text-amber-800 font-medium flex items-start gap-2">
-                            <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                            <span><strong>Importante sobre costos:</strong> OpenAI cobra solo por lo que uses. Un widget promedio con 100 conversaciones al mes cuesta ~$2-5 USD. Puedes ver tu uso en tiempo real en tu panel de OpenAI.</span>
-                          </p>
-                        </div>
-
-                        <div className="bg-green-50 border border-green-200 p-3 rounded-lg">
-                          <p className="text-xs text-green-800 flex items-start gap-2">
-                            <Check className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                            <span><strong>¿Por qué es seguro?</strong> Tu API Key nunca se comparte con terceros. Se almacena de forma cifrada y solo se usa para que TU widget responda a TUS clientes.</span>
-                          </p>
-                        </div>
-
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="w-full"
-                          onClick={() => window.open('https://platform.openai.com/api-keys', '_blank')}
-                        >
-                          <ExternalLink className="w-4 h-4 mr-2" />
-                          Abrir OpenAI Platform
-                        </Button>
-                      </CardContent>
-                    </Card>
-
-                    {/* Model Selection */}
-                    <div className="space-y-2">
-                      <Label>Modelo</Label>
-                      <Select value={aiConfig.ai_model} onValueChange={(value) => setAiConfig({ ...aiConfig, ai_model: value })}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {aiConfig.ai_provider === 'openai' && (
-                            <>
-                              <SelectItem value="gpt-4o">GPT-4o (Más potente)</SelectItem>
-                              <SelectItem value="gpt-4o-mini">GPT-4o Mini (Recomendado)</SelectItem>
-                              <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo (Económico)</SelectItem>
-                            </>
-                          )}
-                          {aiConfig.ai_provider === 'anthropic' && (
-                            <>
-                              <SelectItem value="claude-3-opus">Claude 3 Opus</SelectItem>
-                              <SelectItem value="claude-3-sonnet">Claude 3 Sonnet</SelectItem>
-                              <SelectItem value="claude-3-haiku">Claude 3 Haiku</SelectItem>
-                            </>
-                          )}
-                          {aiConfig.ai_provider === 'google' && (
-                            <>
-                              <SelectItem value="gemini-pro">Gemini Pro</SelectItem>
-                              <SelectItem value="gemini-pro-vision">Gemini Pro Vision</SelectItem>
-                            </>
-                          )}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Temperature */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label>Temperatura ({aiConfig.ai_temperature})</Label>
-                        <span className="text-xs text-muted-foreground">Creatividad de las respuestas</span>
-                      </div>
-                      <input
-                        type="range"
-                        min="0"
-                        max="1"
-                        step="0.1"
-                        value={aiConfig.ai_temperature}
-                        onChange={(e) => setAiConfig({ ...aiConfig, ai_temperature: parseFloat(e.target.value) })}
-                        className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
-                      />
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>Preciso (0.1)</span>
-                        <span>Creativo (1.0)</span>
-                      </div>
-                      <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-                        🌟 Recomendado: <strong>0.5 - 0.7</strong> para conversaciones naturales.
-                      </p>
-                    </div>
-
-                    {/* Max Tokens */}
-                    <div className="space-y-2">
-                      <Label>Máximo de Tokens</Label>
-                      <Input
-                        type="number"
-                        value={aiConfig.ai_max_tokens}
-                        onChange={(e) => setAiConfig({ ...aiConfig, ai_max_tokens: parseInt(e.target.value) })}
-                        min={100}
-                        max={4000}
-                      />
-                      <p className="text-xs text-muted-foreground">Longitud máxima de las respuestas (100-4000)</p>
-                    </div>
-
-                    {/* Business Description */}
-                    <div className="space-y-2">
-                      <Label>Descripción del Negocio (Contexto)</Label>
-                      <textarea
-                        value={aiConfig.business_description}
-                        onChange={(e) => setAiConfig({ ...aiConfig, business_description: e.target.value })}
-                        rows={4}
-                        className="w-full p-3 text-sm border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary bg-slate-50 text-slate-900 placeholder:text-slate-400"
-                        placeholder="Describe tu negocio, productos, servicios y valores clave..."
-                      />
-                      <p className="text-xs text-muted-foreground">Esta información le dará contexto a la IA sobre quién eres.</p>
-                    </div>
-
-                    {/* System Prompt */}
-                    <div className="space-y-2">
-                      <Label>Prompt del Sistema</Label>
-                      <textarea
-                        value={aiConfig.ai_system_prompt}
-                        onChange={(e) => setAiConfig({ ...aiConfig, ai_system_prompt: e.target.value })}
-                        rows={6}
-                        className="w-full p-3 text-sm border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary bg-slate-50 text-slate-900 placeholder:text-slate-400"
-                        placeholder="Instrucciones para el comportamiento de la IA..."
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Define cómo debe comportarse tu asistente IA y qué información debe capturar
-                      </p>
-                    </div>
-
-                    {/* Security Prompt */}
-                    <div className="space-y-2 border-t pt-6">
-                      <Label className="flex items-center gap-2 text-red-600 dark:text-red-400">
-                        <ShieldAlert className="w-4 h-4" /> Protocolo de Seguridad y Bloqueo (Avanzado)
-                      </Label>
-                      <textarea
-                        value={aiConfig.ai_security_prompt}
-                        onChange={(e) => setAiConfig({ ...aiConfig, ai_security_prompt: e.target.value })}
-                        rows={4}
-                        className="w-full p-3 text-sm border-2 border-red-500/20 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-red-500 bg-red-500/5 text-foreground placeholder:text-muted-foreground font-medium"
-                        placeholder="Instrucciones para detectar ataques y bloquear..."
-                      />
-                      <p className="text-xs text-red-600 dark:text-red-400 font-medium">
-                        <b>Protección de Créditos:</b> Define aquí qué comportamientos causarán el bloqueo inmediato de la IP del usuario.
-                      </p>
-                    </div>
-
-                    <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-sm space-y-3">
-                      <p className="font-semibold text-blue-800 dark:text-blue-300 flex items-center gap-2">
-                        <Sparkles className="w-4 h-4" />
-                        Cómo hacer re-direcciones automáticas:
-                      </p>
-                      <p className="text-blue-700 dark:text-blue-400 text-xs">
-                        Instruye a la IA para que use el comando especial cuando haya recopilado todos los datos.
-                      </p>
-                      <div className="bg-background/80 p-3 rounded border border-blue-200 dark:border-blue-800 text-xs font-mono space-y-1 overflow-x-auto">
-                        <p className="text-muted-foreground">// Ejemplo de instrucción:</p>
-                        <p className="text-green-600 dark:text-green-400">"Pide Nombre, Fecha y Servicio. Cuando tengas todo, pregunta si quiere confirmar."</p>
-                        <p className="text-green-600 dark:text-green-400">"Si confirma, responde EXACTAMENTE así (sustituyendo los datos):"</p>
-                        <p className="text-primary font-bold">[WHATSAPP_REDIRECT: Cliente Juan Pérez quiere Cita Dental el Lunes]</p>
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        * La IA remplazará "Juan Pérez" por el nombre real del cliente actual.
-                      </p>
-                    </div>
-
-                    {/* Save Button */}
-                    <Button
-                      onClick={async () => {
-                        if (!user || !widgetConfig) return;
-                        setSavingAI(true);
-                        try {
-                          // Save to profiles (for dashboard access)
-                          await updateDoc(doc(db, 'profiles', user.uid), {
-                            ai_enabled: true,
-                            ai_provider: aiConfig.ai_provider,
-                            ai_api_key: aiConfig.ai_api_key,
-                            ai_model: aiConfig.ai_model,
-                            ai_temperature: aiConfig.ai_temperature,
-                            ai_max_tokens: aiConfig.ai_max_tokens,
-                            business_description: aiConfig.business_description,
-                            ai_system_prompt: aiConfig.ai_system_prompt,
-                            ai_security_prompt: aiConfig.ai_security_prompt,
-                          });
-
-                          // ALSO save to widget_configs (for embedded widget public access)
-                          await updateDoc(doc(db, 'widget_configs', widgetConfig.id), {
-                            ai_enabled: true,
-                            ai_provider: aiConfig.ai_provider,
-                            ai_api_key: aiConfig.ai_api_key,
-                            ai_model: aiConfig.ai_model,
-                            ai_temperature: aiConfig.ai_temperature,
-                            ai_max_tokens: aiConfig.ai_max_tokens,
-                            business_description: aiConfig.business_description,
-                            ai_system_prompt: aiConfig.ai_system_prompt,
-                            ai_security_prompt: aiConfig.ai_security_prompt,
-                          });
-
-                          toast({
-                            title: '✅ Configuración guardada',
-                            description: 'Tu chatbot IA está listo para usar',
-                          });
-                        } catch (error: any) {
-                          toast({
-                            title: 'Error',
-                            description: error.message,
-                            variant: 'destructive',
-                          });
-                        } finally {
-                          setSavingAI(false);
-                        }
-                      }}
-                      disabled={savingAI}
-                      className="w-full"
-                    >
-                      {savingAI ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Check className="w-4 h-4 mr-2" />}
-                      Guardar Configuración de IA
-                    </Button>
-
-                    {/* Info Card */}
-                    <div className="p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-xl">
-                      <div className="flex gap-3">
-                        <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-                        <div className="space-y-2 text-sm">
-                          <p className="font-medium text-blue-900 dark:text-blue-100">Cómo funciona el Chatbot IA</p>
-                          <ul className="space-y-1 text-blue-700 dark:text-blue-300 list-disc list-inside">
-                            <li>La IA responderá automáticamente a los visitantes de tu web</li>
-                            <li>Capturará información relevante según tu prompt del sistema</li>
-                            <li>Los leads se guardarán automáticamente en tu panel</li>
-                            <li>Puedes personalizar el comportamiento editando el prompt</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Leads Tab */}
-              <TabsContent value="leads" className="space-y-6">
-                <Card>
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <div>
-                      <CardTitle>Leads Capturados</CardTitle>
-                      <CardDescription>{leads.length} leads en total</CardDescription>
-                    </div>
-                    <Button variant="outline" onClick={exportLeadsCSV} disabled={leads.length === 0}>
-                      <Download className="w-4 h-4 mr-2" />
-                      Exportar CSV
-                    </Button>
-                  </CardHeader>
-                  <CardContent>
-                    {leads.length === 0 ? (
-                      <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-2xl">
-                        <Users className="w-12 h-12 mx-auto mb-4 opacity-10" />
-                        <p>Aún no tienes leads</p>
-                        <p className="text-sm mt-1">Instala el widget en tu web para empezar a capturar</p>
-                      </div>
-                    ) : (
-                      <div className="overflow-x-auto">
-                        <table className="w-full">
-                          <thead>
-                            <tr className="border-b text-xs uppercase tracking-wider text-muted-foreground">
-                              <th className="text-left py-3 px-4 font-medium">Nombre</th>
-                              <th className="text-left py-3 px-4 font-medium">Teléfono</th>
-                              <th className="text-left py-3 px-4 font-medium">Interés</th>
-                              <th className="text-left py-3 px-4 font-medium">Fecha</th>
-                            </tr>
-                          </thead>
-                          <tbody className="text-sm">
-                            {leads.map((lead) => (
-                              <tr key={lead.id} className="border-b hover:bg-muted/50 transition-colors">
-                                <td className="py-4 px-4 font-medium">{lead.name}</td>
-                                <td className="py-4 px-4 font-mono text-xs">
-                                  {(lead.phone === 'Clic en WhatsApp' ||
-                                    lead.phone === 'Usuario WhatsApp' ||
-                                    (formConfig?.whatsapp_destination && lead.phone.replace(/\D/g, '') === formConfig.whatsapp_destination.replace(/\D/g, ''))) ? (
-                                    <span className="flex items-center gap-1 text-green-600 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-full border border-green-200 dark:border-green-800 w-fit font-sans font-medium">
-                                      <MessageCircle className="w-3 h-3" /> Chat Iniciado
-                                    </span>
-                                  ) : lead.phone === 'Pendiente (Click WA)' ? (
-                                    <span className="text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100">Pendiente</span>
-                                  ) : (
-                                    <a href={`https://wa.me/${lead.phone.replace(/\D/g, '')}`} target="_blank" className="text-primary hover:underline">{lead.phone}</a>
-                                  )}
-                                </td>
-                                <td className="py-4 px-4 text-muted-foreground truncate max-w-[200px]">{lead.interest || '-'}</td>
-                                <td className="py-4 px-4 text-muted-foreground text-xs">
-                                  {(() => {
-                                    const d = lead.created_at;
-                                    if (!d) return '-';
-                                    // Handle Firestore Timestamp (seconds)
-                                    if (d.seconds) return new Date(d.seconds * 1000).toLocaleString('es-PE');
-                                    // Handle string ISO or Date
-                                    return new Date(d).toLocaleString('es-PE');
-                                  })()}
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              {/* Analytics Tab */}
-              <TabsContent value="analytics" className="space-y-6">
-                <div className="grid md:grid-cols-3 gap-6">
-                  <Card className="stat-card">
-                    <CardContent className="pt-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm text-muted-foreground">Visitas (Total)</p>
-                          <div className="flex items-baseline gap-2">
-                            <p className="text-3xl font-bold">{analytics.views}</p>
-                            {analytics.viewsToday > 0 && (
-                              <span className="text-xs font-medium text-green-600 bg-green-100 px-1.5 py-0.5 rounded-full">
-                                +{analytics.viewsToday} hoy
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center">
-                          <Eye className="w-6 h-6 text-secondary" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="stat-card">
-                    <CardContent className="pt-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm text-muted-foreground">Leads</p>
-                          <p className="text-3xl font-bold">{leads.length}</p>
-                        </div>
-                        <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
-                          <Users className="w-6 h-6 text-primary" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="stat-card">
-                    <CardContent className="pt-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm text-muted-foreground">Tasa conversión</p>
-                          <p className="text-3xl font-bold">
-                            {analytics.views > 0 ? Math.round((leads.length / analytics.views) * 100) : 0}%
-                          </p>
-                        </div>
-                        <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center">
-                          <TrendingUp className="w-6 h-6 text-green-600" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Rendimiento semanal</CardTitle>
-                    <CardDescription>Tráfico y captación en los últimos 7 días</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-64 w-full pt-4">
-                      {chartData.length > 0 ? (
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={chartData}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.5} />
-                            <XAxis
-                              dataKey="name"
-                              fontSize={10}
-                              tickLine={false}
-                              axisLine={false}
-                              stroke="hsl(var(--muted-foreground))"
-                            />
-                            <YAxis
-                              fontSize={10}
-                              tickLine={false}
-                              axisLine={false}
-                              stroke="hsl(var(--muted-foreground))"
-                              allowDecimals={false}
-                            />
-                            <RechartsTooltip
-                              cursor={{ fill: 'hsl(var(--muted)/0.3)' }}
-                              contentStyle={{
-                                backgroundColor: 'hsl(var(--popover))',
-                                borderColor: 'hsl(var(--border))',
-                                borderRadius: '8px',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                fontSize: '12px'
-                              }}
-                              itemStyle={{ color: 'hsl(var(--popover-foreground))' }}
-                              labelStyle={{ color: 'hsl(var(--muted-foreground))', marginBottom: '4px' }}
-                            />
-                            <Bar
-                              dataKey="visitas"
-                              fill="hsl(var(--secondary))"
-                              radius={[4, 4, 0, 0]}
-                              name="Visitas"
-                              maxBarSize={50}
-                            />
-                            <Bar
-                              dataKey="leads"
-                              fill="hsl(var(--primary))"
-                              radius={[4, 4, 0, 0]}
-                              name="Leads"
-                              maxBarSize={50}
-                            />
-                          </BarChart>
-                        </ResponsiveContainer>
-                      ) : (
-                        <div className="flex items-center justify-center h-full text-muted-foreground">
-                          <p>Cargando datos...</p>
-                        </div>
+                {/* AI Provider */}
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <Key className="w-4 h-4" />
+                    Proveedor de IA
+                  </Label>
+                  <Select value={aiConfig.ai_provider} onValueChange={(value) => setAiConfig({ ...aiConfig, ai_provider: value })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {aiConfig.ai_provider === 'openai' && (
+                        <>
+                          <SelectItem value="openai">OpenAI (GPT-4, GPT-3.5)</SelectItem>
+                          <SelectItem value="anthropic">Anthropic (Claude)</SelectItem>
+                          <SelectItem value="google">Google (Gemini)</SelectItem>
+                        </>
                       )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
+                      {aiConfig.ai_provider === 'anthropic' && (
+                        <>
+                          <SelectItem value="openai">OpenAI (GPT-4, GPT-3.5)</SelectItem>
+                          <SelectItem value="anthropic">Anthropic (Claude)</SelectItem>
+                          <SelectItem value="google">Google (Gemini)</SelectItem>
+                        </>
+                      )}
+                      {aiConfig.ai_provider === 'google' && (
+                        <>
+                          <SelectItem value="openai">OpenAI (GPT-4, GPT-3.5)</SelectItem>
+                          <SelectItem value="anthropic">Anthropic (Claude)</SelectItem>
+                          <SelectItem value="google">Google (Gemini)</SelectItem>
+                        </>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              {/* Security Tab */}
-              <TabsContent value="security" className="space-y-6">
-                <Card>
+                {/* API Key */}
+                <div className="space-y-2">
+                  <Label>API Key</Label>
+                  <div className="relative">
+                    <Input
+                      type={showApiKey ? "text" : "password"}
+                      value={aiConfig.ai_api_key}
+                      onChange={(e) => setAiConfig({ ...aiConfig, ai_api_key: e.target.value })}
+                      placeholder="sk-..."
+                      className="pr-12"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowApiKey(!showApiKey)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
+                    >
+                      {showApiKey ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {aiConfig.ai_provider === 'openai' && 'Obtén tu API key en platform.openai.com'}
+                    {aiConfig.ai_provider === 'anthropic' && 'Obtén tu API key en console.anthropic.com'}
+                    {aiConfig.ai_provider === 'google' && 'Obtén tu API key en makersuite.google.com'}
+                  </p>
+                </div>
+
+                {/* NUEVO: Guía de Autoservicio */}
+                <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200 dark:from-blue-950/30 dark:to-indigo-950/30 dark:border-blue-800 transition-colors">
                   <CardHeader>
-                    <div className="flex items-center gap-2">
-                      <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center">
-                        <ShieldCheck className="w-5 h-5 text-white" />
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <ShieldCheck className="w-5 h-5 text-blue-600" />
+                      ¿Cómo obtener tu API Key de OpenAI? (Paso a Paso - 3 minutos)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="bg-white/80 p-4 rounded-lg space-y-3 text-sm">
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0">1</div>
+                        <div>
+                          <p className="font-semibold">Crea tu cuenta gratuita</p>
+                          <p className="text-muted-foreground">Ve a <a href="https://platform.openai.com/signup" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">platform.openai.com/signup</a> y regístrate con tu correo.</p>
+                        </div>
                       </div>
-                      <div>
-                        <CardTitle>Seguridad y Bloqueos</CardTitle>
-                        <CardDescription>Controla quién tiene acceso a tu chat widget</CardDescription>
+
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0">2</div>
+                        <div>
+                          <p className="font-semibold">Genera tu API Key</p>
+                          <p className="text-muted-foreground">Accede a <a href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">platform.openai.com/api-keys</a> y haz clic en "Create new secret key". Cópiala inmediatamente.</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <div className="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0">3</div>
+                        <div>
+                          <p className="font-semibold">Pégala aquí arriba</p>
+                          <p className="text-muted-foreground">Copia la API Key (empieza con <code className="bg-slate-200 px-1 rounded">sk-...</code>) y pégala en el campo de arriba. ¡Listo!</p>
+                        </div>
+                      </div>
+
+                      {/* Multilingual Badge */}
+                      <div className="mt-4 p-3 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg border border-indigo-200 dark:border-indigo-800 flex items-center gap-3">
+                        <div className="bg-indigo-600 text-white p-2 rounded-full">
+                          <Globe className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-indigo-900 dark:text-indigo-100 text-xs uppercase tracking-wider">Nuevo: Soporte Multilingüe</p>
+                          <p className="text-xs text-indigo-700 dark:text-indigo-300">Tu IA detecta y responde automáticamente en Inglés 🇺🇸 o Español 🇪🇸 según el cliente. ¡Sin configurar nada!</p>
+                        </div>
                       </div>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl flex gap-3">
-                      <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-                      <p className="text-sm text-amber-800 dark:text-amber-200">
-                        El sistema bloquea automáticamente IPs que intentan manipular la IA o realizan spam.
-                        Si crees que un cliente fue bloqueado por error, puedes rehabilitarlo aquí.
+
+                    <div className="bg-amber-50 border border-amber-200 p-3 rounded-lg">
+                      <p className="text-xs text-amber-800 font-medium flex items-start gap-2">
+                        <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                        <span><strong>Importante sobre costos:</strong> OpenAI cobra solo por lo que uses. Un widget promedio con 100 conversaciones al mes cuesta ~$2-5 USD. Puedes ver tu uso en tiempo real en tu panel de OpenAI.</span>
                       </p>
                     </div>
 
-                    {blockedIps.length === 0 ? (
-                      <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-2xl">
-                        <ShieldCheck className="w-12 h-12 mx-auto mb-4 opacity-10" />
-                        <p>No hay usuarios bloqueados actualmente</p>
-                        <p className="text-sm">Tu escudo de seguridad está activo y vigilando.</p>
-                      </div>
-                    ) : (
-                      <div className="overflow-x-auto">
-                        <table className="w-full">
-                          <thead>
-                            <tr className="border-b text-xs uppercase tracking-wider text-muted-foreground">
-                              <th className="text-left py-3 px-4 font-medium">Dirección IP</th>
-                              <th className="text-left py-3 px-4 font-medium">Motivo</th>
-                              <th className="text-left py-3 px-4 font-medium">Fecha</th>
-                              <th className="text-right py-3 px-4 font-medium">Acción</th>
-                            </tr>
-                          </thead>
-                          <tbody className="text-sm">
-                            {blockedIps.map((ip) => (
-                              <tr key={ip.id} className="border-b hover:bg-muted/50 transition-colors">
-                                <td className="py-4 px-4 font-mono">{ip.ip_address}</td>
-                                <td className="py-4 px-4">
-                                  <span className="px-2 py-1 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded-md text-xs font-medium">
-                                    {ip.reason || 'Actividad inusual'}
-                                  </span>
-                                </td>
-                                <td className="py-4 px-4 text-muted-foreground">
-                                  {new Date(ip.created_at).toLocaleString('es-PE')}
-                                </td>
-                                <td className="py-4 px-4 text-right">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => unblockIp(ip.id)}
-                                    className="text-primary border-primary/20 hover:bg-primary/10"
-                                  >
-                                    Desbloquear
-                                  </Button>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    )}
+                    <div className="bg-green-50 border border-green-200 p-3 rounded-lg">
+                      <p className="text-xs text-green-800 flex items-start gap-2">
+                        <Check className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                        <span><strong>¿Por qué es seguro?</strong> Tu API Key nunca se comparte con terceros. Se almacena de forma cifrada y solo se usa para que TU widget responda a TUS clientes.</span>
+                      </p>
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => window.open('https://platform.openai.com/api-keys', '_blank')}
+                    >
+                      <ExternalLink className="w-4 h-4 mr-2" />
+                      Abrir OpenAI Platform
+                    </Button>
                   </CardContent>
                 </Card>
-              </TabsContent>
 
-              {/* Billing Tab */}
-              <TabsContent value="billing" className="space-y-6">
-                <div className="grid lg:grid-cols-3 gap-8">
-                  {/* Plan Status */}
-                  <Card className="lg:col-span-1">
-                    <CardHeader>
-                      <CardTitle>{t('dashboard.billing_section.title')}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="p-6 bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-2xl">
-                        <div className="flex justify-between items-start mb-4">
-                          <div>
-                            <p className="text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">{t('dashboard.billing_section.current_plan')}</p>
-                            <p className="text-2xl font-black text-primary capitalize">{profile?.plan_type || 'Trial'}</p>
-                          </div>
-                          {getStatusBadge(profile?.subscription_status || 'trial')}
-                        </div>
-
-                        <div className="space-y-3 py-4 border-t border-slate-200 mt-4">
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Precio:</span>
-                            <span className="font-bold text-slate-900 dark:text-white">$11.90 USD <span className="text-xs text-muted-foreground font-medium">( o S/ 30.00 )</span> / mes</span>
-                          </div>
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Siguiente Pago:</span>
-                            <span className="font-bold text-slate-900 dark:text-white">{getTrialEndDateString()}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Payment Info */}
-                  <Card className="lg:col-span-2">
-                    <CardHeader>
-                      <CardTitle>{t('dashboard.billing_section.renew_title')}</CardTitle>
-                      <CardDescription>{t('dashboard.billing_section.renew_desc')}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                      <Tabs defaultValue="paypal" className="w-full">
-                        <TabsList className="w-full h-auto min-h-[52px] p-1.5 bg-slate-100 dark:bg-slate-800 rounded-full grid grid-cols-2 mb-8">
-                          <TabsTrigger
-                            value="paypal"
-                            className="rounded-full py-2.5 text-xs sm:text-sm font-medium transition-all data-[state=active]:bg-slate-900 data-[state=active]:text-white dark:data-[state=active]:bg-slate-200 dark:data-[state=active]:text-slate-900 data-[state=inactive]:text-slate-500 data-[state=inactive]:hover:bg-transparent whitespace-normal h-full leading-tight flex items-center justify-center px-2"
-                          >
-                            {t('dashboard.billing_section.tab_paypal')}
-                          </TabsTrigger>
-                          <TabsTrigger
-                            value="local"
-                            className="rounded-full py-2.5 text-xs sm:text-sm font-medium transition-all data-[state=active]:bg-slate-900 data-[state=active]:text-white dark:data-[state=active]:bg-slate-200 dark:data-[state=active]:text-slate-900 data-[state=inactive]:text-slate-500 data-[state=inactive]:hover:bg-transparent whitespace-normal h-full leading-tight flex items-center justify-center px-2"
-                          >
-                            {t('dashboard.billing_section.tab_local')}
-                          </TabsTrigger>
-                        </TabsList>
-
-                        {/* PayPal Tab */}
-                        <TabsContent value="paypal" className="space-y-4">
-                          <div className="max-w-md mx-auto py-4">
-                            <PayPalPaymentButton
-                              amount="11.90"
-                              currency="USD"
-                              onSuccess={async (details) => {
-                                try {
-                                  // Call Server-Side Verification
-                                  const verifyResponse = await fetch('/api/verify-payment', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({
-                                      orderID: details.id,
-                                      user_id: user?.uid
-                                    })
-                                  });
-
-                                  const verifyData = await verifyResponse.json();
-
-                                  if (!verifyResponse.ok) {
-                                    throw new Error(verifyData.error || 'Verification Failed');
-                                  }
-
-                                  toast({
-                                    title: t('dashboard.billing_section.success_title'),
-                                    description: t('dashboard.billing_section.success_desc'),
-                                  });
-
-                                  // Reload to update UI
-                                  loadData();
-
-                                  // Show Beautiful Success Confirmation
-                                  const Swal = (await import('sweetalert2')).default;
-                                  Swal.fire({
-                                    title: '¡Pago Exitoso!',
-                                    text: 'Tu suscripción PRO ha sido activada y verificada correctamente.',
-                                    icon: 'success',
-                                    confirmButtonText: 'Genial',
-                                    confirmButtonColor: '#00C185',
-                                    background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#fff',
-                                    color: document.documentElement.classList.contains('dark') ? '#fff' : '#000'
-                                  });
-
-                                } catch (e: any) {
-                                  console.error("Payment Verification Error: ", e);
-                                  const Swal = (await import('sweetalert2')).default;
-                                  Swal.fire({
-                                    title: 'Error en la verificación',
-                                    text: 'El pago se procesó, pero hubo un error activando la cuenta. Contacta a soporte con el ID: ' + details.id,
-                                    icon: 'error',
-                                    confirmButtonText: 'Entendido'
-                                  });
-                                }
-                              }}
-                            />
-                            <div className="mt-4 text-center">
-                              <p className="text-xs text-muted-foreground">
-                                <ShieldCheck className="w-3 h-3 inline mr-1" />
-                                {t('dashboard.billing_section.secure_note')}
-                              </p>
-                            </div>
-                          </div>
-                        </TabsContent>
-
-                        {/* Local Payment Tab */}
-                        <TabsContent value="local" className="space-y-6 animate-in fade-in slide-in-from-top-2">
-                          <div className="grid md:grid-cols-2 gap-4">
-                            <div className="p-4 bg-sky-50 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-800 rounded-xl">
-                              <h4 className="font-bold flex items-center gap-2 mb-3">
-                                <div className="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center text-white text-[10px]">Scotia</div>
-                                {t('dashboard.billing_section.local_transfer_title')}
-                              </h4>
-                              <div className="space-y-1 text-xs">
-                                <div className="flex justify-between"><span>Soles:</span> <span className="font-medium">0997561105</span></div>
-                                <div className="flex justify-between"><span>CCI:</span> <span className="font-medium">00926320099756110553</span></div>
-                                <div className="flex justify-between mt-1"><span>Titular:</span> <span className="font-medium">Kenneth Herrera</span></div>
-                              </div>
-                            </div>
-
-                            <div className="p-4 bg-purple-50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-800 rounded-xl">
-                              <h4 className="font-bold flex items-center gap-2 mb-3">
-                                <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-fuchsia-500 rounded-lg flex items-center justify-center text-white text-[10px]">Y/P</div>
-                                {t('dashboard.billing_section.local_yape_title')}
-                              </h4>
-                              <div className="space-y-1 text-xs">
-                                <div className="flex justify-between"><span>Número:</span> <span className="font-medium text-lg">902 105 668</span></div>
-                                <div className="flex justify-between"><span>Titular:</span> <span className="font-medium">Kenneth Herrera</span></div>
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="p-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900 text-center space-y-4">
-                            <div className="w-16 h-16 bg-white dark:bg-slate-800 rounded-full shadow-sm flex items-center justify-center mx-auto mb-2 border border-slate-100 dark:border-slate-700">
-                              <MessageCircle className="w-8 h-8 text-primary/40" />
-                            </div>
-                            <div>
-                              <p className="font-bold mb-1">{t('dashboard.billing_section.report_payment_title')}</p>
-                              <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-4">
-                                {t('dashboard.billing_section.report_payment_desc')}
-                              </p>
-                            </div>
-
-                            <div className="max-w-xs mx-auto space-y-3">
-                              <Input
-                                placeholder="Nro de Operación o Nombre"
-                                id="payment-ref"
-                                className="text-center font-bold h-12 border-primary/20 focus:ring-primary"
-                              />
-                              <Button
-                                className="w-full h-12 font-bold text-lg"
-                                onClick={async () => {
-                                  const refInput = document.getElementById('payment-ref') as HTMLInputElement;
-                                  const reference = refInput?.value;
-                                  if (!reference || reference.trim().length < 3) {
-                                    toast({ title: 'Dato requerido', description: 'Por favor ingresa una referencia válida.', variant: 'destructive' });
-                                    return;
-                                  }
-
-                                  setUploading(true);
-                                  try {
-                                    await addDoc(collection(db, 'payments'), {
-                                      user_id: user?.uid,
-                                      amount: 30,
-                                      payment_method: 'Yape/Plin/BCP',
-                                      description: 'Plan Mensual Lead Widget',
-                                      operation_ref: reference,
-                                      status: 'pending',
-                                      created_at: new Date().toISOString()
-                                    });
-
-                                    toast({
-                                      title: '¡Pago reportado!',
-                                      description: 'Lo validaremos en unos minutos.',
-                                    });
-
-                                    if (refInput) refInput.value = '';
-                                    loadData();
-                                  } catch (e: any) {
-                                    toast({ title: 'Error', description: 'No se pudo reportar el pago.', variant: 'destructive' });
-                                  } finally {
-                                    setUploading(false);
-                                  }
-                                }}
-                                disabled={uploading}
-                              >
-                                {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : t('dashboard.billing_section.report_btn')}
-                              </Button>
-
-                              <p className="text-[10px] text-muted-foreground mt-2">
-                                * Si tienes la captura, envíala a <a href="https://wa.me/51902105668" target="_blank" className="underline text-primary">WhatsApp</a>.
-                              </p>
-                            </div>
-                          </div>
-                        </TabsContent>
-                      </Tabs>
-                    </CardContent>
-                  </Card>
+                {/* Model Selection */}
+                <div className="space-y-2">
+                  <Label>Modelo</Label>
+                  <Select value={aiConfig.ai_model} onValueChange={(value) => setAiConfig({ ...aiConfig, ai_model: value })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {aiConfig.ai_provider === 'openai' && (
+                        <>
+                          <SelectItem value="gpt-4o">GPT-4o (Más potente)</SelectItem>
+                          <SelectItem value="gpt-4o-mini">GPT-4o Mini (Recomendado)</SelectItem>
+                          <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo (Económico)</SelectItem>
+                        </>
+                      )}
+                      {aiConfig.ai_provider === 'anthropic' && (
+                        <>
+                          <SelectItem value="claude-3-opus">Claude 3 Opus</SelectItem>
+                          <SelectItem value="claude-3-sonnet">Claude 3 Sonnet</SelectItem>
+                          <SelectItem value="claude-3-haiku">Claude 3 Haiku</SelectItem>
+                        </>
+                      )}
+                      {aiConfig.ai_provider === 'google' && (
+                        <>
+                          <SelectItem value="gemini-pro">Gemini Pro</SelectItem>
+                          <SelectItem value="gemini-pro-vision">Gemini Pro Vision</SelectItem>
+                        </>
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                {/* Payment History */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Historial de Pagos</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {payments.length === 0 ? (
-                      <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-2xl">
-                        <CreditCard className="w-12 h-12 mx-auto mb-4 opacity-10" />
-                        <p>No tienes pagos registrados aún</p>
-                        <p className="text-sm mt-1">Tus suscripciones aparecerán aquí después de subir el primer comprobante.</p>
+                {/* Temperature */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label>Temperatura ({aiConfig.ai_temperature})</Label>
+                    <span className="text-xs text-muted-foreground">Creatividad de las respuestas</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={aiConfig.ai_temperature}
+                    onChange={(e) => setAiConfig({ ...aiConfig, ai_temperature: parseFloat(e.target.value) })}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Preciso (0.1)</span>
+                    <span>Creativo (1.0)</span>
+                  </div>
+                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                    🌟 Recomendado: <strong>0.5 - 0.7</strong> para conversaciones naturales.
+                  </p>
+                </div>
+
+                {/* Max Tokens */}
+                <div className="space-y-2">
+                  <Label>Máximo de Tokens</Label>
+                  <Input
+                    type="number"
+                    value={aiConfig.ai_max_tokens}
+                    onChange={(e) => setAiConfig({ ...aiConfig, ai_max_tokens: parseInt(e.target.value) })}
+                    min={100}
+                    max={4000}
+                  />
+                  <p className="text-xs text-muted-foreground">Longitud máxima de las respuestas (100-4000)</p>
+                </div>
+
+                {/* Business Description */}
+                <div className="space-y-2">
+                  <Label>Descripción del Negocio (Contexto)</Label>
+                  <textarea
+                    value={aiConfig.business_description}
+                    onChange={(e) => setAiConfig({ ...aiConfig, business_description: e.target.value })}
+                    rows={4}
+                    className="w-full p-3 text-sm border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary bg-slate-50 text-slate-900 placeholder:text-slate-400"
+                    placeholder="Describe tu negocio, productos, servicios y valores clave..."
+                  />
+                  <p className="text-xs text-muted-foreground">Esta información le dará contexto a la IA sobre quién eres.</p>
+                </div>
+
+                {/* System Prompt */}
+                <div className="space-y-2">
+                  <Label>Prompt del Sistema</Label>
+                  <textarea
+                    value={aiConfig.ai_system_prompt}
+                    onChange={(e) => setAiConfig({ ...aiConfig, ai_system_prompt: e.target.value })}
+                    rows={6}
+                    className="w-full p-3 text-sm border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary bg-slate-50 text-slate-900 placeholder:text-slate-400"
+                    placeholder="Instrucciones para el comportamiento de la IA..."
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Define cómo debe comportarse tu asistente IA y qué información debe capturar
+                  </p>
+                </div>
+
+                {/* Security Prompt */}
+                <div className="space-y-2 border-t pt-6">
+                  <Label className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                    <ShieldAlert className="w-4 h-4" /> Protocolo de Seguridad y Bloqueo (Avanzado)
+                  </Label>
+                  <textarea
+                    value={aiConfig.ai_security_prompt}
+                    onChange={(e) => setAiConfig({ ...aiConfig, ai_security_prompt: e.target.value })}
+                    rows={4}
+                    className="w-full p-3 text-sm border-2 border-red-500/20 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-red-500 bg-red-500/5 text-foreground placeholder:text-muted-foreground font-medium"
+                    placeholder="Instrucciones para detectar ataques y bloquear..."
+                  />
+                  <p className="text-xs text-red-600 dark:text-red-400 font-medium">
+                    <b>Protección de Créditos:</b> Define aquí qué comportamientos causarán el bloqueo inmediato de la IP del usuario.
+                  </p>
+                </div>
+
+                <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 text-sm space-y-3">
+                  <p className="font-semibold text-blue-800 dark:text-blue-300 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4" />
+                    Cómo hacer re-direcciones automáticas:
+                  </p>
+                  <p className="text-blue-700 dark:text-blue-400 text-xs">
+                    Instruye a la IA para que use el comando especial cuando haya recopilado todos los datos.
+                  </p>
+                  <div className="bg-background/80 p-3 rounded border border-blue-200 dark:border-blue-800 text-xs font-mono space-y-1 overflow-x-auto">
+                    <p className="text-muted-foreground">// Ejemplo de instrucción:</p>
+                    <p className="text-green-600 dark:text-green-400">"Pide Nombre, Fecha y Servicio. Cuando tengas todo, pregunta si quiere confirmar."</p>
+                    <p className="text-green-600 dark:text-green-400">"Si confirma, responde EXACTAMENTE así (sustituyendo los datos):"</p>
+                    <p className="text-primary font-bold">[WHATSAPP_REDIRECT: Cliente Juan Pérez quiere Cita Dental el Lunes]</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    * La IA remplazará "Juan Pérez" por el nombre real del cliente actual.
+                  </p>
+                </div>
+
+                {/* Save Button */}
+                <Button
+                  onClick={async () => {
+                    if (!user || !widgetConfig) return;
+                    setSavingAI(true);
+                    try {
+                      // Save to profiles (for dashboard access)
+                      await updateDoc(doc(db, 'profiles', user.uid), {
+                        ai_enabled: true,
+                        ai_provider: aiConfig.ai_provider,
+                        ai_api_key: aiConfig.ai_api_key,
+                        ai_model: aiConfig.ai_model,
+                        ai_temperature: aiConfig.ai_temperature,
+                        ai_max_tokens: aiConfig.ai_max_tokens,
+                        business_description: aiConfig.business_description,
+                        ai_system_prompt: aiConfig.ai_system_prompt,
+                        ai_security_prompt: aiConfig.ai_security_prompt,
+                      });
+
+                      // ALSO save to widget_configs (for embedded widget public access)
+                      await updateDoc(doc(db, 'widget_configs', widgetConfig.id), {
+                        ai_enabled: true,
+                        ai_provider: aiConfig.ai_provider,
+                        ai_api_key: aiConfig.ai_api_key,
+                        ai_model: aiConfig.ai_model,
+                        ai_temperature: aiConfig.ai_temperature,
+                        ai_max_tokens: aiConfig.ai_max_tokens,
+                        business_description: aiConfig.business_description,
+                        ai_system_prompt: aiConfig.ai_system_prompt,
+                        ai_security_prompt: aiConfig.ai_security_prompt,
+                      });
+
+                      toast({
+                        title: '✅ Configuración guardada',
+                        description: 'Tu chatbot IA está listo para usar',
+                      });
+                    } catch (error: any) {
+                      toast({
+                        title: 'Error',
+                        description: error.message,
+                        variant: 'destructive',
+                      });
+                    } finally {
+                      setSavingAI(false);
+                    }
+                  }}
+                  disabled={savingAI}
+                  className="w-full"
+                >
+                  {savingAI ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Check className="w-4 h-4 mr-2" />}
+                  Guardar Configuración de IA
+                </Button>
+
+                {/* Info Card */}
+                <div className="p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                  <div className="flex gap-3">
+                    <AlertCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                    <div className="space-y-2 text-sm">
+                      <p className="font-medium text-blue-900 dark:text-blue-100">Cómo funciona el Chatbot IA</p>
+                      <ul className="space-y-1 text-blue-700 dark:text-blue-300 list-disc list-inside">
+                        <li>La IA responderá automáticamente a los visitantes de tu web</li>
+                        <li>Capturará información relevante según tu prompt del sistema</li>
+                        <li>Los leads se guardarán automáticamente en tu panel</li>
+                        <li>Puedes personalizar el comportamiento editando el prompt</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Leads Tab */}
+          <TabsContent value="leads" className="space-y-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle>Leads Capturados</CardTitle>
+                  <CardDescription>{leads.length} leads en total</CardDescription>
+                </div>
+                <Button variant="outline" onClick={exportLeadsCSV} disabled={leads.length === 0}>
+                  <Download className="w-4 h-4 mr-2" />
+                  Exportar CSV
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {leads.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-2xl">
+                    <Users className="w-12 h-12 mx-auto mb-4 opacity-10" />
+                    <p>Aún no tienes leads</p>
+                    <p className="text-sm mt-1">Instala el widget en tu web para empezar a capturar</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b text-xs uppercase tracking-wider text-muted-foreground">
+                          <th className="text-left py-3 px-4 font-medium">Nombre</th>
+                          <th className="text-left py-3 px-4 font-medium">Teléfono</th>
+                          <th className="text-left py-3 px-4 font-medium">Interés</th>
+                          <th className="text-left py-3 px-4 font-medium">Fecha</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-sm">
+                        {leads.map((lead) => (
+                          <tr key={lead.id} className="border-b hover:bg-muted/50 transition-colors">
+                            <td className="py-4 px-4 font-medium">{lead.name}</td>
+                            <td className="py-4 px-4 font-mono text-xs">
+                              {(lead.phone === 'Clic en WhatsApp' ||
+                                lead.phone === 'Usuario WhatsApp' ||
+                                (formConfig?.whatsapp_destination && lead.phone.replace(/\D/g, '') === formConfig.whatsapp_destination.replace(/\D/g, ''))) ? (
+                                <span className="flex items-center gap-1 text-green-600 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-full border border-green-200 dark:border-green-800 w-fit font-sans font-medium">
+                                  <MessageCircle className="w-3 h-3" /> Chat Iniciado
+                                </span>
+                              ) : lead.phone === 'Pendiente (Click WA)' ? (
+                                <span className="text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100">Pendiente</span>
+                              ) : (
+                                <a href={`https://wa.me/${lead.phone.replace(/\D/g, '')}`} target="_blank" className="text-primary hover:underline">{lead.phone}</a>
+                              )}
+                            </td>
+                            <td className="py-4 px-4 text-muted-foreground truncate max-w-[200px]">{lead.interest || '-'}</td>
+                            <td className="py-4 px-4 text-muted-foreground text-xs">
+                              {(() => {
+                                const d = lead.created_at;
+                                if (!d) return '-';
+                                // Handle Firestore Timestamp (seconds)
+                                if (d.seconds) return new Date(d.seconds * 1000).toLocaleString('es-PE');
+                                // Handle string ISO or Date
+                                return new Date(d).toLocaleString('es-PE');
+                              })()}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Analytics Tab */}
+          <TabsContent value="analytics" className="space-y-6">
+            <div className="grid md:grid-cols-3 gap-6">
+              <Card className="stat-card">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Visitas (Total)</p>
+                      <div className="flex items-baseline gap-2">
+                        <p className="text-3xl font-bold">{analytics.views}</p>
+                        {analytics.viewsToday > 0 && (
+                          <span className="text-xs font-medium text-green-600 bg-green-100 px-1.5 py-0.5 rounded-full">
+                            +{analytics.viewsToday} hoy
+                          </span>
+                        )}
                       </div>
-                    ) : (
-                      <div className="overflow-x-auto">
-                        <table className="w-full">
-                          <thead>
-                            <tr className="border-b text-xs uppercase tracking-wider text-muted-foreground">
-                              <th className="text-left py-4 px-6 font-bold">Concepto</th>
-                              <th className="text-left py-4 px-6 font-bold">Monto</th>
-                              <th className="text-left py-4 px-6 font-bold">Fecha</th>
-                              <th className="text-left py-4 px-6 font-bold">Método</th>
-                              <th className="text-right py-4 px-6 font-bold">Estado</th>
-                            </tr>
-                          </thead>
-                          <tbody className="text-sm">
-                            {payments.map((p) => (
-                              <tr key={p.id} className="border-b group hover:bg-slate-50/50 transition-colors">
-                                <td className="py-4 px-6">
-                                  <div className="font-bold text-slate-900 dark:text-slate-100">{p.description || 'Suscripción Lead Widget'}</div>
-                                  <div className="text-[10px] text-muted-foreground font-mono">ID: {p.id.substring(0, 8)}</div>
-                                </td>
-                                <td className="py-4 px-6 font-bold text-slate-700 dark:text-slate-300">
-                                  {p.currency === 'USD' ? '$' : 'S/'} {Number(p.amount).toFixed(2)}
-                                </td>
-                                <td className="py-4 px-6 text-muted-foreground">{new Date(p.created_at).toLocaleDateString('es-PE')}</td>
-                                <td className="py-4 px-6">
-                                  <span className="text-xs font-medium px-2 py-1 bg-slate-100 rounded text-slate-600 uppercase tracking-tighter">{p.payment_method || 'Varios'}</span>
-                                </td>
-                                <td className="py-4 px-6 text-right">
-                                  <span className={`px-3 py-1 rounded-full text-xs font-bold ${['completed', 'active', 'verified'].includes(p.status)
-                                    ? 'bg-green-100 text-green-700 border border-green-200'
-                                    : 'bg-amber-100 text-amber-700 border border-amber-200'
-                                    }`}>
-                                    {['completed', 'active', 'verified'].includes(p.status) ? '✓ Pagado' : '⏳ Pendiente'}
-                                  </span>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                    </div>
+                    <div className="w-12 h-12 bg-secondary/10 rounded-xl flex items-center justify-center">
+                      <Eye className="w-6 h-6 text-secondary" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="stat-card">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Leads</p>
+                      <p className="text-3xl font-bold">{leads.length}</p>
+                    </div>
+                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                      <Users className="w-6 h-6 text-primary" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="stat-card">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Tasa conversión</p>
+                      <p className="text-3xl font-bold">
+                        {analytics.views > 0 ? Math.round((leads.length / analytics.views) * 100) : 0}%
+                      </p>
+                    </div>
+                    <div className="w-12 h-12 bg-green-500/10 rounded-xl flex items-center justify-center">
+                      <TrendingUp className="w-6 h-6 text-green-600" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Rendimiento semanal</CardTitle>
+                <CardDescription>Tráfico y captación en los últimos 7 días</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-64 w-full pt-4">
+                  {chartData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={chartData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.5} />
+                        <XAxis
+                          dataKey="name"
+                          fontSize={10}
+                          tickLine={false}
+                          axisLine={false}
+                          stroke="hsl(var(--muted-foreground))"
+                        />
+                        <YAxis
+                          fontSize={10}
+                          tickLine={false}
+                          axisLine={false}
+                          stroke="hsl(var(--muted-foreground))"
+                          allowDecimals={false}
+                        />
+                        <RechartsTooltip
+                          cursor={{ fill: 'hsl(var(--muted)/0.3)' }}
+                          contentStyle={{
+                            backgroundColor: 'hsl(var(--popover))',
+                            borderColor: 'hsl(var(--border))',
+                            borderRadius: '8px',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                            fontSize: '12px'
+                          }}
+                          itemStyle={{ color: 'hsl(var(--popover-foreground))' }}
+                          labelStyle={{ color: 'hsl(var(--muted-foreground))', marginBottom: '4px' }}
+                        />
+                        <Bar
+                          dataKey="visitas"
+                          fill="hsl(var(--secondary))"
+                          radius={[4, 4, 0, 0]}
+                          name="Visitas"
+                          maxBarSize={50}
+                        />
+                        <Bar
+                          dataKey="leads"
+                          fill="hsl(var(--primary))"
+                          radius={[4, 4, 0, 0]}
+                          name="Leads"
+                          maxBarSize={50}
+                        />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-muted-foreground">
+                      <p>Cargando datos...</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Security Tab */}
+          <TabsContent value="security" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center">
+                    <ShieldCheck className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle>Seguridad y Bloqueos</CardTitle>
+                    <CardDescription>Controla quién tiene acceso a tu chat widget</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-xl flex gap-3">
+                  <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-amber-800 dark:text-amber-200">
+                    El sistema bloquea automáticamente IPs que intentan manipular la IA o realizan spam.
+                    Si crees que un cliente fue bloqueado por error, puedes rehabilitarlo aquí.
+                  </p>
+                </div>
+
+                {blockedIps.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-2xl">
+                    <ShieldCheck className="w-12 h-12 mx-auto mb-4 opacity-10" />
+                    <p>No hay usuarios bloqueados actualmente</p>
+                    <p className="text-sm">Tu escudo de seguridad está activo y vigilando.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b text-xs uppercase tracking-wider text-muted-foreground">
+                          <th className="text-left py-3 px-4 font-medium">Dirección IP</th>
+                          <th className="text-left py-3 px-4 font-medium">Motivo</th>
+                          <th className="text-left py-3 px-4 font-medium">Fecha</th>
+                          <th className="text-right py-3 px-4 font-medium">Acción</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-sm">
+                        {blockedIps.map((ip) => (
+                          <tr key={ip.id} className="border-b hover:bg-muted/50 transition-colors">
+                            <td className="py-4 px-4 font-mono">{ip.ip_address}</td>
+                            <td className="py-4 px-4">
+                              <span className="px-2 py-1 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 rounded-md text-xs font-medium">
+                                {ip.reason || 'Actividad inusual'}
+                              </span>
+                            </td>
+                            <td className="py-4 px-4 text-muted-foreground">
+                              {new Date(ip.created_at).toLocaleString('es-PE')}
+                            </td>
+                            <td className="py-4 px-4 text-right">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => unblockIp(ip.id)}
+                                className="text-primary border-primary/20 hover:bg-primary/10"
+                              >
+                                Desbloquear
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Billing Tab */}
+          <TabsContent value="billing" className="space-y-6">
+            <div className="grid lg:grid-cols-3 gap-8">
+              {/* Plan Status */}
+              <Card className="lg:col-span-1">
+                <CardHeader>
+                  <CardTitle>{t('dashboard.billing_section.title')}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="p-6 bg-slate-50 dark:bg-slate-900 border dark:border-slate-800 rounded-2xl">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wider font-bold mb-1">{t('dashboard.billing_section.current_plan')}</p>
+                        <p className="text-2xl font-black text-primary capitalize">{profile?.plan_type || 'Trial'}</p>
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
-      </div >
-      );
+                      {getStatusBadge(profile?.subscription_status || 'trial')}
+                    </div>
+
+                    <div className="space-y-3 py-4 border-t border-slate-200 mt-4">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Precio:</span>
+                        <span className="font-bold text-slate-900 dark:text-white">$11.90 USD <span className="text-xs text-muted-foreground font-medium">( o S/ 30.00 )</span> / mes</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Siguiente Pago:</span>
+                        <span className="font-bold text-slate-900 dark:text-white">{getTrialEndDateString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Payment Info */}
+              <Card className="lg:col-span-2">
+                <CardHeader>
+                  <CardTitle>{t('dashboard.billing_section.renew_title')}</CardTitle>
+                  <CardDescription>{t('dashboard.billing_section.renew_desc')}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <Tabs defaultValue="paypal" className="w-full">
+                    <TabsList className="w-full h-auto min-h-[52px] p-1.5 bg-slate-100 dark:bg-slate-800 rounded-full grid grid-cols-2 mb-8">
+                      <TabsTrigger
+                        value="paypal"
+                        className="rounded-full py-2.5 text-xs sm:text-sm font-medium transition-all data-[state=active]:bg-slate-900 data-[state=active]:text-white dark:data-[state=active]:bg-slate-200 dark:data-[state=active]:text-slate-900 data-[state=inactive]:text-slate-500 data-[state=inactive]:hover:bg-transparent whitespace-normal h-full leading-tight flex items-center justify-center px-2"
+                      >
+                        {t('dashboard.billing_section.tab_paypal')}
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="local"
+                        className="rounded-full py-2.5 text-xs sm:text-sm font-medium transition-all data-[state=active]:bg-slate-900 data-[state=active]:text-white dark:data-[state=active]:bg-slate-200 dark:data-[state=active]:text-slate-900 data-[state=inactive]:text-slate-500 data-[state=inactive]:hover:bg-transparent whitespace-normal h-full leading-tight flex items-center justify-center px-2"
+                      >
+                        {t('dashboard.billing_section.tab_local')}
+                      </TabsTrigger>
+                    </TabsList>
+
+                    {/* PayPal Tab */}
+                    <TabsContent value="paypal" className="space-y-4">
+                      <div className="max-w-md mx-auto py-4">
+                        <PayPalPaymentButton
+                          amount="11.90"
+                          currency="USD"
+                          onSuccess={async (details) => {
+                            try {
+                              // Call Server-Side Verification
+                              const verifyResponse = await fetch('/api/verify-payment', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  orderID: details.id,
+                                  user_id: user?.uid
+                                })
+                              });
+
+                              const verifyData = await verifyResponse.json();
+
+                              if (!verifyResponse.ok) {
+                                throw new Error(verifyData.error || 'Verification Failed');
+                              }
+
+                              toast({
+                                title: t('dashboard.billing_section.success_title'),
+                                description: t('dashboard.billing_section.success_desc'),
+                              });
+
+                              // Reload to update UI
+                              loadData();
+
+                              // Show Beautiful Success Confirmation
+                              const Swal = (await import('sweetalert2')).default;
+                              Swal.fire({
+                                title: '¡Pago Exitoso!',
+                                text: 'Tu suscripción PRO ha sido activada y verificada correctamente.',
+                                icon: 'success',
+                                confirmButtonText: 'Genial',
+                                confirmButtonColor: '#00C185',
+                                background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#fff',
+                                color: document.documentElement.classList.contains('dark') ? '#fff' : '#000'
+                              });
+
+                            } catch (e: any) {
+                              console.error("Payment Verification Error: ", e);
+                              const Swal = (await import('sweetalert2')).default;
+                              Swal.fire({
+                                title: 'Error en la verificación',
+                                text: 'El pago se procesó, pero hubo un error activando la cuenta. Contacta a soporte con el ID: ' + details.id,
+                                icon: 'error',
+                                confirmButtonText: 'Entendido'
+                              });
+                            }
+                          }}
+                        />
+                        <div className="mt-4 text-center">
+                          <p className="text-xs text-muted-foreground">
+                            <ShieldCheck className="w-3 h-3 inline mr-1" />
+                            {t('dashboard.billing_section.secure_note')}
+                          </p>
+                        </div>
+                      </div>
+                    </TabsContent>
+
+                    {/* Local Payment Tab */}
+                    <TabsContent value="local" className="space-y-6 animate-in fade-in slide-in-from-top-2">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="p-4 bg-sky-50 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-800 rounded-xl">
+                          <h4 className="font-bold flex items-center gap-2 mb-3">
+                            <div className="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center text-white text-[10px]">Scotia</div>
+                            {t('dashboard.billing_section.local_transfer_title')}
+                          </h4>
+                          <div className="space-y-1 text-xs">
+                            <div className="flex justify-between"><span>Soles:</span> <span className="font-medium">0997561105</span></div>
+                            <div className="flex justify-between"><span>CCI:</span> <span className="font-medium">00926320099756110553</span></div>
+                            <div className="flex justify-between mt-1"><span>Titular:</span> <span className="font-medium">Kenneth Herrera</span></div>
+                          </div>
+                        </div>
+
+                        <div className="p-4 bg-purple-50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-800 rounded-xl">
+                          <h4 className="font-bold flex items-center gap-2 mb-3">
+                            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-fuchsia-500 rounded-lg flex items-center justify-center text-white text-[10px]">Y/P</div>
+                            {t('dashboard.billing_section.local_yape_title')}
+                          </h4>
+                          <div className="space-y-1 text-xs">
+                            <div className="flex justify-between"><span>Número:</span> <span className="font-medium text-lg">902 105 668</span></div>
+                            <div className="flex justify-between"><span>Titular:</span> <span className="font-medium">Kenneth Herrera</span></div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50 dark:bg-slate-900 text-center space-y-4">
+                        <div className="w-16 h-16 bg-white dark:bg-slate-800 rounded-full shadow-sm flex items-center justify-center mx-auto mb-2 border border-slate-100 dark:border-slate-700">
+                          <MessageCircle className="w-8 h-8 text-primary/40" />
+                        </div>
+                        <div>
+                          <p className="font-bold mb-1">{t('dashboard.billing_section.report_payment_title')}</p>
+                          <p className="text-sm text-muted-foreground max-w-sm mx-auto mb-4">
+                            {t('dashboard.billing_section.report_payment_desc')}
+                          </p>
+                        </div>
+
+                        <div className="max-w-xs mx-auto space-y-3">
+                          <Input
+                            placeholder="Nro de Operación o Nombre"
+                            id="payment-ref"
+                            className="text-center font-bold h-12 border-primary/20 focus:ring-primary"
+                          />
+                          <Button
+                            className="w-full h-12 font-bold text-lg"
+                            onClick={async () => {
+                              const refInput = document.getElementById('payment-ref') as HTMLInputElement;
+                              const reference = refInput?.value;
+                              if (!reference || reference.trim().length < 3) {
+                                toast({ title: 'Dato requerido', description: 'Por favor ingresa una referencia válida.', variant: 'destructive' });
+                                return;
+                              }
+
+                              setUploading(true);
+                              try {
+                                await addDoc(collection(db, 'payments'), {
+                                  user_id: user?.uid,
+                                  amount: 30,
+                                  payment_method: 'Yape/Plin/BCP',
+                                  description: 'Plan Mensual Lead Widget',
+                                  operation_ref: reference,
+                                  status: 'pending',
+                                  created_at: new Date().toISOString()
+                                });
+
+                                toast({
+                                  title: '¡Pago reportado!',
+                                  description: 'Lo validaremos en unos minutos.',
+                                });
+
+                                if (refInput) refInput.value = '';
+                                loadData();
+                              } catch (e: any) {
+                                toast({ title: 'Error', description: 'No se pudo reportar el pago.', variant: 'destructive' });
+                              } finally {
+                                setUploading(false);
+                              }
+                            }}
+                            disabled={uploading}
+                          >
+                            {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : t('dashboard.billing_section.report_btn')}
+                          </Button>
+
+                          <p className="text-[10px] text-muted-foreground mt-2">
+                            * Si tienes la captura, envíala a <a href="https://wa.me/51902105668" target="_blank" className="underline text-primary">WhatsApp</a>.
+                          </p>
+                        </div>
+                      </div>
+                    </TabsContent>
+                  </Tabs>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Payment History */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Historial de Pagos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {payments.length === 0 ? (
+                  <div className="text-center py-12 text-muted-foreground border-2 border-dashed rounded-2xl">
+                    <CreditCard className="w-12 h-12 mx-auto mb-4 opacity-10" />
+                    <p>No tienes pagos registrados aún</p>
+                    <p className="text-sm mt-1">Tus suscripciones aparecerán aquí después de subir el primer comprobante.</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b text-xs uppercase tracking-wider text-muted-foreground">
+                          <th className="text-left py-4 px-6 font-bold">Concepto</th>
+                          <th className="text-left py-4 px-6 font-bold">Monto</th>
+                          <th className="text-left py-4 px-6 font-bold">Fecha</th>
+                          <th className="text-left py-4 px-6 font-bold">Método</th>
+                          <th className="text-right py-4 px-6 font-bold">Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-sm">
+                        {payments.map((p) => (
+                          <tr key={p.id} className="border-b group hover:bg-slate-50/50 transition-colors">
+                            <td className="py-4 px-6">
+                              <div className="font-bold text-slate-900 dark:text-slate-100">{p.description || 'Suscripción Lead Widget'}</div>
+                              <div className="text-[10px] text-muted-foreground font-mono">ID: {p.id.substring(0, 8)}</div>
+                            </td>
+                            <td className="py-4 px-6 font-bold text-slate-700 dark:text-slate-300">
+                              {p.currency === 'USD' ? '$' : 'S/'} {Number(p.amount).toFixed(2)}
+                            </td>
+                            <td className="py-4 px-6 text-muted-foreground">{new Date(p.created_at).toLocaleDateString('es-PE')}</td>
+                            <td className="py-4 px-6">
+                              <span className="text-xs font-medium px-2 py-1 bg-slate-100 rounded text-slate-600 uppercase tracking-tighter">{p.payment_method || 'Varios'}</span>
+                            </td>
+                            <td className="py-4 px-6 text-right">
+                              <span className={`px-3 py-1 rounded-full text-xs font-bold ${['completed', 'active', 'verified'].includes(p.status)
+                                ? 'bg-green-100 text-green-700 border border-green-200'
+                                : 'bg-amber-100 text-amber-700 border border-amber-200'
+                                }`}>
+                                {['completed', 'active', 'verified'].includes(p.status) ? '✓ Pagado' : '⏳ Pendiente'}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div >
+  );
 }
-
-
