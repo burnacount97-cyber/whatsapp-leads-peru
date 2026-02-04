@@ -591,15 +591,15 @@ export default function Landing() {
                 badge: t('sales_flow.step_4_badge')
               }
             ].map((step, i) => (
-              <div key={i} className="group flex flex-col items-center text-center p-6 rounded-3xl hover:bg-muted/50 transition-all duration-300">
+              <div key={i} className="group flex flex-col items-center text-center p-6 rounded-3xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-300">
                 <div className="w-16 h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 shadow-lg shadow-primary/10 group-hover:scale-110 transition-transform">
                   <step.icon className="w-8 h-8" />
                 </div>
                 <div className="inline-block px-2 py-1 rounded bg-primary/10 text-primary text-[10px] font-bold uppercase mb-3 tracking-widest">
                   {step.badge}
                 </div>
-                <h3 className="text-xl font-bold mb-3">{step.t}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{step.d}</p>
+                <h3 className="text-xl font-bold mb-3 group-hover:text-foreground">{step.t}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed group-hover:text-muted-foreground/90">{step.d}</p>
               </div>
             ))}
           </div>
