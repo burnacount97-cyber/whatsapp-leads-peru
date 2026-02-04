@@ -70,10 +70,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         ai_model: 'gpt-4o-mini' // Default configuration
       });
 
-      // Default role
+      // Default role is handled by absence of doc or default rules
+      /* 
       await setDoc(doc(db, "user_roles", user.uid), {
         role: 'client'
       });
+      */
 
       toast({
         title: "¡Bienvenido!",
