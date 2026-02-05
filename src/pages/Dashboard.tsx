@@ -2258,7 +2258,7 @@ export default function Dashboard() {
                     <div className="text-center py-4">
                       <div className="flex items-baseline justify-center gap-2 mb-1">
                         <span className="text-4xl font-black text-emerald-900 dark:text-emerald-100">
-                          {currency === 'USD' ? '$30' : 'S/ 60'}
+                          {currency === 'USD' ? '$29' : 'S/ 60'}
                         </span>
                         <span className="text-sm text-emerald-700 dark:text-emerald-300">/mes</span>
                       </div>
@@ -2323,7 +2323,7 @@ export default function Dashboard() {
                   <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-900/50 p-6 rounded-2xl border-2 border-slate-200 dark:border-slate-700">
                     <h3 className="font-bold text-lg mb-4 text-center">Selecciona tu Plan</h3>
                     <div className="grid grid-cols-2 gap-4">
-                      {/* Standard Plan */}
+                      {/* Pro Plan (Antes Estándar) */}
                       <button
                         onClick={() => setSelectedPlan('standard')}
                         className={`p-4 rounded-xl border-2 transition-all ${selectedPlan === 'standard'
@@ -2333,9 +2333,9 @@ export default function Dashboard() {
                       >
                         <div className="text-center">
                           <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">Plan</div>
-                          <div className="font-bold text-lg mb-2">Estándar</div>
+                          <div className="font-bold text-lg mb-2">Pro</div>
                           <div className="text-2xl font-black text-blue-600">
-                            {currency === 'USD' ? '$20' : 'S/ 30'}
+                            {currency === 'USD' ? '$15' : 'S/ 30'}
                           </div>
                           <div className="text-[10px] text-slate-500 mt-1">/mes</div>
                           <div className="mt-3 text-xs text-slate-600 dark:text-slate-400">
@@ -2366,7 +2366,7 @@ export default function Dashboard() {
                             </svg>
                           </div>
                           <div className="text-2xl font-black text-emerald-600">
-                            {currency === 'USD' ? '$30' : 'S/ 60'}
+                            {currency === 'USD' ? '$29' : 'S/ 60'}
                           </div>
                           <div className="text-[10px] text-emerald-600 mt-1">/mes</div>
                           <div className="mt-3 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
@@ -2388,8 +2388,8 @@ export default function Dashboard() {
                         <span className="text-slate-600 dark:text-slate-400">Monto a pagar:</span>
                         <span className="text-xl font-black text-primary">
                           {selectedPlan === 'plus'
-                            ? (currency === 'USD' ? '$30' : 'S/ 60')
-                            : (currency === 'USD' ? '$20' : 'S/ 30')
+                            ? (currency === 'USD' ? '$29' : 'S/ 60')
+                            : (currency === 'USD' ? '$15' : 'S/ 30')
                           } /mes
                         </span>
                       </div>
@@ -2397,19 +2397,21 @@ export default function Dashboard() {
                   </div>
 
                   <Tabs defaultValue="paypal" className="w-full">
-                    <TabsList className="w-full h-auto min-h-[52px] p-1.5 bg-slate-100 dark:bg-slate-800 rounded-full grid grid-cols-2 mb-8">
+                    <TabsList className={`w-full h-auto min-h-[52px] p-1.5 bg-slate-100 dark:bg-slate-800 rounded-full grid ${currency === 'PEN' ? 'grid-cols-2' : 'grid-cols-1'} mb-8`}>
                       <TabsTrigger
                         value="paypal"
                         className="rounded-full py-2.5 text-xs sm:text-sm font-medium transition-all data-[state=active]:bg-slate-900 data-[state=active]:text-white dark:data-[state=active]:bg-slate-200 dark:data-[state=active]:text-slate-900 data-[state=inactive]:text-slate-500 data-[state=inactive]:hover:bg-transparent whitespace-normal h-full leading-tight flex items-center justify-center px-2"
                       >
                         {t('dashboard.billing_section.tab_paypal')}
                       </TabsTrigger>
-                      <TabsTrigger
-                        value="local"
-                        className="rounded-full py-2.5 text-xs sm:text-sm font-medium transition-all data-[state=active]:bg-slate-900 data-[state=active]:text-white dark:data-[state=active]:bg-slate-200 dark:data-[state=active]:text-slate-900 data-[state=inactive]:text-slate-500 data-[state=inactive]:hover:bg-transparent whitespace-normal h-full leading-tight flex items-center justify-center px-2"
-                      >
-                        {t('dashboard.billing_section.tab_local')}
-                      </TabsTrigger>
+                      {currency === 'PEN' && (
+                        <TabsTrigger
+                          value="local"
+                          className="rounded-full py-2.5 text-xs sm:text-sm font-medium transition-all data-[state=active]:bg-slate-900 data-[state=active]:text-white dark:data-[state=active]:bg-slate-200 dark:data-[state=active]:text-slate-900 data-[state=inactive]:text-slate-500 data-[state=inactive]:hover:bg-transparent whitespace-normal h-full leading-tight flex items-center justify-center px-2"
+                        >
+                          {t('dashboard.billing_section.tab_local')}
+                        </TabsTrigger>
+                      )}
                     </TabsList>
 
                     {/* PayPal Tab */}
@@ -2419,7 +2421,7 @@ export default function Dashboard() {
                           amount={
                             currency === 'PEN'
                               ? (selectedPlan === 'plus' ? '17.00' : '9.00') // Local price converted to USD check
-                              : (selectedPlan === 'plus' ? '30.00' : '20.00') // International price
+                              : (selectedPlan === 'plus' ? '29.00' : '15.00') // International price adjusted
                           }
                           currency="USD"
                           onSuccess={async (details) => {
