@@ -523,7 +523,12 @@
                 </svg>
               </button>
             </form>
-            <div id="lw-footer">• Atención 24/7 con Inteligencia Artificial •</div>
+            <div id="lw-footer" style="text-align:center; padding:8px 0; background:white; font-size:10px;">
+              <a href="https://whatsapp-leads-peru.vercel.app/crear-ahora?ref=${clientId}" target="_blank" style="color:${config.primaryColor}; text-decoration:none; font-weight:600; display:flex; align-items:center; justify-content:center; gap:4px;">
+                <span style="background:rgba(0,0,0,0.05); padding:2px 6px; border-radius:4px; font-weight:800;">⚡</span>
+                <span id="lw-viral-text">Tecnología LeadWidget</span>
+              </a>
+            </div>
           </div>
         </div>
 
@@ -590,6 +595,14 @@
 
     function stopVibration() {
       button.classList.remove('lw-vibrating-soft', 'lw-vibrating-strong');
+    }
+
+    // Viral Loop A/B Testing
+    const viralTexts = ['⚡ Tecnología LeadWidget', '¿Quieres un chat así?', 'Crea tu Widget GRATIS'];
+    const viralTextEl = document.getElementById('lw-viral-text');
+    if (viralTextEl) {
+      const randomText = viralTexts[Math.floor(Math.random() * viralTexts.length)];
+      viralTextEl.textContent = randomText;
     }
 
     // Render quick replies

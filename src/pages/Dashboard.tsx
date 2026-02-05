@@ -58,6 +58,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { WidgetPreview } from '@/components/WidgetPreview';
+import { AffiliateCard } from '@/components/AffiliateCard';
 import { useToast } from '@/hooks/use-toast';
 
 interface Lead {
@@ -1025,6 +1026,9 @@ export default function Dashboard() {
             </div>
           </div>
         )}
+
+        {/* Affiliate Card */}
+        <AffiliateCard />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
           {/* Mobile Navigation (Segmented Control) */}
