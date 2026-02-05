@@ -57,9 +57,9 @@ export function AffiliateCard({ dismissible = false, className }: AffiliateCardP
                             </p>
                         </div>
 
-                        <div className="w-full bg-black/20 rounded-xl p-2 flex flex-col sm:flex-row gap-2">
-                            <div className="relative w-full min-w-0 overflow-hidden rounded-lg border border-white/5 bg-black/10 sm:bg-transparent px-3 py-2.5 sm:py-2">
-                                <p className="truncate text-xs font-mono text-white select-all">
+                        <div className="w-full bg-black/20 rounded-xl p-2 flex flex-col sm:flex-row gap-2 max-w-full">
+                            <div className="w-full min-w-0 overflow-hidden rounded-lg border border-white/5 bg-black/10 sm:bg-transparent px-3 py-2.5 sm:py-2">
+                                <p className="truncate text-[10px] sm:text-xs font-mono text-white select-all w-full block">
                                     {referralLink}
                                 </p>
                             </div>
