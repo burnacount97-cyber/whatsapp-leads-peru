@@ -477,42 +477,43 @@ export default function SuperAdmin() {
           </Card>
         </div>
 
+
         <Tabs defaultValue="clients" className="space-y-8">
-          <TabsList className="bg-slate-900/90 text-slate-400 p-1 rounded-2xl border border-slate-800 backdrop-blur-sm inline-flex h-auto w-full sm:w-auto">
+          <TabsList className="bg-slate-900/90 text-slate-400 p-1 rounded-2xl border border-slate-800 backdrop-blur-sm inline-flex h-auto w-full sm:w-auto gap-1">
             <TabsTrigger
               value="clients"
-              className="flex flex-col gap-1 px-6 py-3 h-auto data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500 data-[state=active]:shadow-none rounded-xl transition-all"
+              className="flex flex-col gap-1 px-3 py-2 h-auto data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500 data-[state=active]:shadow-none rounded-xl transition-all"
             >
-              <Users className="w-5 h-5 stroke-[2.5px]" />
-              <span className="text-[10px] font-medium">Clientes</span>
+              <Users className="w-4 h-4 stroke-[2.5px]" />
+              <span className="text-[9px] font-medium">Clientes</span>
             </TabsTrigger>
             <TabsTrigger
               value="payments"
-              className="flex flex-col gap-1 px-6 py-3 h-auto data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500 data-[state=active]:shadow-none rounded-xl transition-all"
+              className="flex flex-col gap-1 px-3 py-2 h-auto data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500 data-[state=active]:shadow-none rounded-xl transition-all"
             >
-              <CreditCard className="w-5 h-5 stroke-[2.5px]" />
-              <span className="text-[10px] font-medium">Pagos</span>
+              <CreditCard className="w-4 h-4 stroke-[2.5px]" />
+              <span className="text-[9px] font-medium">Pagos</span>
             </TabsTrigger>
             <TabsTrigger
               value="analytics"
-              className="flex flex-col gap-1 px-6 py-3 h-auto data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500 data-[state=active]:shadow-none rounded-xl transition-all"
+              className="flex flex-col gap-1 px-3 py-2 h-auto data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500 data-[state=active]:shadow-none rounded-xl transition-all"
             >
-              <BarChart3 className="w-5 h-5 stroke-[2.5px]" />
-              <span className="text-[10px] font-medium">Data</span>
+              <BarChart3 className="w-4 h-4 stroke-[2.5px]" />
+              <span className="text-[9px] font-medium">Data</span>
             </TabsTrigger>
             <TabsTrigger
               value="security"
-              className="flex flex-col gap-1 px-6 py-3 h-auto data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500 data-[state=active]:shadow-none rounded-xl transition-all"
+              className="flex flex-col gap-1 px-3 py-2 h-auto data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500 data-[state=active]:shadow-none rounded-xl transition-all"
             >
-              <ShieldCheck className="w-5 h-5 stroke-[2.5px]" />
-              <span className="text-[10px] font-medium">Seguridad</span>
+              <ShieldCheck className="w-4 h-4 stroke-[2.5px]" />
+              <span className="text-[9px] font-medium">Seguridad</span>
             </TabsTrigger>
             <TabsTrigger
               value="affiliates"
-              className="flex flex-col gap-1 px-6 py-3 h-auto data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500 data-[state=active]:shadow-none rounded-xl transition-all"
+              className="flex flex-col gap-1 px-3 py-2 h-auto data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500 data-[state=active]:shadow-none rounded-xl transition-all"
             >
-              <Gift className="w-5 h-5 stroke-[2.5px]" />
-              <span className="text-[10px] font-medium">Afiliados</span>
+              <Gift className="w-4 h-4 stroke-[2.5px]" />
+              <span className="text-[9px] font-medium">Afiliados</span>
             </TabsTrigger>
           </TabsList>
 

@@ -2229,6 +2229,77 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
+              {/* Upgrade to PLUS - Only show if not already PLUS */}
+              {profile?.plan_type !== 'plus' && (
+                <Card className="lg:col-span-1 border-2 border-emerald-500 bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-950/30 dark:to-cyan-950/30">
+                  <CardHeader>
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 bg-emerald-500 rounded-lg">
+                        <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <CardTitle className="text-emerald-900 dark:text-emerald-100">Plan PLUS</CardTitle>
+                        <p className="text-xs text-emerald-700 dark:text-emerald-300">Widget 100% Personalizable</p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="text-center py-4">
+                      <div className="flex items-baseline justify-center gap-2 mb-1">
+                        <span className="text-4xl font-black text-emerald-900 dark:text-emerald-100">
+                          {navigator.language?.startsWith('en') || navigator.language?.includes('US') ? '$30' : 'S/ 60'}
+                        </span>
+                        <span className="text-sm text-emerald-700 dark:text-emerald-300">/mes</span>
+                      </div>
+                      <p className="text-xs text-emerald-600 dark:text-emerald-400">
+                        {navigator.language?.startsWith('en') || navigator.language?.includes('US')
+                          ? '(~S/ 110/mes)'
+                          : '(~$16 USD/mes)'}
+                      </p>
+                    </div>
+
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-200">
+                        <Check className="w-4 h-4 text-emerald-600" />
+                        <span className="font-semibold">🎁 Sin marca de agua</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-200">
+                        <Check className="w-4 h-4 text-emerald-600" />
+                        <span>Widget 100% tuyo</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-200">
+                        <Check className="w-4 h-4 text-emerald-600" />
+                        <span>Soporte prioritario</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-200">
+                        <Check className="w-4 h-4 text-emerald-600" />
+                        <span>Estadísticas avanzadas</span>
+                      </div>
+                    </div>
+
+                    <Button
+                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                      onClick={() => {
+                        // Scroll to payment section
+                        const paymentSection = document.querySelector('[value="paypal"]');
+                        paymentSection?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        toast({
+                          title: "💎 Upgrade a Plan PLUS",
+                          description: "Selecciona tu método de pago preferido abajo para actualizar",
+                        });
+                      }}
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                      </svg>
+                      Actualizar a PLUS
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Payment Info */}
               <Card className="lg:col-span-2">
                 <CardHeader>
