@@ -2483,27 +2483,42 @@ export default function Dashboard() {
 
                     {/* Local Payment Tab */}
                     <TabsContent value="local" className="space-y-6 animate-in fade-in slide-in-from-top-2">
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div className="p-4 bg-sky-50 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-800 rounded-xl">
-                          <h4 className="font-bold flex items-center gap-2 mb-3">
-                            <div className="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center text-white text-[10px]">Scotia</div>
-                            {t('dashboard.billing_section.local_transfer_title')}
+                      <div className="flex flex-col gap-4">
+                        <div className="p-4 bg-sky-50 dark:bg-sky-950/30 border border-sky-100 dark:border-sky-800 rounded-xl shadow-sm">
+                          <h4 className="font-bold flex items-center gap-2 mb-3 text-sky-900 dark:text-sky-100">
+                            <div className="w-8 h-8 bg-sky-600 rounded-lg flex items-center justify-center text-white text-[10px] font-bold">Scotia</div>
+                            Transferencia Bancaria (Scotia)
                           </h4>
-                          <div className="space-y-1 text-xs">
-                            <div className="flex justify-between"><span>{t('dashboard.billing_section.soles')}</span> <span className="font-medium">0997561105</span></div>
-                            <div className="flex justify-between"><span>CCI:</span> <span className="font-medium">00926320099756110553</span></div>
-                            <div className="flex justify-between mt-1"><span>{t('dashboard.billing_section.local_titular')}</span> <span className="font-medium">Kenneth Herrera</span></div>
+                          <div className="space-y-2 text-sm text-sky-800 dark:text-sky-200">
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-sky-200 dark:border-sky-800 pb-1">
+                              <span className="text-xs opacity-70 uppercase tracking-wider">Cuenta Soles</span>
+                              <span className="font-mono font-bold select-all">099-7561105</span>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-sky-200 dark:border-sky-800 pb-1">
+                              <span className="text-xs opacity-70 uppercase tracking-wider">CCI Interbancario</span>
+                              <span className="font-mono font-bold select-all text-xs">009-263-200997561105-53</span>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center pt-1">
+                              <span className="text-xs opacity-70 uppercase tracking-wider">Titular</span>
+                              <span className="font-medium">Kenneth Herrera</span>
+                            </div>
                           </div>
                         </div>
 
-                        <div className="p-4 bg-purple-50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-800 rounded-xl">
-                          <h4 className="font-bold flex items-center gap-2 mb-3">
-                            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-fuchsia-500 rounded-lg flex items-center justify-center text-white text-[10px]">Y/P</div>
-                            {t('dashboard.billing_section.local_yape_title')}
+                        <div className="p-4 bg-purple-50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-800 rounded-xl shadow-sm">
+                          <h4 className="font-bold flex items-center gap-2 mb-3 text-purple-900 dark:text-purple-100">
+                            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-fuchsia-500 rounded-lg flex items-center justify-center text-white text-[10px] font-bold">Y/P</div>
+                            Yape / Plin
                           </h4>
-                          <div className="space-y-1 text-xs">
-                            <div className="flex justify-between"><span>{t('dashboard.billing_section.table_phone')}:</span> <span className="font-medium text-lg">902 105 668</span></div>
-                            <div className="flex justify-between"><span>{t('dashboard.billing_section.local_titular')}</span> <span className="font-medium">Kenneth Herrera</span></div>
+                          <div className="space-y-2 text-sm text-purple-800 dark:text-purple-200">
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center border-b border-purple-200 dark:border-purple-800 pb-1">
+                              <span className="text-xs opacity-70 uppercase tracking-wider">Número Celular</span>
+                              <span className="font-bold text-xl select-all">902 105 668</span>
+                            </div>
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center pt-1">
+                              <span className="text-xs opacity-70 uppercase tracking-wider">Titular</span>
+                              <span className="font-medium">Kenneth Herrera</span>
+                            </div>
                           </div>
                         </div>
                       </div>
