@@ -34,7 +34,7 @@ import {
   ExternalLink, Settings, History, Lock, AlertCircle, LogOut, Loader2, Sparkles,
   Layout, Palette, Code, BarChart as BarChartIcon, BarChart3, Users, CreditCard,
   Eye, Target, Upload, Clock, Bot, Key, Shield, X, Smartphone, EyeOff, MoreHorizontal, Globe,
-  ShoppingBag, HeartPulse, Wrench, Home, Utensils
+  ShoppingBag, HeartPulse, Wrench, Home, Utensils, Banknote, Calculator, HandCoins
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -193,6 +193,7 @@ export default function Dashboard() {
   const [isTestimonialDialogOpen, setIsTestimonialDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<'standard' | 'plus'>('standard');
   const [currency, setCurrency] = useState<'PEN' | 'USD'>('PEN');
+  const [affiliateRefers, setAffiliateRefers] = useState(10); // Calculator state
 
   useEffect(() => {
     // Detect currency based on locale or current app language
@@ -1040,7 +1041,7 @@ export default function Dashboard() {
         )}
 
         {/* Affiliate Card */}
-        <AffiliateCard />
+        <AffiliateCard dismissible={true} />
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
           {/* Mobile Navigation (Segmented Control) */}
@@ -1098,6 +1099,9 @@ export default function Dashboard() {
                 <DropdownMenuItem onClick={() => setActiveTab('billing')} className="gap-2 h-10 cursor-pointer">
                   <CreditCard className="w-4 h-4" /> {t('dashboard.tabs.billing')}
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveTab('affiliates')} className="gap-2 h-10 cursor-pointer text-emerald-600 font-bold bg-emerald-50">
+                  <Banknote className="w-4 h-4" /> Afiliados
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -1127,6 +1131,10 @@ export default function Dashboard() {
             <TabsTrigger value="billing" className="gap-2 flex-shrink-0 px-4">
               <CreditCard className="w-4 h-4" />
               <span>{t('dashboard.billing')}</span>
+            </TabsTrigger>
+            <TabsTrigger value="affiliates" className="gap-2 flex-shrink-0 px-4 text-emerald-600 data-[state=active]:text-emerald-700 data-[state=active]:bg-emerald-50">
+              <Banknote className="w-4 h-4" />
+              <span>Afiliados</span>
             </TabsTrigger>
           </TabsList>
 
@@ -2647,6 +2655,115 @@ export default function Dashboard() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Affiliate Tab */}
+          <TabsContent value="affiliates" className="space-y-6">
+            <div className="grid lg:grid-cols-2 gap-8">
+              {/* Left Column: Link & Info */}
+              <div className="space-y-6">
+                {/* Fixed Affiliate Card */}
+                <AffiliateCard dismissible={false} className="shadow-xl" />
+
+                {/* Terms Box */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <Info className="w-5 h-5 text-slate-400" />
+                      ¿Cómo funciona el pago?
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
+                    <p>
+                      Nuestro modelo de afiliados funciona bajo el esquema <strong>CPA (Costo Por Adquisición)</strong>.
+                    </p>
+                    <ul className="space-y-2 list-disc pl-4">
+                      <li>
+                        Recibes el <strong>20% del valor del primer pago</strong> que realice tu referido.
+                      </li>
+                      <li>
+                        No aplica para pagos recurrentes mensuales (esos se destinan al 100% al mantenimiento de la infraestructura de IA).
+                      </li>
+                      <li>
+                        Los pagos se realizan mensualmente vía Transferencia o PayPal una vez acumules un mínimo de S/ 100.
+                      </li>
+                    </ul>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Right Column: Calculator */}
+              <div className="space-y-6">
+                <Card className="border-emerald-100 dark:border-emerald-900/30 shadow-lg shadow-emerald-100/50 dark:shadow-none">
+                  <CardHeader className="pb-2">
+                    <div className="flex items-center justify-between">
+                      <CardTitle>Calculadora de Ingresos</CardTitle>
+                      <Calculator className="w-5 h-5 text-emerald-600" />
+                    </div>
+                    <CardDescription>Proyecta tus ganancias estimadas</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-8 pt-6">
+                    <div className="space-y-6">
+                      <div className="flex justify-between items-center">
+                        <Label>Clientes referidos al mes</Label>
+                        <span className="text-2xl font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-4 py-1 rounded-lg">
+                          {affiliateRefers}
+                        </span>
+                      </div>
+
+                      <input
+                        type="range"
+                        min="1"
+                        max="100"
+                        step="1"
+                        value={affiliateRefers}
+                        onChange={(e) => setAffiliateRefers(parseInt(e.target.value))}
+                        className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                      />
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>1 cliente</span>
+                        <span>50 clientes</span>
+                        <span>100 clientes</span>
+                      </div>
+                    </div>
+
+                    <div className="p-6 bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl border border-emerald-100 dark:border-emerald-900/20 text-center space-y-2">
+                      <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300 uppercase tracking-widest">Ganancia Estimada (CPA)</p>
+                      <div className="text-5xl font-black text-emerald-600 dark:text-emerald-400">
+                        {currency === 'USD' ? '$' : 'S/'}
+                        {currency === 'USD'
+                          ? (affiliateRefers * (22 * 0.20)).toFixed(2) // $22 avg ticket * 20% = $4.4 per user
+                          : (affiliateRefers * (45 * 0.20)).toFixed(2) // S/ 45 avg ticket * 20% = S/ 9 per user
+                        }
+                      </div>
+                      <p className="text-xs text-emerald-700/60 dark:text-emerald-400/60">
+                        Basado en un ticket promedio de {currency === 'USD' ? '$22 USD' : 'S/ 45'}
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12">
+                        <HandCoins className="w-4 h-4 mr-2" />
+                        Solicitar Retiro de Fondos
+                      </Button>
+                      <p className="text-[10px] text-center text-muted-foreground">
+                        * Botón habilitado al superar el mínimo de retiro.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div className="bg-sky-50 dark:bg-sky-900/10 border border-sky-100 dark:border-sky-800 p-4 rounded-xl flex gap-3">
+                  <TrendingUp className="w-5 h-5 text-sky-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="font-bold text-sky-900 dark:text-sky-100 text-sm">Consejo Pro</h4>
+                    <p className="text-xs text-sky-700 dark:text-sky-300 mt-1 leading-relaxed">
+                      Las agencias de marketing que instalan LeadWidget en todos sus clientes suelen generar más de <strong>S/ 500 extras al mes</strong> solo en comisiones de referencia.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
