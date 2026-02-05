@@ -192,6 +192,13 @@ export default function Dashboard() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [isTestimonialDialogOpen, setIsTestimonialDialogOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<'standard' | 'plus'>('standard');
+  const [currency, setCurrency] = useState<'PEN' | 'USD'>('PEN');
+
+  useEffect(() => {
+    // Detect currency based on locale
+    const isForeign = navigator.language?.startsWith('en') || navigator.language?.includes('US');
+    setCurrency(isForeign ? 'USD' : 'PEN');
+  }, []);
 
 
   // PWA Install Prompt
@@ -2250,12 +2257,12 @@ export default function Dashboard() {
                     <div className="text-center py-4">
                       <div className="flex items-baseline justify-center gap-2 mb-1">
                         <span className="text-4xl font-black text-emerald-900 dark:text-emerald-100">
-                          {navigator.language?.startsWith('en') || navigator.language?.includes('US') ? '$30' : 'S/ 60'}
+                          {currency === 'USD' ? '$30' : 'S/ 60'}
                         </span>
                         <span className="text-sm text-emerald-700 dark:text-emerald-300">/mes</span>
                       </div>
                       <p className="text-xs text-emerald-600 dark:text-emerald-400">
-                        {navigator.language?.startsWith('en') || navigator.language?.includes('US')
+                        {currency === 'USD'
                           ? '(~S/ 110/mes)'
                           : '(~$16 USD/mes)'}
                       </p>
@@ -2327,7 +2334,7 @@ export default function Dashboard() {
                           <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">Plan</div>
                           <div className="font-bold text-lg mb-2">Estándar</div>
                           <div className="text-2xl font-black text-blue-600">
-                            {navigator.language?.startsWith('en') || navigator.language?.includes('US') ? '$20' : 'S/ 30'}
+                            {currency === 'USD' ? '$20' : 'S/ 30'}
                           </div>
                           <div className="text-[10px] text-slate-500 mt-1">/mes</div>
                           <div className="mt-3 text-xs text-slate-600 dark:text-slate-400">
@@ -2358,7 +2365,7 @@ export default function Dashboard() {
                             </svg>
                           </div>
                           <div className="text-2xl font-black text-emerald-600">
-                            {navigator.language?.startsWith('en') || navigator.language?.includes('US') ? '$30' : 'S/ 60'}
+                            {currency === 'USD' ? '$30' : 'S/ 60'}
                           </div>
                           <div className="text-[10px] text-emerald-600 mt-1">/mes</div>
                           <div className="mt-3 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
@@ -2380,8 +2387,8 @@ export default function Dashboard() {
                         <span className="text-slate-600 dark:text-slate-400">Monto a pagar:</span>
                         <span className="text-xl font-black text-primary">
                           {selectedPlan === 'plus'
-                            ? (navigator.language?.startsWith('en') || navigator.language?.includes('US') ? '$30' : 'S/ 60')
-                            : (navigator.language?.startsWith('en') || navigator.language?.includes('US') ? '$20' : 'S/ 30')
+                            ? (currency === 'USD' ? '$30' : 'S/ 60')
+                            : (currency === 'USD' ? '$20' : 'S/ 30')
                           } /mes
                         </span>
                       </div>
@@ -2408,7 +2415,11 @@ export default function Dashboard() {
                     <TabsContent value="paypal" className="space-y-4">
                       <div className="max-w-md mx-auto py-4">
                         <PayPalPaymentButton
-                          amount={selectedPlan === 'plus' ? '30.00' : '20.00'}
+                          amount={
+                            currency === 'PEN'
+                              ? (selectedPlan === 'plus' ? '17.00' : '9.00') // Local price converted to USD check
+                              : (selectedPlan === 'plus' ? '30.00' : '20.00') // International price
+                          }
                           currency="USD"
                           onSuccess={async (details) => {
                             try {
