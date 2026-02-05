@@ -598,7 +598,11 @@
     }
 
     // Viral Loop A/B Testing
-    const viralTexts = ['⚡ Tecnología LeadWidget', '¿Quieres un chat así?', 'Crea tu Widget GRATIS'];
+    const viralTexts = [
+      '⚡ Tecnología LeadWidget',
+      '¿Quieres un chat así en tu web?',
+      'Crea tu Widget GRATIS aquí'
+    ];
     const viralTextEl = document.getElementById('lw-viral-text');
     if (viralTextEl) {
       const randomText = viralTexts[Math.floor(Math.random() * viralTexts.length)];
