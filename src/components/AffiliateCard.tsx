@@ -57,14 +57,14 @@ export function AffiliateCard({ dismissible = false, className }: AffiliateCardP
                             </p>
                         </div>
 
-                        <div className="flex items-center gap-1 p-1 bg-black/20 rounded-xl max-w-md mx-auto sm:mx-0">
-                            <div className="flex-1 bg-transparent px-3 py-2 text-xs font-mono text-white truncate text-left rounded-lg select-all border border-white/5">
+                        <div className="flex items-center gap-2 p-1.5 bg-black/20 rounded-xl w-full max-w-[calc(100vw-3rem)] sm:max-w-md mx-auto sm:mx-0">
+                            <div className="flex-1 min-w-0 bg-transparent px-2 sm:px-3 py-2 text-[10px] sm:text-xs font-mono text-white truncate text-left rounded-lg select-all border border-white/5">
                                 {referralLink}
                             </div>
                             <Button
                                 size="sm"
                                 variant="ghost"
-                                className="h-8 hover:bg-white/20 text-white"
+                                className="h-8 px-2 sm:px-3 hover:bg-white/20 text-white shrink-0"
                                 onClick={() => {
                                     navigator.clipboard.writeText(referralLink);
                                     toast({
