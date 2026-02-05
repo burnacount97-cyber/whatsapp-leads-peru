@@ -89,6 +89,7 @@ interface WidgetConfig {
   language?: 'es' | 'en';
   testimonials_json?: string;
   launcher_icon?: string;
+  hide_branding?: boolean;
 }
 
 const STATIC_ICONS = [
@@ -280,6 +281,7 @@ export default function Dashboard() {
     // Quick Replies
     quick_replies: '¿Cómo funciona?\nQuiero más información\nVer precios',
     launcher_icon: '',
+    hide_branding: false,
   });
 
   const [showApiKey, setShowApiKey] = useState(false);
@@ -398,6 +400,7 @@ export default function Dashboard() {
             ? configData.quick_replies.join('\n')
             : (configData.quick_replies || '¿Cómo funciona?\nQuiero más información\nVer precios'),
           launcher_icon: configData.launcher_icon || '',
+          hide_branding: configData.hide_branding || false,
         });
 
         if (configData.testimonials_json) {
@@ -1436,6 +1439,47 @@ export default function Dashboard() {
                             />
                           </div>
                         </div>
+                      )}
+                    </div>
+
+                    {/* PLUS Plan: Hide Branding */}
+                    <div className="space-y-4 p-4 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl border-2 border-emerald-200">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Label className="cursor-pointer font-semibold text-emerald-900" htmlFor="hide-branding">
+                              🎁 Ocultar Marca de Agua
+                            </Label>
+                            {profile?.plan_type === 'plus' && (
+                              <span className="text-[10px] bg-emerald-600 text-white px-2 py-0.5 rounded-full font-bold">
+                                PLAN PLUS
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-emerald-700">
+                            {profile?.plan_type === 'plus'
+                              ? 'Activa esta opción para remover "⚡ Tecnología LeadWidget" del pie de tu chat.'
+                              : 'Actualiza al Plan PLUS (S/ 60/mes) para remover la marca de agua y tener un widget 100% tuyo.'
+                            }
+                          </p>
+                        </div>
+                        <Switch
+                          id="hide-branding"
+                          checked={formConfig.hide_branding || false}
+                          onCheckedChange={(checked) => setFormConfig({ ...formConfig, hide_branding: checked })}
+                          disabled={profile?.plan_type !== 'plus'}
+                          className={profile?.plan_type !== 'plus' ? 'opacity-50' : ''}
+                        />
+                      </div>
+                      {profile?.plan_type !== 'plus' && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full border-emerald-600 text-emerald-700 hover:bg-emerald-50"
+                          onClick={() => setActiveTab('billing')}
+                        >
+                          🚀 Actualizar a Plan PLUS
+                        </Button>
                       )}
                     </div>
                   </div>

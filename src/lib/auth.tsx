@@ -60,6 +60,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
+      // Check for referral
+      const referredBy = localStorage.getItem('leadwidget_ref') || null;
+      if (referredBy) {
+        console.log('New user referred by:', referredBy);
+        localStorage.removeItem('leadwidget_ref'); // Clean up
+      }
+
       // Create user profile in Firestore
       await setDoc(doc(db, "profiles", user.uid), {
         email: user.email,
@@ -67,7 +74,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         created_at: new Date().toISOString(),
         subscription_status: 'trial',
         ai_enabled: false,
-        ai_model: 'gpt-4o-mini' // Default configuration
+        ai_model: 'gpt-4o-mini', // Default configuration
+        referred_by: referredBy, // Track who referred this user
       });
 
       // Default role is handled by absence of doc or default rules

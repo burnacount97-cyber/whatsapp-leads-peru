@@ -129,6 +129,7 @@
           exitIntentDescription: fields.exit_intent_description?.stringValue || defaultConfig.exitIntentDescription,
           exitIntentCta: fields.exit_intent_cta?.stringValue || defaultConfig.exitIntentCta,
           clientId: clientId,
+          hideBranding: fields.hide_branding?.booleanValue === true,
           // AI Configuration (now stored in widget_configs for public access)
           ai_enabled: fields.ai_enabled?.booleanValue === true,
           ai_provider: fields.ai_provider?.stringValue || 'openai',
@@ -523,12 +524,14 @@
                 </svg>
               </button>
             </form>
+            ${!config.hideBranding ? `
             <div id="lw-footer" style="text-align:center; padding:8px 0; background:white; font-size:10px;">
               <a href="https://whatsapp-leads-peru.vercel.app/crear-ahora?ref=${config.clientId}" target="_blank" style="color:${config.primaryColor}; text-decoration:none; font-weight:600; display:flex; align-items:center; justify-content:center; gap:4px;">
                 <span style="background:rgba(0,0,0,0.05); padding:2px 6px; border-radius:4px; font-weight:800;">⚡</span>
                 <span id="lw-viral-text">Tecnología LeadWidget</span>
               </a>
             </div>
+            ` : ''}
           </div>
         </div>
 

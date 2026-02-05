@@ -30,7 +30,8 @@ import {
   Pencil,
   Copy,
   ExternalLink,
-  Trash2
+  Trash2,
+  Gift
 } from 'lucide-react';
 import {
   Dialog,
@@ -53,6 +54,7 @@ interface Profile {
   created_at: string;
   trial_ends_at?: string;
   plan_type?: string;
+  referred_by?: string;
 }
 
 interface Payment {
@@ -505,6 +507,13 @@ export default function SuperAdmin() {
               <ShieldCheck className="w-5 h-5 stroke-[2.5px]" />
               <span className="text-[10px] font-medium">Seguridad</span>
             </TabsTrigger>
+            <TabsTrigger
+              value="affiliates"
+              className="flex flex-col gap-1 px-6 py-3 h-auto data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-500 data-[state=active]:shadow-none rounded-xl transition-all"
+            >
+              <Gift className="w-5 h-5 stroke-[2.5px]" />
+              <span className="text-[10px] font-medium">Afiliados</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* Clients Tab */}
@@ -910,6 +919,149 @@ export default function SuperAdmin() {
                     </table>
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Affiliates Tab */}
+          <TabsContent value="affiliates">
+            <Card>
+              <CardHeader>
+                <CardTitle>Sistema de Referidos y Comisiones</CardTitle>
+                <CardDescription>
+                  Tracking completo de afiliados - 20% de comisión o 1 mes gratis por cada referido activo
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {/* Referral Stats */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card className="bg-emerald-50 border-emerald-200">
+                      <CardContent className="pt-4">
+                        <p className="text-sm text-emerald-700 font-medium">Total Referidos</p>
+                        <p className="text-3xl font-bold text-emerald-900">
+                          {clients.filter(c => c.referred_by).length}
+                        </p>
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-cyan-50 border-cyan-200">
+                      <CardContent className="pt-4">
+                        <p className="text-sm text-cyan-700 font-medium">Referidos Activos</p>
+                        <p className="text-3xl font-bold text-cyan-900">
+                          {clients.filter(c => c.referred_by && c.subscription_status === 'active').length}
+                        </p>
+                      </CardContent>
+                    </Card>
+                    <Card className="bg-purple-50 border-purple-200">
+                      <CardContent className="pt-4">
+                        <p className="text-sm text-purple-700 font-medium">Comisiones Potenciales</p>
+                        <p className="text-2xl font-bold text-purple-900">
+                          S/ {(clients.filter(c => c.referred_by && c.subscription_status === 'active').length * 30 * 0.2).toFixed(2)}
+                        </p>
+                        <p className="text-xs text-purple-600">20% por mes</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Referral Table */}
+                  <div className="rounded-xl border overflow-hidden">
+                    <table className="w-full">
+                      <thead className="bg-slate-50">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Referido (Cliente Nuevo)</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Afiliado (Quién Refirió)</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Plan</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Estado</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Comisión/Mes</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y">
+                        {clients
+                          .filter(c => c.referred_by)
+                          .map((client) => {
+                            const referrer = clients.find(c => c.id === client.referred_by);
+                            const isActive = client.subscription_status === 'active';
+                            const plan = client.plan_type || 'standard';
+                            const basePrice = plan === 'plus' ? 60 : 30;
+                            const commission = isActive ? (basePrice * 0.2).toFixed(2) : '0.00';
+
+                            return (
+                              <tr key={client.id} className="hover:bg-slate-50">
+                                <td className="px-4 py-3">
+                                  <div>
+                                    <p className="font-medium text-sm">{client.business_name}</p>
+                                    <p className="text-xs text-slate-500">{client.email}</p>
+                                  </div>
+                                </td>
+                                <td className="px-4 py-3">
+                                  {referrer ? (
+                                    <div>
+                                      <p className="font-medium text-sm text-emerald-700">
+                                        {referrer.business_name}
+                                      </p>
+                                      <p className="text-xs text-slate-500">{referrer.email}</p>
+                                    </div>
+                                  ) : (
+                                    <span className="text-xs text-slate-400">
+                                      Usuario eliminado ({client.referred_by?.substring(0, 8)})
+                                    </span>
+                                  )}
+                                </td>
+                                <td className="px-4 py-3">
+                                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${plan === 'plus'
+                                    ? 'bg-purple-100 text-purple-700'
+                                    : 'bg-blue-100 text-blue-700'
+                                    }`}>
+                                    {plan === 'plus' ? '👑 PLUS' : 'Estándar'}
+                                  </span>
+                                </td>
+                                <td className="px-4 py-3">
+                                  {getStatusBadge(client.subscription_status || 'trial')}
+                                </td>
+                                <td className="px-4 py-3">
+                                  <div className="text-sm font-bold text-emerald-700">
+                                    S/ {commission}
+                                  </div>
+                                  <div className="text-xs text-slate-500">
+                                    {isActive ? '🎁 Activo' : '⏸️ Inactivo'}
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        {clients.filter(c => c.referred_by).length === 0 && (
+                          <tr>
+                            <td colSpan={5} className="px- py-8 text-center text-slate-500">
+                              <Gift className="w-12 h-12 mx-auto mb-2 text-slate-300" />
+                              <p>Aún no hay referidos en el sistema</p>
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Info Card */}
+                  <Card className="bg-gradient-to-br from-emerald-50 to-cyan-50 border-emerald-200">
+                    <CardContent className="pt-6">
+                      <div className="flex items-start gap-4">
+                        <div className="p-3 bg-white rounded-xl">
+                          <Gift className="w-6 h-6 text-emerald-600" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-emerald-900 mb-2">Cómo Funciona el Sistema de Afiliados</h4>
+                          <ul className="space-y-1 text-sm text-emerald-800">
+                            <li>✅ Cada cliente activo genera un 20% de comisión mensual para su afiliado</li>
+                            <li>✅ Alternativamente, puede otorgarse 1 mes gratis por referido activo</li>
+                            <li>✅ Plan Estándar (S/ 30) = S/ 6 comisión/mes</li>
+                            <li>✅ Plan PLUS (S/ 60) = S/ 12 comisión/mes</li>
+                            <li>✅ El tracking es automático via parámetro `?ref=USER_ID`</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
