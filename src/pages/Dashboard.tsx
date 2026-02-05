@@ -191,6 +191,7 @@ export default function Dashboard() {
   const [chartData, setChartData] = useState<any[]>([]);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [isTestimonialDialogOpen, setIsTestimonialDialogOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<'standard' | 'plus'>('standard');
 
 
   // PWA Install Prompt
@@ -2282,9 +2283,12 @@ export default function Dashboard() {
                     <Button
                       className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
                       onClick={() => {
+                        setSelectedPlan('plus');
                         // Scroll to payment section
-                        const paymentSection = document.querySelector('[value="paypal"]');
-                        paymentSection?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        setTimeout(() => {
+                          const paymentSection = document.querySelector('[value="paypal"]');
+                          paymentSection?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 100);
                         toast({
                           title: "💎 Upgrade a Plan PLUS",
                           description: "Selecciona tu método de pago preferido abajo para actualizar",
@@ -2307,6 +2311,83 @@ export default function Dashboard() {
                   <CardDescription>{t('dashboard.billing_section.renew_desc')}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
+                  {/* Plan Selector */}
+                  <div className="bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-900/50 p-6 rounded-2xl border-2 border-slate-200 dark:border-slate-700">
+                    <h3 className="font-bold text-lg mb-4 text-center">Selecciona tu Plan</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      {/* Standard Plan */}
+                      <button
+                        onClick={() => setSelectedPlan('standard')}
+                        className={`p-4 rounded-xl border-2 transition-all ${selectedPlan === 'standard'
+                          ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/30 shadow-lg scale-105'
+                          : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-blue-300'
+                          }`}
+                      >
+                        <div className="text-center">
+                          <div className="text-xs text-slate-600 dark:text-slate-400 mb-1">Plan</div>
+                          <div className="font-bold text-lg mb-2">Estándar</div>
+                          <div className="text-2xl font-black text-blue-600">
+                            {navigator.language?.startsWith('en') || navigator.language?.includes('US') ? '$20' : 'S/ 30'}
+                          </div>
+                          <div className="text-[10px] text-slate-500 mt-1">/mes</div>
+                          <div className="mt-3 text-xs text-slate-600 dark:text-slate-400">
+                            Con marca de agua
+                          </div>
+                        </div>
+                      </button>
+
+                      {/* PLUS Plan */}
+                      <button
+                        onClick={() => setSelectedPlan('plus')}
+                        className={`p-4 rounded-xl border-2 transition-all relative ${selectedPlan === 'plus'
+                          ? 'border-emerald-500 bg-gradient-to-br from-emerald-50 to-cyan-50 dark:from-emerald-950/30 dark:to-cyan-950/30 shadow-lg scale-105'
+                          : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-emerald-300'
+                          }`}
+                      >
+                        {selectedPlan === 'plus' && (
+                          <div className="absolute -top-2 -right-2 bg-emerald-500 text-white text-[9px] px-2 py-0.5 rounded-full font-bold">
+                            SELECCIONADO
+                          </div>
+                        )}
+                        <div className="text-center">
+                          <div className="text-xs text-emerald-600 mb-1">Plan</div>
+                          <div className="font-bold text-lg mb-2 flex items-center justify-center gap-1">
+                            <span>PLUS</span>
+                            <svg className="w-4 h-4 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                            </svg>
+                          </div>
+                          <div className="text-2xl font-black text-emerald-600">
+                            {navigator.language?.startsWith('en') || navigator.language?.includes('US') ? '$30' : 'S/ 60'}
+                          </div>
+                          <div className="text-[10px] text-emerald-600 mt-1">/mes</div>
+                          <div className="mt-3 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
+                            🎁 Sin marca de agua
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+
+                    {/* Selected Plan Summary */}
+                    <div className="mt-4 p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-slate-600 dark:text-slate-400">Plan seleccionado:</span>
+                        <span className="font-bold">
+                          {selectedPlan === 'plus' ? 'PLUS' : 'Estándar'}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm mt-2">
+                        <span className="text-slate-600 dark:text-slate-400">Monto a pagar:</span>
+                        <span className="text-xl font-black text-primary">
+                          {selectedPlan === 'plus'
+                            ? (navigator.language?.startsWith('en') || navigator.language?.includes('US') ? '$30' : 'S/ 60')
+                            : (navigator.language?.startsWith('en') || navigator.language?.includes('US') ? '$20' : 'S/ 30')
+                          } /mes
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
                   <Tabs defaultValue="paypal" className="w-full">
                     <TabsList className="w-full h-auto min-h-[52px] p-1.5 bg-slate-100 dark:bg-slate-800 rounded-full grid grid-cols-2 mb-8">
                       <TabsTrigger
@@ -2327,7 +2408,7 @@ export default function Dashboard() {
                     <TabsContent value="paypal" className="space-y-4">
                       <div className="max-w-md mx-auto py-4">
                         <PayPalPaymentButton
-                          amount="11.90"
+                          amount={selectedPlan === 'plus' ? '30.00' : '20.00'}
                           currency="USD"
                           onSuccess={async (details) => {
                             try {
@@ -2446,9 +2527,9 @@ export default function Dashboard() {
                               try {
                                 await addDoc(collection(db, 'payments'), {
                                   user_id: user?.uid,
-                                  amount: 30,
+                                  amount: selectedPlan === 'plus' ? 60 : 30,
                                   payment_method: 'Yape/Plin/BCP',
-                                  description: 'Plan Mensual Lead Widget',
+                                  description: `Plan ${selectedPlan === 'plus' ? 'PLUS' : 'Estándar'} Lead Widget`,
                                   operation_ref: reference,
                                   status: 'pending',
                                   created_at: new Date().toISOString()
