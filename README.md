@@ -12,7 +12,7 @@ El sistema incorpora un **"Viral Loop" (Ciclo Viral)** diseñado para el crecimi
 El sistema está diseñado para venderse solo mientras es utilizado por los clientes.
 *   **Viral Loop Integrado:** Cada widget gratuito o del "Plan Pro" incluye una marca de agua estratégica (*"⚡ Tecnología LeadWidget"*) que convierte el tráfico de tus clientes en nuevos prospectos para ti.
 *   **Landing Contextual ("Espejo"):** Los clics en la marca de agua dirigen a una landing page especial (`/crear-ahora`) diseñada para capitalizar el momento "Wow" del usuario que acaba de ver el widget en acción.
-*   **Sistema de Afiliados "Inception":** Cada usuario registrado obtiene automáticamente un código de afiliado incrustado en su widget, incentivándolos a mantener la marca de agua a cambio de comisiones o beneficios.
+*   **Sistema de Afiliados "Inception":** Cada usuario tiene acceso a un panel dedicado donde puede generar enlaces de referido, visualizar sus ganancias estimadas con una calculadora inteligente (CPA 20%) y solicitar retiros de fondos vía Yape/Plin/PayPal.
 
 ### 2. Widget de Chat Proactivo e Inteligente
 *   **IA de Próxima Generación:** Soporte nativo y optimizado.
@@ -27,6 +27,7 @@ El sistema está diseñado para venderse solo mientras es utilizado por los clie
 *   **Live Preview:** Constructor de widgets en tiempo real con vista previa exacta de cómo se verá en el sitio web.
 *   **Gestión de Leads:** CRM ligero incorporado con exportación a Excel/CSV.
 *   **Analytics Hub:** Métricas de rendimiento (Vistas vs Conversiones).
+*   **Centro de Afiliados:** Panel completo para socios con calculadora de proyección de ingresos, métricas de referidos en tiempo real (registrados vs pagados) y módulo de solicitud de pagos.
 *   **Seguridad:** Panel de gestión de IPs bloqueadas y cortafuegos de IA anti-abuso.
 
 ---
@@ -77,6 +78,7 @@ El sistema detecta automáticamente la ubicación del visitante para adaptar la 
 *   `src/pages/Dashboard.tsx`: Panel principal con lógica de facturación híbrida y builder.
 *   `src/pages/Landing.tsx`: Home page optimizada para conversión con detección de idioma/moneda.
 *   `src/pages/CreateNow.tsx`: Landing page "Espejo" específica para tráfico proveniente de la marca de agua.
+*   `src/components/AffiliateCard.tsx`: Tarjeta inteligente reutilizable para el programa de referidos, con diseño adaptable a móviles y persistencia de estado.
 *   `src/lib/wsp.ts`: Utilidades para la integración profunda con WhatsApp.
 
 ---
