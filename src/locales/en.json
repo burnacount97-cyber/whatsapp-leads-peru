@@ -596,5 +596,32 @@
         "still_problems": "Still having problems?",
         "support_help": "Our support team can help you install it.",
         "contact_support": "Contact Support"
+    },
+    "affiliates_landing": {
+        "nav_partners": "Partners",
+        "login": "Log In",
+        "register": "Start Now",
+        "hero_badge": "Recurring Commission System",
+        "hero_title_1": "Turn your influence",
+        "hero_title_2": "into passive income",
+        "hero_subtitle": "Recommend the most powerful AI tool for WhatsApp and earn <0>20% commission</0> for every sale. No limits.",
+        "cta_calc": "Calculate Earnings",
+        "cta_register": "Register for Free",
+        "calculator_title": "Income Simulator",
+        "calculator_subtitle": "Discover how much you can earn promoting LeadWidget.",
+        "clients_label": "Clients referred / mo",
+        "plan_label": "Plan sold",
+        "monthly_earnings": "Estimated Monthly Earnings",
+        "earnings_note": "* Calculated with a 20% CPA on the first sale.",
+        "start_earning": "Start Earning",
+        "benefits_title": "Why become a LeadWidget partner?",
+        "benefits_subtitle": "Everything you need to scale your income.",
+        "benefit_1_title": "Unlimited Referrals",
+        "benefit_1_desc": "There is no cap. Bring your agency clients, friends, or audience and monetize every installation.",
+        "benefit_2_title": "Easy Withdrawals",
+        "benefit_2_desc": "Request your earnings directly to your bank account, PayPal, or local wallets starting from $30.",
+        "benefit_3_title": "Transparent Dashboard",
+        "benefit_3_desc": "Monitor every click, registration, and conversion in real-time from your own partner dashboard.",
+        "footer_rights": "Made for entrepreneurs."
     }
 }

@@ -596,5 +596,32 @@
         "still_problems": "¿Aún tienes problemas?",
         "support_help": "Nuestro equipo de soporte puede ayudarte a instalarlo.",
         "contact_support": "Contactar Soporte"
+    },
+    "affiliates_landing": {
+        "nav_partners": "Partners",
+        "login": "Ingresar",
+        "register": "Empezar Ahora",
+        "hero_badge": "Sistema de Comisiones Recurrentes",
+        "hero_title_1": "Convierte tu influencia",
+        "hero_title_2": "en ingresos pasivos",
+        "hero_subtitle": "Recomienda la herramienta de IA más potente para WhatsApp y gana el <0>20% de comisión</0> por cada venta. Sin límites.",
+        "cta_calc": "Calcular Ganancias",
+        "cta_register": "Registrarme Gratis",
+        "calculator_title": "Simulador de Ingresos",
+        "calculator_subtitle": "Descubre cuánto puedes ganar promoviendo LeadWidget.",
+        "clients_label": "Clientes referidos / mes",
+        "plan_label": "Plan vendido",
+        "monthly_earnings": "Ganancia Mensual Estimada",
+        "earnings_note": "* Calculado con CPA del 20% sobre la primera venta.",
+        "start_earning": "Empezar a Ganar",
+        "benefits_title": "¿Por qué ser socio de LeadWidget?",
+        "benefits_subtitle": "Todo lo que necesitas para escalar tus ingresos.",
+        "benefit_1_title": "Referidos Ilimitados",
+        "benefit_1_desc": "No hay tope. Trae a tus clientes de agencia, amigos o audiencia y monetiza cada instalación.",
+        "benefit_2_title": "Retiros Fáciles",
+        "benefit_2_desc": "Solicita tus ganancias directamente a tu cuenta bancaria BCP, Yape, Plin o PayPal a partir de S/ 100.",
+        "benefit_3_title": "Panel Transparente",
+        "benefit_3_desc": "Monitorea cada clic, registro y conversión en tiempo real desde tu propio dashboard de socio.",
+        "footer_rights": "Hecho para emprendedores."
     }
 }

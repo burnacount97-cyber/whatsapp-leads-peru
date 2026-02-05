@@ -78,8 +78,9 @@ El sistema detecta automáticamente la ubicación del visitante para adaptar la 
 *   `src/pages/Dashboard.tsx`: Panel principal con lógica de facturación híbrida y builder.
 *   `src/pages/Landing.tsx`: Home page optimizada para conversión con detección de idioma/moneda.
 *   `src/pages/CreateNow.tsx`: Landing page "Espejo" específica para tráfico proveniente de la marca de agua.
-*   `src/pages/AffiliatesLanding.tsx`: Landing page pública para reclutamiento de socios con calculadora interactiva.
+*   `src/pages/AffiliatesLanding.tsx`: Landing page pública para reclutamiento de socios (Multilingüe + Chat Widget).
 *   `src/components/AffiliateCard.tsx`: Tarjeta inteligente reutilizable para el programa de referidos, con diseño adaptable a móviles y persistencia de estado.
+*   `src/locales/*.json`: Archivos de traducción expandidos para cubrir todo el flujo de afiliados ("Inception").
 *   `src/lib/wsp.ts`: Utilidades para la integración profunda con WhatsApp.
 
 ---
