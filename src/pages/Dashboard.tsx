@@ -194,6 +194,7 @@ export default function Dashboard() {
   const [selectedPlan, setSelectedPlan] = useState<'standard' | 'plus'>('standard');
   const [currency, setCurrency] = useState<'PEN' | 'USD'>('PEN');
   const [affiliateRefers, setAffiliateRefers] = useState(10); // Calculator state
+  const [affiliatePlanType, setAffiliatePlanType] = useState<'pro' | 'plus'>('pro'); // Calculator Plan Selector
 
   useEffect(() => {
     // Detect currency based on locale or current app language
@@ -2702,7 +2703,26 @@ export default function Dashboard() {
                     </div>
                     <CardDescription>Proyecta tus ganancias estimadas</CardDescription>
                   </CardHeader>
-                  <CardContent className="space-y-8 pt-6">
+                  <CardContent className="space-y-6 pt-6">
+                    {/* Plan Selector */}
+                    <div className="space-y-3">
+                      <Label>¿Qué plan estimas vender?</Label>
+                      <div className="grid grid-cols-2 gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg">
+                        <button
+                          onClick={() => setAffiliatePlanType('pro')}
+                          className={`py-2 px-3 text-xs font-bold rounded-md transition-all ${affiliatePlanType === 'pro' ? 'bg-white dark:bg-slate-700 shadow text-emerald-600' : 'text-slate-500 hover:text-slate-700'}`}
+                        >
+                          Plan Pro ({currency === 'USD' ? '$15' : 'S/ 30'})
+                        </button>
+                        <button
+                          onClick={() => setAffiliatePlanType('plus')}
+                          className={`py-2 px-3 text-xs font-bold rounded-md transition-all ${affiliatePlanType === 'plus' ? 'bg-white dark:bg-slate-700 shadow text-blue-600' : 'text-slate-500 hover:text-slate-700'}`}
+                        >
+                          Plan Plus ({currency === 'USD' ? '$29' : 'S/ 60'})
+                        </button>
+                      </div>
+                    </div>
+
                     <div className="space-y-6">
                       <div className="flex justify-between items-center">
                         <Label>Clientes referidos al mes</Label>
@@ -2728,16 +2748,18 @@ export default function Dashboard() {
                     </div>
 
                     <div className="p-6 bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl border border-emerald-100 dark:border-emerald-900/20 text-center space-y-2">
-                      <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300 uppercase tracking-widest">Ganancia Estimada (CPA)</p>
+                      <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300 uppercase tracking-widest">Ganancia Estimada (CPA 20%)</p>
                       <div className="text-5xl font-black text-emerald-600 dark:text-emerald-400">
                         {currency === 'USD' ? '$' : 'S/'}
-                        {currency === 'USD'
-                          ? (affiliateRefers * (22 * 0.20)).toFixed(2) // $22 avg ticket * 20% = $4.4 per user
-                          : (affiliateRefers * (45 * 0.20)).toFixed(2) // S/ 45 avg ticket * 20% = S/ 9 per user
-                        }
+                        {(() => {
+                          const price = currency === 'USD'
+                            ? (affiliatePlanType === 'pro' ? 15 : 29)
+                            : (affiliatePlanType === 'pro' ? 30 : 60);
+                          return (affiliateRefers * price * 0.20).toFixed(2);
+                        })()}
                       </div>
                       <p className="text-xs text-emerald-700/60 dark:text-emerald-400/60">
-                        Basado en un ticket promedio de {currency === 'USD' ? '$22 USD' : 'S/ 45'}
+                        Basado en el precio del Plan {affiliatePlanType === 'pro' ? 'Pro' : 'Plus'}
                       </p>
                     </div>
 
