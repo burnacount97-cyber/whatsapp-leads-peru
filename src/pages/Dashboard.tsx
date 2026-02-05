@@ -2662,7 +2662,7 @@ export default function Dashboard() {
           <TabsContent value="affiliates" className="space-y-6">
             <div className="grid lg:grid-cols-2 gap-8">
               {/* Left Column: Link & Info */}
-              <div className="space-y-6">
+              <div className="space-y-6 w-full max-w-full overflow-hidden">
                 {/* Fixed Affiliate Card */}
                 <AffiliateCard dismissible={false} className="shadow-xl" />
 
