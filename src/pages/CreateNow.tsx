@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, CheckCircle, Zap, ArrowRight } from 'lucide-react';
@@ -6,12 +6,17 @@ import { MessageCircle, CheckCircle, Zap, ArrowRight } from 'lucide-react';
 export default function CreateNow() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
+    const [currency, setCurrency] = useState<'PEN' | 'USD'>('PEN');
 
     useEffect(() => {
         const ref = searchParams.get('ref');
         if (ref) {
             localStorage.setItem('leadwidget_ref', ref);
         }
+
+        // Simple currency detection
+        const isForeign = navigator.language?.startsWith('en') || navigator.language?.includes('US');
+        setCurrency(isForeign ? 'USD' : 'PEN');
     }, [searchParams]);
 
     return (
@@ -54,7 +59,7 @@ export default function CreateNow() {
                         </div>
                         <div className="flex items-center gap-3 text-slate-300 justify-center">
                             <CheckCircle className="w-5 h-5 text-emerald-400" />
-                            <span>Precio: <b>S/ 30 al mes</b></span>
+                            <span>Precio: <b>{currency === 'USD' ? '$15 USD' : 'S/ 30'} al mes</b></span>
                         </div>
                     </div>
 

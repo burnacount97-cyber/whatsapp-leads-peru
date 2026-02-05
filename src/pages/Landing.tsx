@@ -724,7 +724,9 @@ export default function Landing() {
                 <div className="flex-1 w-full text-center md:text-left mt-6 md:mt-0">
                   <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-2">{t('pricing.plan_name')}</p>
                   <div className="flex items-baseline justify-center md:justify-start gap-1 mb-8">
-                    <span className="text-5xl sm:text-7xl font-black tracking-tighter text-foreground">{t('pricing.price')}</span>
+                    <span className="text-5xl sm:text-7xl font-black tracking-tighter text-foreground">
+                      {(i18n.language?.startsWith('en') || i18n.language?.includes('US')) ? '$15' : 'S/ 30'}
+                    </span>
                     <span className="text-lg text-muted-foreground font-medium">{t('pricing.period')}</span>
                   </div>
 
