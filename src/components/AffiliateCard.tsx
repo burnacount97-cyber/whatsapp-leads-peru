@@ -40,14 +40,14 @@ export function AffiliateCard({ dismissible = false, className }: AffiliateCardP
                     <X className="w-4 h-4" />
                 </button>
             )}
-            <CardContent className="p-5 sm:p-6">
-                <div className="flex flex-col sm:flex-row gap-5 items-center sm:items-start text-center sm:text-left">
+            <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-5 items-center sm:items-start text-center sm:text-left">
 
-                    <div className="p-4 bg-white/10 rounded-2xl shrink-0 text-emerald-100">
-                        <Gift className="w-8 h-8" />
+                    <div className="p-3 sm:p-4 bg-white/10 rounded-2xl shrink-0 text-emerald-100">
+                        <Gift className="w-6 h-6 sm:w-8 sm:h-8" />
                     </div>
 
-                    <div className="space-y-3 flex-1 w-full">
+                    <div className="space-y-3 flex-1 w-full min-w-0">
                         <div>
                             <h3 className="font-bold text-lg sm:text-xl text-white">
                                 🎁 ¡Gana Meses Gratis!
@@ -57,14 +57,14 @@ export function AffiliateCard({ dismissible = false, className }: AffiliateCardP
                             </p>
                         </div>
 
-                        <div className="flex items-center gap-2 p-1.5 bg-black/20 rounded-xl w-full max-w-[calc(100vw-3rem)] sm:max-w-md mx-auto sm:mx-0">
-                            <div className="flex-1 min-w-0 bg-transparent px-2 sm:px-3 py-2 text-[10px] sm:text-xs font-mono text-white truncate text-left rounded-lg select-all border border-white/5">
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 p-2 bg-black/20 rounded-xl w-full">
+                            <div className="flex-1 min-w-0 bg-transparent px-3 py-2.5 sm:py-2 text-xs font-mono text-white truncate text-center sm:text-left rounded-lg select-all border border-white/5 bg-black/10 sm:bg-transparent">
                                 {referralLink}
                             </div>
                             <Button
                                 size="sm"
-                                variant="ghost"
-                                className="h-8 px-2 sm:px-3 hover:bg-white/20 text-white shrink-0"
+                                variant="secondary"
+                                className="h-9 sm:h-8 w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white border-0 shrink-0"
                                 onClick={() => {
                                     navigator.clipboard.writeText(referralLink);
                                     toast({
@@ -73,8 +73,8 @@ export function AffiliateCard({ dismissible = false, className }: AffiliateCardP
                                     });
                                 }}
                             >
-                                <Copy className="w-4 h-4 mr-1" />
-                                <span className="text-xs font-semibold">COPIAR</span>
+                                <Copy className="w-4 h-4 mr-2 sm:mr-1" />
+                                <span className="text-xs font-bold">COPIAR</span>
                             </Button>
                         </div>
                     </div>
