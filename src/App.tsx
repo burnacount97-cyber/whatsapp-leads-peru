@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import SuperAdmin from "./pages/SuperAdmin";
 import InstallationGuide from "./pages/InstallationGuide";
 import CreateNow from "./pages/CreateNow";
+import AffiliatesLanding from "./pages/AffiliatesLanding";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/superadmin" element={<SuperAdmin />} />
             <Route path="/installation-guide" element={<InstallationGuide />} />
             <Route path="/crear-ahora" element={<CreateNow />} />
+            <Route path="/afiliados" element={<AffiliatesLanding />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

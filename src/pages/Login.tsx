@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/lib/auth';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 import { MessageCircle, Loader2, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
@@ -33,6 +35,33 @@ export default function Login() {
       }
     }
   }, [user, isSuperAdmin, authLoading, navigate]);
+
+  const handlePasswordReset = async () => {
+    if (!email) {
+      toast({
+        title: "Ingresa tu correo",
+        description: "Escribe tu correo electrónico en el campo de arriba y vuelve a hacer clic aquí.",
+      });
+      return;
+    }
+    try {
+      setLocalLoading(true);
+      await sendPasswordResetEmail(auth, email);
+      toast({
+        title: "✅ Correo enviado",
+        description: "Revisa tu bandeja de entrada para restablecer tu contraseña.",
+        className: "bg-emerald-600 text-white border-0"
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "No pudimos enviar el correo. Verifica que esté bien escrito.",
+        variant: "destructive"
+      });
+    } finally {
+      setLocalLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,7 +127,16 @@ export default function Login() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">{t('auth_pages.login.password_label')}</Label>
+              <div className="flex justify-between items-center">
+                <Label htmlFor="password">{t('auth_pages.login.password_label')}</Label>
+                <button
+                  type="button"
+                  onClick={handlePasswordReset}
+                  className="text-xs text-muted-foreground hover:text-emerald-500 hover:underline transition-colors"
+                >
+                  ¿Olvidaste tu contraseña?
+                </button>
+              </div>
               <div className="relative">
                 <Input
                   id="password"

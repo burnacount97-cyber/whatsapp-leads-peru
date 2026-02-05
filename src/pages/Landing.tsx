@@ -926,6 +926,10 @@ export default function Landing() {
                 <li><button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-primary transition-colors">{t('footer.about')}</button></li>
                 <li><button className="hover:text-primary transition-colors opacity-50 cursor-not-allowed">{t('footer.success_stories')}</button></li>
                 <li><button className="hover:text-primary transition-colors opacity-50 cursor-not-allowed">{t('footer.blog')}</button></li>
+                <li><Link to="/afiliados" className="hover:text-emerald-400 transition-colors font-medium relative group flex items-center gap-2 w-fit">
+                  Afiliados
+                  <span className="bg-emerald-500/20 text-emerald-400 text-[10px] px-1.5 py-0.5 rounded-full border border-emerald-500/30 group-hover:bg-emerald-500 group-hover:text-white transition-all">Socio</span>
+                </Link></li>
                 <li><button onClick={() => window.dispatchEvent(new Event('open-lead-widget'))} className="hover:text-primary transition-colors">{t('footer.support')}</button></li>
               </ul>
             </div>
