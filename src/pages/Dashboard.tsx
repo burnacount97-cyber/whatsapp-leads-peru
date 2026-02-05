@@ -168,7 +168,7 @@ const templates = [
 ];
 
 export default function Dashboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { user, signOut, loading: authLoading, isSuperAdmin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -195,10 +195,11 @@ export default function Dashboard() {
   const [currency, setCurrency] = useState<'PEN' | 'USD'>('PEN');
 
   useEffect(() => {
-    // Detect currency based on locale
-    const isForeign = navigator.language?.startsWith('en') || navigator.language?.includes('US');
+    // Detect currency based on locale or current app language
+    const currentLang = i18n.language || navigator.language;
+    const isForeign = currentLang?.startsWith('en') || currentLang?.includes('US');
     setCurrency(isForeign ? 'USD' : 'PEN');
-  }, []);
+  }, [i18n.language]);
 
 
   // PWA Install Prompt
