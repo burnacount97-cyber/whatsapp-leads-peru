@@ -25,7 +25,8 @@ export function AffiliateCard({ dismissible = false, className }: AffiliateCardP
 
     if (!isVisible && dismissible) return null;
 
-    const referralLink = `https://leadwidget.com/crear-ahora?ref=${user?.uid}`;
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://whatsapp-leads-peru.vercel.app';
+    const referralLink = `${origin}/crear-ahora?ref=${user?.uid}`;
 
     return (
         <Card className={`bg-gradient-to-br from-emerald-600 to-teal-700 border-0 text-white overflow-hidden relative mb-6 ${className || ''}`}>
