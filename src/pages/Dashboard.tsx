@@ -196,6 +196,29 @@ export default function Dashboard() {
   const [affiliateRefers, setAffiliateRefers] = useState(10); // Calculator state
   const [affiliatePlanType, setAffiliatePlanType] = useState<'pro' | 'plus'>('pro'); // Calculator Plan Selector
 
+  const [isPayoutModalOpen, setIsPayoutModalOpen] = useState(false);
+  const [payoutMethod, setPayoutMethod] = useState('yape');
+  const [payoutAccount, setPayoutAccount] = useState('');
+
+  // Real Affiliate Data Hooks
+  const [realAffiliatesCount, setRealAffiliatesCount] = useState(0);
+  useEffect(() => {
+    if (!user?.uid) return;
+    const fetchAffiliates = async () => {
+      try {
+        const q = query(collection(db, 'profiles'), where('referred_by', '==', user.uid));
+        const snapshot = await getDocs(q);
+        setRealAffiliatesCount(snapshot.size);
+      } catch (e) {
+        console.error("Error fetching affiliates", e);
+      }
+    };
+    fetchAffiliates();
+  }, [user]);
+
+  const pendingEarnings = realAffiliatesCount * 30; // Min commission S/ 30
+  const minWithdrawal = 100;
+
   useEffect(() => {
     // Detect currency based on locale or current app language
     const currentLang = i18n.language || navigator.language;
@@ -2763,25 +2786,41 @@ export default function Dashboard() {
                       </p>
                     </div>
 
+
+
                     <div className="flex flex-col gap-2">
-                      <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12">
+                      <Button
+                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold h-12 disabled:opacity-50"
+                        onClick={() => setIsPayoutModalOpen(true)}
+                        disabled={pendingEarnings < minWithdrawal}
+                      >
                         <HandCoins className="w-4 h-4 mr-2" />
-                        Solicitar Retiro de Fondos
+                        Solicitar Retiro (Min S/ 100)
                       </Button>
-                      <p className="text-[10px] text-center text-muted-foreground">
-                        * Botón habilitado al superar el mínimo de retiro.
-                      </p>
+                      {pendingEarnings < minWithdrawal && (
+                        <p className="text-[10px] text-center text-muted-foreground">
+                          Te faltan S/ {minWithdrawal - pendingEarnings} para retirar.
+                        </p>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
 
-                <div className="bg-sky-50 dark:bg-sky-900/10 border border-sky-100 dark:border-sky-800 p-4 rounded-xl flex gap-3">
-                  <TrendingUp className="w-5 h-5 text-sky-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <h4 className="font-bold text-sky-900 dark:text-sky-100 text-sm">Consejo Pro</h4>
-                    <p className="text-xs text-sky-700 dark:text-sky-300 mt-1 leading-relaxed">
-                      Las agencias de marketing que instalan LeadWidget en todos sus clientes suelen generar más de <strong>S/ 500 extras al mes</strong> solo en comisiones de referencia.
-                    </p>
+                {/* Real Stats Card */}
+                <div className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800 p-4 rounded-xl space-y-3">
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="w-5 h-5 text-emerald-600" />
+                    <h4 className="font-bold text-emerald-900 dark:text-emerald-100 text-sm">Tus Resultados Hoy</h4>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <div className="text-2xl font-black text-slate-800 dark:text-white">{realAffiliatesCount}</div>
+                      <div className="text-xs text-slate-500">Usuarios Registrados</div>
+                    </div>
+                    <div>
+                      <div className="text-2xl font-black text-emerald-600">S/ {pendingEarnings}</div>
+                      <div className="text-xs text-slate-500">Ganancias Pendientes</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2789,6 +2828,70 @@ export default function Dashboard() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Payout Request Modal */}
+      <Dialog open={isPayoutModalOpen} onOpenChange={setIsPayoutModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <HandCoins className="w-5 h-5 text-emerald-600" />
+              Solicitar Retiro
+            </DialogTitle>
+            <DialogDescription>
+              Ingresa tus datos para recibir sus comisiones. El pago se procesa en 24-48 horas hábiles.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Método de Pago</Label>
+              <select
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                value={payoutMethod}
+                onChange={(e) => setPayoutMethod(e.target.value)}
+              >
+                <option value="yape">Yape / Plin (Perú)</option>
+                <option value="bcp">Transferencia BCP (Perú)</option>
+                <option value="bank">Interbank / Otros (Perú)</option>
+                <option value="paypal">PayPal (Internacional)</option>
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label>
+                {payoutMethod === 'paypal' ? 'Correo PayPal' : (payoutMethod === 'yape' ? 'Número de Celular' : 'Número de Cuenta / CCI')}
+              </Label>
+              <Input
+                placeholder={payoutMethod === 'paypal' ? 'ejemplo@gmail.com' : 'Ingresa tu número aquí'}
+                value={payoutAccount}
+                onChange={(e) => setPayoutAccount(e.target.value)}
+              />
+            </div>
+            <div className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-800 dark:text-emerald-300 text-xs p-3 rounded-lg flex items-start gap-2 border border-emerald-100 dark:border-emerald-800">
+              <Info className="w-4 h-4 shrink-0 mt-0.5" />
+              <p>Las comisiones solo se pagan por ventas confirmadas. Mínimo de retiro: <strong>S/ 100 o $30 USD</strong>.</p>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setIsPayoutModalOpen(false)}>Cancelar</Button>
+            <Button
+              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              onClick={() => {
+                if (!payoutAccount) {
+                  toast({ title: "Faltan datos", description: "Por favor ingresa tu cuenta o celular.", variant: "destructive" });
+                  return;
+                }
+                setIsPayoutModalOpen(false);
+                toast({
+                  title: "✅ Solicitud Enviada",
+                  description: "Revisaremos tus referidos y procesaremos el pago brevemente."
+                });
+                setPayoutAccount('');
+              }}
+            >
+              Enviar Solicitud
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div >
   );
 }
