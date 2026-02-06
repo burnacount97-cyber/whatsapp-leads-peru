@@ -23,10 +23,13 @@ export default function InstallationGuide() {
         const fetchWidgetId = async () => {
             if (!user) return;
             try {
-                const q = query(collection(db, 'widgets'), where('userId', '==', user.uid), limit(1));
+                // Correct collection: 'widget_configs', Correct field: 'user_id'
+                const q = query(collection(db, 'widget_configs'), where('user_id', '==', user.uid), limit(1));
                 const querySnapshot = await getDocs(q);
                 if (!querySnapshot.empty) {
-                    setWidgetId(querySnapshot.docs[0].id);
+                    const data = querySnapshot.docs[0].data();
+                    // The public short ID is usually stored in 'widget_id' field, NOT the document ID
+                    setWidgetId(data.widget_id || querySnapshot.docs[0].id);
                 }
             } catch (error) {
                 console.error("Error fetching widget ID:", error);
