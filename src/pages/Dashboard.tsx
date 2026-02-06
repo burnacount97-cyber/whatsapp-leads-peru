@@ -2788,7 +2788,7 @@ export default function Dashboard() {
                           </div>
                           <div className="flex-1 text-left">
                             <h4 className="font-semibold text-sm text-blue-900 dark:text-blue-100 mb-1">
-                              💡 ¿Te parece poco? ¡Vende a USA y gana en dólares!
+                              💡 ¿Quieres más? ¡Vende a USA y gana en dólares!
                             </h4>
                             <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed mb-2">
                               El mercado estadounidense paga en <strong>USD</strong>. Cambia el idioma a <strong>Inglés</strong>{' '}
