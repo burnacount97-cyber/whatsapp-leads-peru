@@ -2779,6 +2779,35 @@ export default function Dashboard() {
                       </p>
                     </div>
 
+                    {/* Motivational Tip for PEN users */}
+                    {currency === 'PEN' && (
+                      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 border border-blue-200 dark:border-blue-900/50 rounded-xl p-4 space-y-2">
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                            <Globe className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                          </div>
+                          <div className="flex-1 text-left">
+                            <h4 className="font-semibold text-sm text-blue-900 dark:text-blue-100 mb-1">
+                              💡 ¿Te parece poco? ¡Vende a USA y gana en dólares!
+                            </h4>
+                            <p className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed mb-2">
+                              El mercado estadounidense paga en <strong>USD</strong>. Cambia el idioma a <strong>Inglés</strong>{' '}
+                              <button
+                                onClick={() => i18n.changeLanguage('en')}
+                                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors font-semibold"
+                              >
+                                (haz clic aquí)
+                              </button>
+                              {' '}y tu link de afiliado mostrará precios en dólares automáticamente.
+                            </p>
+                            <p className="text-[10px] text-blue-600/70 dark:text-blue-400/70">
+                              <strong>Ejemplo:</strong> 10 ventas del Plan Pro = <strong>${(10 * 15 * 0.20).toFixed(2)} USD</strong> vs S/{(10 * 30 * 0.20).toFixed(2)} PEN
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
 
 
                     <div className="flex flex-col gap-2">
