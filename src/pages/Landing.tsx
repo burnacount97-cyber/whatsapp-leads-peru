@@ -352,7 +352,7 @@ export default function Landing() {
                     <div className="space-y-2">
                       <p className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Tu Widget ID Único</p>
                       <div className="bg-slate-950 border border-slate-700 rounded-xl p-4 font-mono text-green-400 text-sm flex justify-between items-center shadow-inner">
-                        <span className="tracking-widest">kxnqh6ip3r</span>
+                        <span className="tracking-widest opacity-50">abc123xyz</span>
                         <div className="flex items-center gap-1 bg-green-500/10 px-2 py-1 rounded text-[10px] text-green-400 border border-green-500/20">
                           <Check className="w-3 h-3" /> Verificado
                         </div>
