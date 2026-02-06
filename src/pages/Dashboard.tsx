@@ -34,7 +34,7 @@ import {
   ExternalLink, Settings, History, Lock, AlertCircle, LogOut, Loader2, Sparkles,
   Layout, Palette, Code, BarChart as BarChartIcon, BarChart3, Users, CreditCard,
   Eye, Target, Upload, Clock, Bot, Key, Shield, X, Smartphone, EyeOff, MoreHorizontal, Globe,
-  ShoppingBag, HeartPulse, Wrench, Home, Utensils, Banknote, Calculator, HandCoins
+  ShoppingBag, HeartPulse, Wrench, Home, Utensils, Banknote, Calculator, HandCoins, BookOpen
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -1594,31 +1594,24 @@ export default function Dashboard() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 border-indigo-100 dark:border-slate-700">
                   <CardHeader>
-                    <CardTitle>{t('dashboard.widget_config.install_code')}</CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                      <Code className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                      {t('dashboard.widget_config.install_code')}
+                    </CardTitle>
                     <CardDescription>{t('dashboard.widget_config.install_code_desc')}</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <div className="bg-muted rounded-lg p-4 font-mono text-sm break-all">
-                      {`<script src="${window.location.origin}/api/w/${widgetConfig?.widget_id}.js" async></script>`}
-                    </div>
-                    <Button onClick={copyEmbedCode} variant="outline" className="w-full mt-4">
-                      <Copy className="w-4 h-4 mr-2" />
-                      {t('dashboard.widget_config.copy_code')}
-                    </Button>
-                    <div className="mt-3 text-center">
-                      <Link
-                        to="/installation-guide"
-                        target="_blank"
-                        className="text-xs text-primary hover:underline inline-flex items-center gap-1 font-medium"
-                      >
-                        <Info className="w-3 h-3" />
-                        {t('dashboard.widget_config.no_install_hint')}
+                  <CardContent className="space-y-4">
+                    <Button asChild className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 dark:shadow-none transition-all py-6 rounded-xl group" size="lg">
+                      <Link to="/installation-guide">
+                        <BookOpen className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" />
+                        <span className="font-semibold text-base">Guía de instalación: Pulsa aquí</span>
                       </Link>
-                    </div>
-
-                    {/* Dynamic Domain Info Removed */}
+                    </Button>
+                    <p className="text-xs text-center text-muted-foreground">
+                      Compatible con WordPress, Shopify, Wix y HTML/PHP.
+                    </p>
                   </CardContent>
                 </Card>
               </div>
