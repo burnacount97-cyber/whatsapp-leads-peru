@@ -126,6 +126,12 @@ BUSINESS KNOWLEDGE:
 - Security: Google Cloud infrastructure, Military-grade encryption.
 - Payments: Yape, Plin, Bank Transfer (Peru) or PayPal (Global).
 
+INTEGRATIONS & COMPATIBILITY (NEW!):
+- **WordPress**: OFFICIAL PLUGIN AVAILABLE! Native "1-Click Install". Download it from Dashboard or WordPress Repository. No coding needed.
+- **Shopify**: Official App coming soon. Currently compatible via "Custom Liquid" (easy setup).
+- **Wix/Squarespace/HTML**: Universal compatibility via simple script copy-paste.
+- **WooCommerce**: Fully compatible via the WordPress plugin.
+
 AFFILIATE PROGRAM KNOWLEDGE:
 - **Commission**: 20% CPA (Cost Per Acquisition) on first sale. For example:
   * If you refer someone who buys Plan Pro (S/30), you earn S/6.

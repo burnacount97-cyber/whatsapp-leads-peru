@@ -24,9 +24,10 @@ El sistema está diseñado para venderse solo mientras es utilizado por los clie
 *   **Diseño Premium:** Interfaz flotante moderna, vibración háptica configurable y animaciones de "atención".
 
 ### 3. Plugins & Integraciones (NUEVO)
-*   **Plugin Oficial de WordPress:** Instalación nativa sin código. Simplemente instala, activa y pega tu Widget ID.
-*   **Compatibilidad Universal:** Scripts optimizados para Shopify, Wix, Squarespace y sitios HTML/PHP personalizados.
-*   **Guía Paso a Paso:** Nuevo módulo interactivo en el Dashboard que detecta tu ID y te enseña cómo instalar en cada plataforma.
+*   **Plugin Oficial de WordPress:** Instalación nativa sin código. Compatible con WooCommerce, Elementor y Divi. Descargable desde el Dashboard.
+*   **Shopify App (En Desarrollo):** Aplicación nativa basada en Remix para instalación directa desde Shopify Store. Integración vía Theme App Extension.
+*   **Compatibilidad Universal:** Scripts optimizados para Wix, Squarespace y sitios HTML/PHP personalizados.
+*   **Guía Paso a Paso:** Módulo interactivo en el Dashboard que detecta tu ID y te enseña cómo instalar en cada plataforma.
 
 ### 4. Dashboard Integral & Builder Visual
 *   **Live Preview:** Constructor de widgets en tiempo real con vista previa exacta de cómo se verá en el sitio web.
@@ -71,6 +72,7 @@ El sistema detecta automáticamente la ubicación del visitante para adaptar la 
 *   **Estilos:** Tailwind CSS + **Shadcn/UI** (Diseño System Premium).
 *   **Backend:** Node.js (Serverless Functions) + Firebase Admin SDK.
 *   **Base de Datos:** Firebase Firestore (NoSQL realtime).
+*   **Shopify Integration:** Remix Framework + Shopify CLI (Node.js).
 *   **Pagos:** Integración nativa con **PayPal SDK** y subida de comprobantes para pagos manuales.
 *   **Internacionalización:** **i18n** completo (Español/Inglés) con detección automática de navegador.
 *   **PWA:** Soporte progresivo instalable en móviles y escritorio.
@@ -80,6 +82,8 @@ El sistema detecta automáticamente la ubicación del visitante para adaptar la 
 ## 📦 Estructura de Archivos Clave
 
 *   `api/w/[widgetId].js`: **El cerebro del viral loop.** Script que inyecta el widget, gestiona la marca de agua dinámica y el sistema de referidos.
+*   `shopify-app`: **Shopify App Nativa.** Aplicación Remix + Theme Extension para integración directa en Shopify Stores.
+*   `wordpress-plugin`: **WordPress Integration.** Plugin nativo para distribución en WP Repository.
 *   `src/pages/Dashboard.tsx`: Panel principal con lógica de facturación híbrida y builder.
 *   `src/pages/Landing.tsx`: Home page optimizada para conversión con detección de idioma/moneda.
 *   `src/pages/CreateNow.tsx`: Landing page "Espejo" específica para tráfico proveniente de la marca de agua.
