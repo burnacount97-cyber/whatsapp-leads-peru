@@ -33,7 +33,9 @@ import {
   Code2,
   Cpu,
   Fingerprint,
-  CreditCard
+  CreditCard,
+  Settings,
+  Download
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -319,6 +321,100 @@ export default function Landing() {
                 <span className="font-black text-[10px] text-slate-400 group-hover:text-foreground">CARRD</span>
               </div>
               <span className="text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors">Carrd</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- WORDPRESS PLUGIN SPOTLIGHT --- */}
+      <section className="py-20 bg-gradient-to-b from-background to-blue-50/50 dark:from-background dark:to-blue-900/10 border-b border-border/50">
+        <div className="container mx-auto max-w-6xl px-4">
+          <div className="flex flex-col md:flex-row items-center gap-12 lg:gap-20">
+            {/* Visual */}
+            <div className="flex-1 w-full max-w-md order-2 md:order-1">
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-3xl blur opacity-30 group-hover:opacity-50 transition duration-1000"></div>
+                <div className="relative bg-slate-900 text-white rounded-3xl p-6 sm:p-8 border border-slate-700 shadow-2xl overflow-hidden transform group-hover:scale-[1.02] transition-transform duration-500">
+                  {/* WP Admin Mockup */}
+                  <div className="flex items-center gap-3 mb-8 border-b border-white/10 pb-4">
+                    <div className="w-10 h-10 bg-[#21759b] rounded-lg flex items-center justify-center shadow-lg">
+                      <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-white">
+                        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 0 1-8-8c0-1.8.6-3.5 1.6-4.8L17 19a7.9 7.9 0 0 1-5 1zm6.9-3.1L13.8 9h-.8l-3.3 9.4a8 8 0 0 1-2.8-5.7c0-2.3 1-4.4 2.6-5.9l5.6 13.1c1.2-1 2.2-2.3 2.8-3.8z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-sm">Lead Widget Settings</h3>
+                      <p className="text-[10px] text-slate-400">WordPress Admin Panel</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Tu Widget ID Único</p>
+                      <div className="bg-slate-950 border border-slate-700 rounded-xl p-4 font-mono text-green-400 text-sm flex justify-between items-center shadow-inner">
+                        <span className="tracking-widest">kxnqh6ip3r</span>
+                        <div className="flex items-center gap-1 bg-green-500/10 px-2 py-1 rounded text-[10px] text-green-400 border border-green-500/20">
+                          <Check className="w-3 h-3" /> Verificado
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-xl flex gap-3 items-start">
+                      <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5 shadow-lg shadow-green-500/20">
+                        <Check className="w-3 h-3 text-white stroke-[3]" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-green-100 mb-0.5">Conectado Exitosamente</p>
+                        <p className="text-[10px] text-green-200/80 leading-relaxed">El widget ya es visible en todas las páginas de tu sitio web.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 text-center md:text-left space-y-6 order-1 md:order-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#21759b]/10 text-[#21759b] dark:text-blue-400 text-xs font-bold uppercase tracking-wide">
+                <Settings className="w-3 h-3" />
+                Nueva Integración
+              </div>
+
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-balance leading-tight">
+                Instalación Nativa en <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#21759b] to-cyan-500">WordPress</span>
+              </h2>
+
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                Olvídate de editar código o tocar archivos del tema. Con nuestro nuevo <strong>Plugin Oficial</strong>, conectar Lead Widget es tan fácil como copiar y pegar.
+              </p>
+
+              <ul className="space-y-3 inline-block text-left mx-auto md:mx-0 bg-card/50 p-6 rounded-2xl border border-border/50 backdrop-blur-sm">
+                {[
+                  "Instalación en 1 Clic (Sin código)",
+                  "Carga asíncrona optimizada (No ralentiza tu web)",
+                  "Compatible con Elementor, Divi y Gutenberg",
+                  "Actualizaciones automáticas y seguras"
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-3">
+                    <div className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    </div>
+                    <span className="font-medium text-sm sm:text-base text-foreground/90">{item}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                <Link to="/register">
+                  <Button size="lg" className="font-bold shadow-lg shadow-blue-500/20 bg-[#21759b] hover:bg-[#1a5c7a] text-white rounded-full w-full sm:w-auto h-12 px-8 transition-transform hover:-translate-y-0.5">
+                    <Download className="w-4 h-4 mr-2" />
+                    Obtener Plugin Gratis
+                  </Button>
+                </Link>
+                {/* <p className="text-xs text-muted-foreground mt-3 sm:mt-0 sm:ml-4 flex items-center justify-center">
+                  Disponible para todos los planes
+                </p> */}
+              </div>
             </div>
           </div>
         </div>
