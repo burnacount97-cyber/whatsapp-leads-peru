@@ -257,15 +257,49 @@ export default function InstallationGuide() {
                                             <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
                                                 <ShoppingBag className="w-6 h-6 text-green-600 dark:text-green-400" />
                                             </div>
-                                            <div>
-                                                <h3 className="text-xl font-bold">{t('installation_guide.shopify_title')}</h3>
+                                            <div className="flex-1">
+                                                <h3 className="text-xl font-bold flex items-center gap-2">
+                                                    {t('installation_guide.shopify_title')}
+                                                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
+                                                        App Próximamente
+                                                    </span>
+                                                </h3>
                                                 <p className="text-sm text-muted-foreground">{t('installation_guide.shopify_subtitle')}</p>
                                             </div>
                                         </div>
 
-                                        <div className="space-y-4">
-                                            {/* Reuse Dark Block Logic mainly for code copying */}
-                                            <div className="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-lg my-4">
+                                        {/* Coming Soon Banner */}
+                                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 border border-green-200 dark:border-green-900/50 rounded-xl p-4 flex items-start gap-3">
+                                            <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                                                <ShoppingBag className="w-5 h-5 text-green-600 dark:text-green-400" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <h4 className="font-semibold text-sm text-green-900 dark:text-green-100 mb-1">
+                                                    🚀 App Nativa en Desarrollo
+                                                </h4>
+                                                <p className="text-xs text-green-700 dark:text-green-300 leading-relaxed">
+                                                    Estamos construyendo una <strong>App Oficial para Shopify</strong> que permitirá instalación en 1-clic directamente desde la Shopify App Store. Mientras tanto, puedes usar el método manual que funciona perfectamente.
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Manual Installation */}
+                                        <div className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm">
+                                            <h4 className="font-semibold text-base mb-4 flex items-center gap-2">
+                                                <Code className="w-4 h-4 text-green-600" />
+                                                Instalación Manual (Disponible Ahora)
+                                            </h4>
+
+                                            {/* Code Block */}
+                                            <div className="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-lg mb-4">
+                                                <div className="flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800">
+                                                    <div className="flex gap-1.5">
+                                                        <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"></div>
+                                                        <div className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"></div>
+                                                        <div className="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50"></div>
+                                                    </div>
+                                                    <span className="text-[10px] uppercase font-mono text-slate-500">Liquid Script</span>
+                                                </div>
                                                 <div className="p-4 overflow-x-auto">
                                                     <pre className="text-xs font-mono text-slate-300 whitespace-pre-wrap break-all">
                                                         {scriptCode}
@@ -284,22 +318,36 @@ export default function InstallationGuide() {
                                                 </div>
                                             </div>
 
-                                            <div className="flex gap-3">
-                                                <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">1</div>
-                                                <p className="text-sm">En tu admin de Shopify, ve a <strong>Tienda Online &gt; Temas</strong>.</p>
+                                            <div className="space-y-3">
+                                                <div className="flex gap-3">
+                                                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center font-bold text-sm text-green-600">1</div>
+                                                    <p className="text-sm">En tu admin de Shopify, ve a <strong>Tienda Online → Temas</strong>.</p>
+                                                </div>
+                                                <div className="flex gap-3">
+                                                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center font-bold text-sm text-green-600">2</div>
+                                                    <p className="text-sm">Haz clic en los 3 puntos <strong>(...)</strong> junto a tu tema actual y selecciona <strong>"Editar código"</strong>.</p>
+                                                </div>
+                                                <div className="flex gap-3">
+                                                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center font-bold text-sm text-green-600">3</div>
+                                                    <p className="text-sm">En la carpeta <strong>Layout</strong>, abre el archivo <code className="bg-slate-200 dark:bg-slate-800 px-1.5 py-0.5 rounded text-xs font-mono">theme.liquid</code>.</p>
+                                                </div>
+                                                <div className="flex gap-3">
+                                                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center font-bold text-sm text-green-600">4</div>
+                                                    <p className="text-sm">Pega el script justo <strong>antes</strong> de la etiqueta de cierre <code className="bg-red-100 dark:bg-red-900/30 px-1.5 py-0.5 rounded text-xs font-mono text-red-600 dark:text-red-400">&lt;/body&gt;</code>.</p>
+                                                </div>
+                                                <div className="flex gap-3">
+                                                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center font-bold text-sm text-green-600">5</div>
+                                                    <p className="text-sm">Haz clic en <strong>"Guardar"</strong> y ¡listo! 🎉</p>
+                                                </div>
                                             </div>
-                                            <div className="flex gap-3">
-                                                <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">2</div>
-                                                <p className="text-sm">Haz clic en los 3 puntos (...) junto a tu tema actual y selecciona <strong>"Editar código"</strong>.</p>
-                                            </div>
-                                            <div className="flex gap-3">
-                                                <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">3</div>
-                                                <p className="text-sm">Busca el archivo <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded">theme.liquid</code>.</p>
-                                            </div>
-                                            <div className="flex gap-3">
-                                                <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">4</div>
-                                                <p className="text-sm">Pega el código antes de <code className="text-red-500">&lt;/body&gt;</code>.</p>
-                                            </div>
+                                        </div>
+
+                                        {/* Help Note */}
+                                        <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/50 rounded-lg p-3 flex gap-2 text-xs">
+                                            <HelpCircle className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
+                                            <p className="text-blue-700 dark:text-blue-300">
+                                                <strong>Nota:</strong> El widget aparecerá en todas las páginas de tu tienda automáticamente. Compatible con cualquier tema de Shopify.
+                                            </p>
                                         </div>
                                     </TabsContent>
 
