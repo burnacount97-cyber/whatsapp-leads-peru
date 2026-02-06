@@ -141,14 +141,25 @@ export default function InstallationGuide() {
                                                         <span>Tu Widget ID Único</span>
                                                     </div>
                                                     <div className="flex items-center gap-2">
-                                                        <code className="flex-1 bg-slate-900 text-green-400 px-4 py-3 rounded-lg font-mono text-center text-lg tracking-widest border border-slate-700 shadow-inner">
-                                                            {widgetId || "Cargando..."}
-                                                        </code>
+                                                        {loading ? (
+                                                            <div className="flex-1 bg-slate-900 border border-slate-700 rounded-lg p-3 flex justify-center">
+                                                                <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+                                                            </div>
+                                                        ) : widgetId ? (
+                                                            <code className="flex-1 bg-slate-900 text-green-400 px-4 py-3 rounded-lg font-mono text-center text-lg tracking-widest border border-slate-700 shadow-inner">
+                                                                {widgetId}
+                                                            </code>
+                                                        ) : (
+                                                            <div className="flex-1 bg-red-900/20 border border-red-900/50 text-red-400 px-4 py-3 rounded-lg text-center text-sm">
+                                                                ⚠️ No has creado ningún widget aún.
+                                                                <Link to="/app" className="underline ml-2 hover:text-red-300">Ir al Dashboard</Link>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                     <Button
                                                         onClick={handleCopyId}
                                                         className="w-full bg-slate-800 hover:bg-slate-700 text-white"
-                                                        disabled={!widgetId}
+                                                        disabled={!widgetId || loading}
                                                     >
                                                         {copiedId ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
                                                         {copiedId ? "¡Copiado!" : "Copiar ID para el Plugin"}
