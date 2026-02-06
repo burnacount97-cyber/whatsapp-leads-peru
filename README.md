@@ -23,7 +23,12 @@ El sistema está diseñado para venderse solo mientras es utilizado por los clie
 *   **Iconos de Nicho:** Sets de iconos SVG optimizados para Ecommerce, Salud, Talleres, Inmobiliaria, Restaurantes, etc.
 *   **Diseño Premium:** Interfaz flotante moderna, vibración háptica configurable y animaciones de "atención".
 
-### 3. Dashboard Integro & Builder Visual
+### 3. Plugins & Integraciones (NUEVO)
+*   **Plugin Oficial de WordPress:** Instalación nativa sin código. Simplemente instala, activa y pega tu Widget ID.
+*   **Compatibilidad Universal:** Scripts optimizados para Shopify, Wix, Squarespace y sitios HTML/PHP personalizados.
+*   **Guía Paso a Paso:** Nuevo módulo interactivo en el Dashboard que detecta tu ID y te enseña cómo instalar en cada plataforma.
+
+### 4. Dashboard Integral & Builder Visual
 *   **Live Preview:** Constructor de widgets en tiempo real con vista previa exacta de cómo se verá en el sitio web.
 *   **Gestión de Leads:** CRM ligero incorporado con exportación a Excel/CSV.
 *   **Analytics Hub:** Métricas de rendimiento (Vistas vs Conversiones).
