@@ -35,7 +35,8 @@ import {
   Fingerprint,
   CreditCard,
   Settings,
-  Download
+  Download,
+  ShoppingBag
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -418,6 +419,49 @@ export default function Landing() {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* --- SHOPIFY INTEGRATION (COMING SOON) --- */}
+      <section className="py-16 border-b border-border/50 bg-gradient-to-r from-green-50/50 via-emerald-50/30 to-green-50/50 dark:from-green-950/10 dark:via-emerald-900/10 dark:to-green-950/10">
+        <div className="container mx-auto max-w-6xl px-4 text-center">
+
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wider mb-6 border border-emerald-200 dark:border-emerald-800">
+            <Sparkles className="w-3.5 h-3.5" />
+            Próximamente
+          </div>
+
+          <h2 className="text-3xl md:text-4xl font-black mb-6 flex items-center justify-center gap-3">
+            <ShoppingBag className="w-8 h-8 md:w-10 md:h-10 text-[#95bF47]" />
+            Integración Nativa con <span className="text-[#95bF47]">Shopify</span>
+          </h2>
+
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 text-balance">
+            Estamos construyendo la App Oficial para Shopify. Muy pronto podrás instalar Lead Widget directamente desde la <strong>Shopify App Store</strong>.
+          </p>
+
+          <div className="flex flex-wrap justify-center gap-8 md:gap-16 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+            {/* Feature Mocks */}
+            <div className="flex flex-col items-center gap-3 group">
+              <div className="w-14 h-14 rounded-2xl bg-white dark:bg-card border border-border flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <ShoppingBag className="w-7 h-7 text-[#95bF47]" />
+              </div>
+              <span className="text-sm font-semibold">Shopify App</span>
+            </div>
+            <div className="flex flex-col items-center gap-3 group">
+              <div className="w-14 h-14 rounded-2xl bg-white dark:bg-card border border-border flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <MousePointer2 className="w-7 h-7 text-blue-500" />
+              </div>
+              <span className="text-sm font-semibold">1-Click Setup</span>
+            </div>
+            <div className="flex flex-col items-center gap-3 group">
+              <div className="w-14 h-14 rounded-2xl bg-white dark:bg-card border border-border flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <Zap className="w-7 h-7 text-amber-500" />
+              </div>
+              <span className="text-sm font-semibold">Zero Lag</span>
+            </div>
+          </div>
+        </div>
+
       </section>
 
       {/* --- PAIN POINTS SECTION (Dark Style) --- */}
