@@ -1,23 +1,62 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Code, Globe, ShoppingBag, LayoutTemplate, HelpCircle, Check, Copy, ExternalLink, Menu } from 'lucide-react';
+import { ArrowLeft, Code, Globe, ShoppingBag, LayoutTemplate, HelpCircle, Check, Copy, ExternalLink, Menu, Loader2 } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { useTranslation, Trans } from 'react-i18next';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { db } from '@/lib/firebase';
+import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 
 export default function InstallationGuide() {
     const { t } = useTranslation();
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState('wordpress');
+    const [widgetId, setWidgetId] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [copiedId, setCopiedId] = useState(false);
+    const [copiedCode, setCopiedCode] = useState(false);
 
-    // We can construct the script tag example. 
-    // Note: ideally we'd pass the actual widget ID if possible, but user ID is often used or we can tell them to copy from dashboard.
-    // The dashboard shows: <script src="${window.location.origin}/api/w/${widgetConfig?.widget_id}.js" async></script>
-    // Since we might not have the widgetConfig here easily without fetching, we'll instruct them to copy the code from Dashboard first.
-    // OR we can make this page helpful by explaining WHERE to paste it.
+    useEffect(() => {
+        const fetchWidgetId = async () => {
+            if (!user) return;
+            try {
+                const q = query(collection(db, 'widgets'), where('userId', '==', user.uid), limit(1));
+                const querySnapshot = await getDocs(q);
+                if (!querySnapshot.empty) {
+                    setWidgetId(querySnapshot.docs[0].id);
+                }
+            } catch (error) {
+                console.error("Error fetching widget ID:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchWidgetId();
+    }, [user]);
+
+    const scriptCode = widgetId
+        ? `<script src="${window.location.origin}/api/w/${widgetId}.js" async></script>`
+        : '<!-- Cargando tu código único... -->';
+
+    const handleCopyId = () => {
+        if (widgetId) {
+            navigator.clipboard.writeText(widgetId);
+            setCopiedId(true);
+            setTimeout(() => setCopiedId(false), 2000);
+        }
+    };
+
+    const handleCopyCode = () => {
+        if (widgetId) {
+            navigator.clipboard.writeText(scriptCode);
+            setCopiedCode(true);
+            setTimeout(() => setCopiedCode(false), 2000);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-4 md:p-8">
@@ -47,239 +86,294 @@ export default function InstallationGuide() {
                         <CardDescription>{t('installation_guide.platform_desc')}</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <Tabs defaultValue="wordpress" value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+                        {loading ? (
+                            <div className="flex justify-center py-12">
+                                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                            </div>
+                        ) : (
+                            <Tabs defaultValue="wordpress" value={activeTab} onValueChange={setActiveTab} className="space-y-8">
 
-                            <TabsList className="flex flex-wrap h-auto gap-2 bg-transparent p-0 justify-start">
-                                <TabsTrigger value="wordpress" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white border border-slate-200 dark:border-slate-700 px-6 py-3 rounded-xl gap-2 h-auto hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-                                    <Globe className="w-5 h-5" /> {t('installation_guide.wordpress_tab')}
-                                </TabsTrigger>
-                                <TabsTrigger value="shopify" className="data-[state=active]:bg-green-600 data-[state=active]:text-white border border-slate-200 dark:border-slate-700 px-6 py-3 rounded-xl gap-2 h-auto hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-                                    <ShoppingBag className="w-5 h-5" /> {t('installation_guide.shopify_tab')}
-                                </TabsTrigger>
-                                <TabsTrigger value="wix" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white border border-slate-200 dark:border-slate-700 px-6 py-3 rounded-xl gap-2 h-auto hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-                                    <LayoutTemplate className="w-5 h-5" /> {t('installation_guide.wix_tab')}
-                                </TabsTrigger>
-                                <TabsTrigger value="html" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white border border-slate-200 dark:border-slate-700 px-6 py-3 rounded-xl gap-2 h-auto hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-                                    <Code className="w-5 h-5" /> {t('installation_guide.html_tab')}
-                                </TabsTrigger>
-                            </TabsList>
+                                <TabsList className="flex flex-wrap h-auto gap-2 bg-transparent p-0 justify-start">
+                                    <TabsTrigger value="wordpress" className="data-[state=active]:bg-blue-600 data-[state=active]:text-white border border-slate-200 dark:border-slate-700 px-6 py-3 rounded-xl gap-2 h-auto hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                                        <Globe className="w-5 h-5" /> {t('installation_guide.wordpress_tab')}
+                                    </TabsTrigger>
+                                    <TabsTrigger value="shopify" className="data-[state=active]:bg-green-600 data-[state=active]:text-white border border-slate-200 dark:border-slate-700 px-6 py-3 rounded-xl gap-2 h-auto hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                                        <ShoppingBag className="w-5 h-5" /> {t('installation_guide.shopify_tab')}
+                                    </TabsTrigger>
+                                    <TabsTrigger value="wix" className="data-[state=active]:bg-purple-600 data-[state=active]:text-white border border-slate-200 dark:border-slate-700 px-6 py-3 rounded-xl gap-2 h-auto hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                                        <LayoutTemplate className="w-5 h-5" /> {t('installation_guide.wix_tab')}
+                                    </TabsTrigger>
+                                    <TabsTrigger value="html" className="data-[state=active]:bg-orange-600 data-[state=active]:text-white border border-slate-200 dark:border-slate-700 px-6 py-3 rounded-xl gap-2 h-auto hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
+                                        <Code className="w-5 h-5" /> {t('installation_guide.html_tab')}
+                                    </TabsTrigger>
+                                </TabsList>
 
-                            <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
+                                <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-800">
 
-                                {/* WordPress Instructions */}
-                                <TabsContent value="wordpress" className="mt-0 space-y-6 animate-in fade-in zoom-in-95 duration-300">
-                                    <div className="flex items-center gap-4 mb-6">
-                                        <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
-                                            <Globe className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                                    {/* WordPress Instructions */}
+                                    <TabsContent value="wordpress" className="mt-0 space-y-8 animate-in fade-in zoom-in-95 duration-300">
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center">
+                                                <Globe className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-xl font-bold">{t('installation_guide.wp_title')}</h3>
+                                                <p className="text-sm text-muted-foreground">{t('installation_guide.wp_subtitle')}</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <h3 className="text-xl font-bold">{t('installation_guide.wp_title')}</h3>
-                                            <p className="text-sm text-muted-foreground">{t('installation_guide.wp_subtitle')}</p>
-                                        </div>
-                                    </div>
 
-                                    <div className="grid gap-6 md:grid-cols-2">
-                                        <div className="space-y-4">
-                                            <div className="flex gap-3">
-                                                <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">1</div>
-                                                <p className="text-sm">{t('installation_guide.wp_step1')}</p>
-                                            </div>
-                                            <div className="flex gap-3">
-                                                <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">2</div>
-                                                <p className="text-sm">
-                                                    <Trans i18nKey="installation_guide.wp_step2">
-                                                        Instala el plugin gratuito <strong>"WPCode"</strong> (o "Insert Headers and Footers").
-                                                    </Trans>
-                                                </p>
-                                            </div>
-                                            <div className="flex gap-3">
-                                                <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">3</div>
-                                                <p className="text-sm">
-                                                    <Trans i18nKey="installation_guide.wp_step3">
-                                                        Ve a <strong>Code Snippets &gt; Header &amp; Footer</strong>.
-                                                    </Trans>
-                                                </p>
-                                            </div>
-                                            <div className="flex gap-3">
-                                                <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">4</div>
-                                                <div className="space-y-2">
-                                                    <p className="text-sm">
-                                                        <Trans i18nKey="installation_guide.wp_step4">
-                                                            Pega el código de instalación en la sección <strong>Footer</strong>.
-                                                        </Trans>
+                                        {/* OPTION A: OFFICIAL PLUGIN */}
+                                        <div className="bg-white dark:bg-slate-950 border border-blue-200 dark:border-blue-900/50 rounded-xl p-6 shadow-sm">
+                                            <div className="flex items-start justify-between gap-4 mb-4">
+                                                <div>
+                                                    <h4 className="font-semibold text-lg text-blue-700 dark:text-blue-400 flex items-center gap-2">
+                                                        <Check className="w-5 h-5" /> Opción Recomendada: Plugin Oficial
+                                                    </h4>
+                                                    <p className="text-sm text-muted-foreground mt-1">
+                                                        La forma más fácil. Instala nuestro plugin y pega tu ID único.
                                                     </p>
-                                                    <div className="bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-800 p-3 rounded-md text-xs text-yellow-800 dark:text-yellow-200">
-                                                        <strong>{t('installation_guide.wp_note')}</strong> {t('installation_guide.wp_note_text')}
+                                                </div>
+                                            </div>
+
+                                            <div className="flex flex-col md:flex-row gap-6 items-center">
+                                                <div className="flex-1 space-y-3 w-full">
+                                                    <div className="flex items-center justify-between text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
+                                                        <span>Tu Widget ID Único</span>
                                                     </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <code className="flex-1 bg-slate-900 text-green-400 px-4 py-3 rounded-lg font-mono text-center text-lg tracking-widest border border-slate-700 shadow-inner">
+                                                            {widgetId || "Cargando..."}
+                                                        </code>
+                                                    </div>
+                                                    <Button
+                                                        onClick={handleCopyId}
+                                                        className="w-full bg-slate-800 hover:bg-slate-700 text-white"
+                                                        disabled={!widgetId}
+                                                    >
+                                                        {copiedId ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
+                                                        {copiedId ? "¡Copiado!" : "Copiar ID para el Plugin"}
+                                                    </Button>
+                                                </div>
+                                                <div className="w-full md:w-px h-px md:h-24 bg-slate-200 dark:bg-slate-800"></div>
+                                                <div className="flex-1 text-sm space-y-2">
+                                                    <ol className="list-decimal list-inside space-y-2 text-muted-foreground">
+                                                        <li>Instala el plugin <strong>LeadWidget</strong> en tu WordPress.</li>
+                                                        <li>Ve a <strong>Ajustes &gt; LeadWidget</strong>.</li>
+                                                        <li>Pega este ID en el campo correspondiente.</li>
+                                                        <li>Guarda y ¡listo!</li>
+                                                    </ol>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="bg-white dark:bg-slate-950 rounded-xl border p-4 flex items-center justify-center">
-                                            {/* You could add an image here using an img tag if you had one, for now text/icon placeholder */}
-                                            <div className="text-center space-y-2 opacity-50">
-                                                <LayoutTemplate className="w-16 h-16 mx-auto mb-2" />
-                                                <p className="text-xs">{t('installation_guide.wp_visual')}</p>
+
+                                        <div className="relative">
+                                            <div className="absolute inset-0 flex items-center">
+                                                <span className="w-full border-t border-slate-200 dark:border-slate-800" />
+                                            </div>
+                                            <div className="relative flex justify-center text-xs uppercase">
+                                                <span className="bg-slate-50 dark:bg-slate-900 px-2 text-muted-foreground">
+                                                    O hazlo manualmente (Opción Avanzada)
+                                                </span>
                                             </div>
                                         </div>
-                                    </div>
-                                </TabsContent>
 
-                                {/* Shopify Instructions */}
-                                <TabsContent value="shopify" className="mt-0 space-y-6 animate-in fade-in zoom-in-95 duration-300">
-                                    <div className="flex items-center gap-4 mb-6">
-                                        <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
-                                            <ShoppingBag className="w-6 h-6 text-green-600 dark:text-green-400" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-xl font-bold">{t('installation_guide.shopify_title')}</h3>
-                                            <p className="text-sm text-muted-foreground">{t('installation_guide.shopify_subtitle')}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        <div className="flex gap-3">
-                                            <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">1</div>
-                                            <p className="text-sm">
-                                                <Trans i18nKey="installation_guide.shopify_step1">
-                                                    En tu admin de Shopify, ve a <strong>Tienda Online &gt; Temas</strong>.
-                                                </Trans>
-                                            </p>
-                                        </div>
-                                        <div className="flex gap-3">
-                                            <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">2</div>
-                                            <p className="text-sm">
-                                                <Trans i18nKey="installation_guide.shopify_step2">
-                                                    Haz clic en los 3 puntos (...) junto a tu tema actual y selecciona <strong>"Editar código"</strong>.
-                                                </Trans>
-                                            </p>
-                                        </div>
-                                        <div className="flex gap-3">
-                                            <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">3</div>
-                                            <p className="text-sm">
-                                                <Trans i18nKey="installation_guide.shopify_step3">
-                                                    Busca el archivo <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded">theme.liquid</code> en la barra lateral izquierda.
-                                                </Trans>
-                                            </p>
-                                        </div>
-                                        <div className="flex gap-3">
-                                            <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">4</div>
-                                            <p className="text-sm">
-                                                <Trans i18nKey="installation_guide.shopify_step4">
-                                                    Desliza hasta el final del archivo y pega el código justo antes de la etiqueta <code className="text-red-500">&lt;/body&gt;</code>.
-                                                </Trans>
-                                            </p>
-                                        </div>
-                                        <div className="flex gap-3">
-                                            <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">5</div>
-                                            <p className="text-sm">
-                                                <Trans i18nKey="installation_guide.shopify_step5">
-                                                    Haz clic en <strong>Guardar</strong>.
-                                                </Trans>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </TabsContent>
-
-                                {/* Wix Instructions */}
-                                <TabsContent value="wix" className="mt-0 space-y-6 animate-in fade-in zoom-in-95 duration-300">
-                                    <div className="flex items-center gap-4 mb-6">
-                                        <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center">
-                                            <LayoutTemplate className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-xl font-bold">{t('installation_guide.wix_title')}</h3>
-                                            <p className="text-sm text-muted-foreground">{t('installation_guide.wix_subtitle')}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        <div className="flex gap-3">
-                                            <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">1</div>
-                                            <p className="text-sm">
-                                                <Trans i18nKey="installation_guide.wix_step1">
-                                                    Ve a <strong>Configuración &gt; Código personalizado</strong> en tu panel.
-                                                </Trans>
-                                            </p>
-                                        </div>
-                                        <div className="flex gap-3">
-                                            <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">2</div>
-                                            <p className="text-sm">
-                                                <Trans i18nKey="installation_guide.wix_step2">
-                                                    Haz clic en <strong>+ Agregar código personalizado</strong>.
-                                                </Trans>
-                                            </p>
-                                        </div>
-                                        <div className="flex gap-3">
-                                            <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">3</div>
-                                            <p className="text-sm">{t('installation_guide.wix_step3')}</p>
-                                        </div>
-                                        <div className="flex gap-3">
-                                            <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">4</div>
-                                            <p className="text-sm">
-                                                <Trans i18nKey="installation_guide.wix_step4">
-                                                    Selecciona <strong>"Body - fin"</strong> en la opción de ubicación.
-                                                </Trans>
-                                            </p>
-                                        </div>
-                                        <div className="flex gap-3">
-                                            <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">5</div>
-                                            <p className="text-sm">{t('installation_guide.wix_step5')}</p>
-                                        </div>
-                                    </div>
-                                </TabsContent>
-
-                                {/* HTML / Other Instructions */}
-                                <TabsContent value="html" className="mt-0 space-y-6 animate-in fade-in zoom-in-95 duration-300">
-                                    <div className="flex items-center gap-4 mb-6">
-                                        <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center">
-                                            <Code className="w-6 h-6 text-orange-600 dark:text-orange-400" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-xl font-bold">{t('installation_guide.html_title')}</h3>
-                                            <p className="text-sm text-muted-foreground">{t('installation_guide.html_subtitle')}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        <p className="text-sm">
-                                            <Trans i18nKey="installation_guide.html_text">
-                                                La regla general es simple: Debes pegar el código <strong>al final de tu página, justo antes de que se cierre la etiqueta <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded font-mono text-red-500">&lt;/body&gt;</code></strong>.
-                                            </Trans>
-                                        </p>
-
-                                        <div className="bg-slate-900 text-slate-50 p-4 rounded-lg font-mono text-xs overflow-x-auto relative group">
-                                            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <span className="text-[10px] text-slate-400">{t('installation_guide.html_example_hint')}</span>
+                                        {/* OPTION B: MANUAL CODE */}
+                                        <div className="grid gap-6 md:grid-cols-2 opacity-80 hover:opacity-100 transition-opacity">
+                                            <div className="space-y-4">
+                                                <div className="flex gap-3">
+                                                    <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">1</div>
+                                                    <p className="text-sm">
+                                                        Instala el plugin gratuito <strong>"WPCode"</strong> (o "Insert Headers and Footers").
+                                                    </p>
+                                                </div>
+                                                <div className="flex gap-3">
+                                                    <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">2</div>
+                                                    <p className="text-sm">
+                                                        Ve a <strong>Code Snippets &gt; Header &amp; Footer</strong>.
+                                                    </p>
+                                                </div>
+                                                <div className="flex gap-3">
+                                                    <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">3</div>
+                                                    <div className="space-y-2 w-full">
+                                                        <p className="text-sm">
+                                                            Pega este código en la sección <strong>Footer</strong>:
+                                                        </p>
+                                                        {/* Dark Code Block for Manual Install */}
+                                                        <div className="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-lg">
+                                                            <div className="flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800">
+                                                                <div className="flex gap-1.5">
+                                                                    <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"></div>
+                                                                    <div className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"></div>
+                                                                    <div className="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50"></div>
+                                                                </div>
+                                                                <span className="text-[10px] uppercase font-mono text-slate-500">HTML Script</span>
+                                                            </div>
+                                                            <div className="p-4 overflow-x-auto">
+                                                                <pre className="text-xs font-mono text-slate-300 whitespace-pre-wrap break-all">
+                                                                    {scriptCode}
+                                                                </pre>
+                                                            </div>
+                                                            <div className="px-4 py-2 bg-slate-900 border-t border-slate-800 flex justify-end">
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="sm"
+                                                                    className="h-8 text-xs text-slate-400 hover:text-white hover:bg-slate-800"
+                                                                    onClick={handleCopyCode}
+                                                                >
+                                                                    {copiedCode ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
+                                                                    {copiedCode ? "Copiado" : "Copiar código"}
+                                                                </Button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <pre>{`<html>
-  <head>
-    ...
-  </head>
-  <body>
-    <!-- ${t('installation_guide.html_your_content')} -->
-    <h1>${t('installation_guide.html_my_web')}</h1>
-    ...
+                                            <div className="bg-white dark:bg-slate-950 rounded-xl border p-4 flex items-center justify-center">
+                                                <div className="text-center space-y-2 opacity-50">
+                                                    <LayoutTemplate className="w-16 h-16 mx-auto mb-2" />
+                                                    <p className="text-xs">{t('installation_guide.wp_visual')}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </TabsContent>
 
-    <!-- ${t('installation_guide.html_comment')} -->
-    <script src=".../widget.js"></script>
-    
-  </body>
-</html>`}</pre>
+                                    {/* Shopify Instructions */}
+                                    <TabsContent value="shopify" className="mt-0 space-y-6 animate-in fade-in zoom-in-95 duration-300">
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-xl flex items-center justify-center">
+                                                <ShoppingBag className="w-6 h-6 text-green-600 dark:text-green-400" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-xl font-bold">{t('installation_guide.shopify_title')}</h3>
+                                                <p className="text-sm text-muted-foreground">{t('installation_guide.shopify_subtitle')}</p>
+                                            </div>
                                         </div>
 
-                                        <div className="flex gap-3 mt-4">
-                                            <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">?</div>
+                                        <div className="space-y-4">
+                                            {/* Reuse Dark Block Logic mainly for code copying */}
+                                            <div className="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-lg my-4">
+                                                <div className="p-4 overflow-x-auto">
+                                                    <pre className="text-xs font-mono text-slate-300 whitespace-pre-wrap break-all">
+                                                        {scriptCode}
+                                                    </pre>
+                                                </div>
+                                                <div className="px-4 py-2 bg-slate-900 border-t border-slate-800 flex justify-end">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-8 text-xs text-slate-400 hover:text-white hover:bg-slate-800"
+                                                        onClick={handleCopyCode}
+                                                    >
+                                                        {copiedCode ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
+                                                        {copiedCode ? "Copiado" : "Copiar código"}
+                                                    </Button>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex gap-3">
+                                                <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">1</div>
+                                                <p className="text-sm">En tu admin de Shopify, ve a <strong>Tienda Online &gt; Temas</strong>.</p>
+                                            </div>
+                                            <div className="flex gap-3">
+                                                <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">2</div>
+                                                <p className="text-sm">Haz clic en los 3 puntos (...) junto a tu tema actual y selecciona <strong>"Editar código"</strong>.</p>
+                                            </div>
+                                            <div className="flex gap-3">
+                                                <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">3</div>
+                                                <p className="text-sm">Busca el archivo <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded">theme.liquid</code>.</p>
+                                            </div>
+                                            <div className="flex gap-3">
+                                                <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">4</div>
+                                                <p className="text-sm">Pega el código antes de <code className="text-red-500">&lt;/body&gt;</code>.</p>
+                                            </div>
+                                        </div>
+                                    </TabsContent>
+
+                                    {/* Wix Instructions - Reusing Dark Block */}
+                                    <TabsContent value="wix" className="mt-0 space-y-6 animate-in fade-in zoom-in-95 duration-300">
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center">
+                                                <LayoutTemplate className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-xl font-bold">{t('installation_guide.wix_title')}</h3>
+                                                <p className="text-sm text-muted-foreground">{t('installation_guide.wix_subtitle')}</p>
+                                            </div>
+                                        </div>
+                                        <div className="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-lg my-4">
+                                            <div className="p-4 overflow-x-auto">
+                                                <pre className="text-xs font-mono text-slate-300 whitespace-pre-wrap break-all">
+                                                    {scriptCode}
+                                                </pre>
+                                            </div>
+                                            <div className="px-4 py-2 bg-slate-900 border-t border-slate-800 flex justify-end">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="h-8 text-xs text-slate-400 hover:text-white hover:bg-slate-800"
+                                                    onClick={handleCopyCode}
+                                                >
+                                                    {copiedCode ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
+                                                    {copiedCode ? "Copiado" : "Copiar código"}
+                                                </Button>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-4">
+                                            <div className="flex gap-3">
+                                                <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">1</div>
+                                                <p className="text-sm">Ve a <strong>Configuración &gt; Código personalizado</strong>.</p>
+                                            </div>
+                                            <div className="flex gap-3">
+                                                <div className="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-sm">2</div>
+                                                <p className="text-sm">Selecciona <strong>"Body - fin"</strong>.</p>
+                                            </div>
+                                        </div>
+                                    </TabsContent>
+
+                                    {/* HTML / Other Instructions - Reusing Dark Block */}
+                                    <TabsContent value="html" className="mt-0 space-y-6 animate-in fade-in zoom-in-95 duration-300">
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center">
+                                                <Code className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+                                            </div>
+                                            <div>
+                                                <h3 className="text-xl font-bold">{t('installation_guide.html_title')}</h3>
+                                                <p className="text-sm text-muted-foreground">{t('installation_guide.html_subtitle')}</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-4">
                                             <p className="text-sm">
-                                                <Trans i18nKey="installation_guide.html_tiendanube">
-                                                    Si usas <strong>TiendaNube</strong>, ve a <strong>Configuraciones &gt; Códigos Externos</strong> y pégalo en el campo "Códigos de tracking (footer)".
-                                                </Trans>
+                                                Pega el siguiente código justo antes de cerrar la etiqueta <code className="bg-slate-100 dark:bg-slate-800 px-1 rounded font-mono text-red-500">&lt;/body&gt;</code>:
                                             </p>
-                                        </div>
-                                    </div>
-                                </TabsContent>
 
-                            </div>
-                        </Tabs>
+                                            <div className="bg-slate-950 rounded-xl border border-slate-800 overflow-hidden shadow-lg">
+                                                <div className="flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800">
+                                                    <span className="text-[10px] uppercase font-mono text-slate-500">HTML</span>
+                                                </div>
+                                                <div className="p-4 overflow-x-auto">
+                                                    <pre className="text-xs font-mono text-slate-300 whitespace-pre-wrap break-all">
+                                                        {scriptCode}
+                                                    </pre>
+                                                </div>
+                                                <div className="px-4 py-2 bg-slate-900 border-t border-slate-800 flex justify-end">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="h-8 text-xs text-slate-400 hover:text-white hover:bg-slate-800"
+                                                        onClick={handleCopyCode}
+                                                    >
+                                                        {copiedCode ? <Check className="w-3 h-3 mr-1" /> : <Copy className="w-3 h-3 mr-1" />}
+                                                        {copiedCode ? "Copiado" : "Copiar código"}
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </TabsContent>
+
+                                </div>
+                            </Tabs>
+                        )}
                     </CardContent>
                 </Card>
 

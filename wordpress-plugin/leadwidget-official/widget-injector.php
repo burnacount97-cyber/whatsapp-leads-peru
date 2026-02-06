@@ -5,9 +5,8 @@
  */
 
 // Exit if accessed directly
-if (!defined('ABSPATH')) {
+if (!defined('ABSPATH'))
     exit;
-}
 
 class LeadWidget_Injector
 {
@@ -36,14 +35,33 @@ class LeadWidget_Injector
             return;
         }
 
+        // Should we load on this specific page?
+        if (!self::should_load_widget()) {
+            return;
+        }
+
         // Sanitize User ID (extra safety)
         $user_id = sanitize_text_field($user_id);
 
         // Build script URL
         $script_url = self::get_script_url($user_id);
 
-        // Output the script tag
-        echo self::render_script_tag($script_url);
+        // Enqueue the script properly
+        wp_enqueue_script('leadwidget-script', $script_url, array(), LEADWIDGET_VERSION, true);
+
+        // Add async attribute via filter
+        add_filter('script_loader_tag', array(__CLASS__, 'add_async_attribute'), 10, 2);
+    }
+
+    /**
+     * Add async attribute to script tag
+     */
+    public static function add_async_attribute($tag, $handle)
+    {
+        if ('leadwidget-script' !== $handle) {
+            return $tag;
+        }
+        return str_replace(' src', ' async src', $tag);
     }
 
     /**
@@ -54,31 +72,13 @@ class LeadWidget_Injector
      */
     private static function get_script_url($user_id)
     {
-        // Production URL (change this to your actual domain)
+        // Production URL
         $base_url = 'https://whatsapp-leads-peru.vercel.app';
 
         // Allow filtering for custom domains or staging environments
         $base_url = apply_filters('leadwidget_script_base_url', $base_url);
 
         return trailingslashit($base_url) . 'api/w/' . urlencode($user_id);
-    }
-
-    /**
-     * Render the script tag HTML
-     * 
-     * @param string $script_url URL to widget script
-     * @return string HTML script tag
-     */
-    private static function render_script_tag($script_url)
-    {
-        $output = "\n<!-- LeadWidget by LeadWidget.com -->\n";
-        $output .= sprintf(
-            '<script src="%s" async id="leadwidget-script"></script>',
-            esc_url($script_url)
-        );
-        $output .= "\n<!-- /LeadWidget -->\n";
-
-        return $output;
     }
 
     /**
@@ -92,7 +92,11 @@ class LeadWidget_Injector
         $should_load = true;
 
         // Don't load on login/register pages
-        if (is_page(array('login', 'register', 'checkout'))) {
+        if (function_exists('is_account_page') && is_account_page()) {
+            $should_load = false;
+        }
+
+        if (function_exists('is_checkout') && is_checkout()) {
             $should_load = false;
         }
 

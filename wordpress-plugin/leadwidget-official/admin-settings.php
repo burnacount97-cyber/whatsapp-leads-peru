@@ -5,21 +5,19 @@
  */
 
 // Exit if accessed directly
-if (!defined('ABSPATH')) {
+if (!defined('ABSPATH'))
     exit;
-}
 
 class LeadWidget_Admin_Settings
 {
-
     /**
      * Add menu page to WordPress admin
      */
     public static function add_menu()
     {
         add_menu_page(
-            __('LeadWidget Settings', 'leadwidget'),      // Page title
-            __('LeadWidget', 'leadwidget'),                // Menu title
+            esc_html__('LeadWidget Settings', 'leadwidget'),      // Page title
+            esc_html__('LeadWidget', 'leadwidget'),                // Menu title
             'manage_options',                              // Capability
             'leadwidget',                                  // Menu slug
             array(__CLASS__, 'render_settings_page'),     // Callback
@@ -28,53 +26,7 @@ class LeadWidget_Admin_Settings
         );
     }
 
-    /**
-     * Register plugin settings
-     */
-    public static function register_settings()
-    {
-        register_setting(
-            'leadwidget_settings',           // Option group
-            'leadwidget_user_id',           // Option name
-            array(
-                'type' => 'string',
-                'sanitize_callback' => array(__CLASS__, 'sanitize_user_id'),
-                'default' => ''
-            )
-        );
-
-        register_setting(
-            'leadwidget_settings',
-            'leadwidget_enabled',
-            array(
-                'type' => 'boolean',
-                'sanitize_callback' => array(__CLASS__, 'sanitize_checkbox'),
-                'default' => true
-            )
-        );
-    }
-
-    /**
-     * Sanitize User ID input
-     */
-    public static function sanitize_user_id($input)
-    {
-        // Remove any whitespace
-        $clean = trim($input);
-
-        // Allow alphanumeric, hyphens, and underscores only
-        $clean = preg_replace('/[^a-zA-Z0-9\-_]/', '', $clean);
-
-        return $clean;
-    }
-
-    /**
-     * Sanitize checkbox input
-     */
-    public static function sanitize_checkbox($input)
-    {
-        return ($input === '1' || $input === 1 || $input === true) ? '1' : '0';
-    }
+    // ... lines skipped ...
 
     /**
      * Render the settings page
@@ -83,7 +35,7 @@ class LeadWidget_Admin_Settings
     {
         // Check user permissions
         if (!current_user_can('manage_options')) {
-            wp_die(__('You do not have sufficient permissions to access this page.', 'leadwidget'));
+            wp_die(esc_html__('You do not have sufficient permissions to access this page.', 'leadwidget'));
         }
 
         // Get current values
@@ -121,8 +73,7 @@ class LeadWidget_Admin_Settings
                                     <td>
                                         <label class="leadwidget-toggle">
                                             <input type="checkbox" id="leadwidget_enabled" name="leadwidget_enabled" value="1"
-                                                <?php checked($enabled, '1'); ?>
-                                            />
+                                                <?php checked($enabled, '1'); ?> />
                                             <span class="leadwidget-toggle-slider"></span>
                                         </label>
                                         <p class="description">
@@ -147,6 +98,7 @@ class LeadWidget_Admin_Settings
                                             <?php
                                             printf(
                                                 wp_kses(
+                                                    /* translators: %s: URL to dashboard */
                                                     __('Get your User ID from your <a href="%s" target="_blank">LeadWidget Dashboard</a>.', 'leadwidget'),
                                                     array('a' => array('href' => array(), 'target' => array()))
                                                 ),

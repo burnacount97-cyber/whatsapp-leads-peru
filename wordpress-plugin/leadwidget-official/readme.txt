@@ -1,8 +1,8 @@
-=== LeadWidget - AI Chat & WhatsApp Lead Capture ===
+=== LeadWidget ===
 Contributors: leadwidget
-Tags: chat, whatsapp, chatbot, ai, leads, conversion, sales, live chat, customer support
+Tags: chat, whatsapp, leads, conversion, artificial intelligence
 Requires at least: 5.0
-Tested up to: 6.4
+Tested up to: 6.9
 Stable tag: 1.0.0
 Requires PHP: 7.0
 License: GPLv2 or later
