@@ -34,7 +34,7 @@ import {
   ExternalLink, Settings, History, Lock, AlertCircle, LogOut, Loader2, Sparkles,
   Layout, Palette, Code, BarChart as BarChartIcon, BarChart3, Users, CreditCard,
   Eye, Target, Upload, Clock, Bot, Key, Shield, X, Smartphone, EyeOff, MoreHorizontal, Globe,
-  ShoppingBag, HeartPulse, Wrench, Home, Utensils, Banknote, Calculator, HandCoins, BookOpen
+  ShoppingBag, HeartPulse, Wrench, Home, Utensils, Banknote, Calculator, HandCoins, BookOpen, Rocket
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -1597,20 +1597,20 @@ export default function Dashboard() {
                 <Card className="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 border-indigo-100 dark:border-slate-700">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Code className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                      {t('dashboard.widget_config.install_code')}
+                      <Rocket className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                      Activa tu Widget
                     </CardTitle>
-                    <CardDescription>{t('dashboard.widget_config.install_code_desc')}</CardDescription>
+                    <CardDescription>Conéctalo a tu web para empezar a recibir clientes.</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <Button asChild className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 dark:shadow-none transition-all py-6 rounded-xl group" size="lg">
                       <Link to="/installation-guide">
                         <BookOpen className="w-5 h-5 mr-3 group-hover:scale-110 transition-transform" />
-                        <span className="font-semibold text-base">Guía de instalación: Pulsa aquí</span>
+                        <span className="font-semibold text-base">Ver Guía de Instalación</span>
                       </Link>
                     </Button>
                     <p className="text-xs text-center text-muted-foreground">
-                      Compatible con WordPress, Shopify, Wix y HTML/PHP.
+                      Compatible con WordPress, Shopify, Wix y más.
                     </p>
                   </CardContent>
                 </Card>
