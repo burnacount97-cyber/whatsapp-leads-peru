@@ -4,7 +4,10 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signOut as firebaseSignOut
+  signOut as firebaseSignOut,
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+  signInWithPopup
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
@@ -16,6 +19,8 @@ interface AuthContextType {
   isSuperAdmin: boolean;
   signUp: (email: string, password: string, businessName?: string) => Promise<{ error: Error | null; data?: User }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
+  signInWithGoogle: () => Promise<{ error: Error | null }>;
+  signInWithFacebook: () => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -116,13 +121,107 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const signInWithGoogle = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({
+        prompt: 'select_account'
+      });
+
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Check if user profile exists, if not create it
+      const profileDoc = await getDoc(doc(db, "profiles", user.uid));
+      if (!profileDoc.exists()) {
+        const referredBy = localStorage.getItem('leadwidget_ref') || null;
+        if (referredBy) {
+          console.log('New user referred by:', referredBy);
+          localStorage.removeItem('leadwidget_ref');
+        }
+
+        await setDoc(doc(db, "profiles", user.uid), {
+          email: user.email,
+          business_name: user.displayName || '',
+          created_at: new Date().toISOString(),
+          subscription_status: 'trial',
+          ai_enabled: false,
+          ai_model: 'gpt-4o-mini',
+          referred_by: referredBy,
+        });
+
+        toast({
+          title: "¡Bienvenido!",
+          description: "Tu cuenta ha sido creada exitosamente con Google.",
+        });
+      }
+
+      return { error: null };
+    } catch (error: any) {
+      console.error("Google Sign In Error:", error);
+      let message = "Error al iniciar sesión con Google";
+      if (error.code === 'auth/popup-closed-by-user') message = "Ventana de inicio de sesión cerrada";
+      if (error.code === 'auth/popup-blocked') message = "Popup bloqueado. Por favor, permite popups para este sitio";
+      if (error.code === 'auth/cancelled-popup-request') message = "Solicitud cancelada";
+
+      return { error: { ...error, message } };
+    }
+  };
+
+  const signInWithFacebook = async () => {
+    try {
+      const provider = new FacebookAuthProvider();
+
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Check if user profile exists, if not create it
+      const profileDoc = await getDoc(doc(db, "profiles", user.uid));
+      if (!profileDoc.exists()) {
+        const referredBy = localStorage.getItem('leadwidget_ref') || null;
+        if (referredBy) {
+          console.log('New user referred by:', referredBy);
+          localStorage.removeItem('leadwidget_ref');
+        }
+
+        await setDoc(doc(db, "profiles", user.uid), {
+          email: user.email,
+          business_name: user.displayName || '',
+          created_at: new Date().toISOString(),
+          subscription_status: 'trial',
+          ai_enabled: false,
+          ai_model: 'gpt-4o-mini',
+          referred_by: referredBy,
+        });
+
+        toast({
+          title: "¡Bienvenido!",
+          description: "Tu cuenta ha sido creada exitosamente con Facebook.",
+        });
+      }
+
+      return { error: null };
+    } catch (error: any) {
+      console.error("Facebook Sign In Error:", error);
+      let message = "Error al iniciar sesión con Facebook";
+      if (error.code === 'auth/popup-closed-by-user') message = "Ventana de inicio de sesión cerrada";
+      if (error.code === 'auth/popup-blocked') message = "Popup bloqueado. Por favor, permite popups para este sitio";
+      if (error.code === 'auth/cancelled-popup-request') message = "Solicitud cancelada";
+      if (error.code === 'auth/account-exists-with-different-credential') {
+        message = "Ya existe una cuenta con este correo usando otro método de inicio de sesión";
+      }
+
+      return { error: { ...error, message } };
+    }
+  };
+
   const signOut = async () => {
     await firebaseSignOut(auth);
     setIsSuperAdmin(false);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, isSuperAdmin, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, loading, isSuperAdmin, signUp, signIn, signInWithGoogle, signInWithFacebook, signOut }}>
       {children}
     </AuthContext.Provider>
   );

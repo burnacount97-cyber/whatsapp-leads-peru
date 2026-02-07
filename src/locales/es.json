@@ -226,8 +226,12 @@
                 "password": "••••••••"
             },
             "submit_btn": "Iniciar Sesión",
+            "social_google": "Continuar con Google",
+            "social_facebook": "Continuar con Facebook",
+            "divider": "O continúa con",
             "no_account": "¿No tienes cuenta?",
             "register_link": "Regístrate gratis",
+            "error_title": "Error",
             "right_panel": {
                 "title": "Captura leads 24/7",
                 "desc": "Tu widget trabaja mientras duermes. Cada visita es una oportunidad de negocio que no puedes perder."
